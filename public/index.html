@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX — AI Motorsport Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=4" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="mark">APEX</div>
+      <div class="brand-sub">
+        <span class="serif">AI Motorsport Intelligence</span>
+        <span class="dot">·</span>
+        <span>real-time decision + CBF-QP safety filter</span>
+      </div>
+    </div>
+    <div class="top-meta">
+      <button id="btn-tour" class="ghost tour-launch" type="button">How this works</button>
+      <span class="chip">PROTOTYPE</span>
+      <span id="clock" class="mono">L1 · 00.0s</span>
+    </div>
+  </header>
+
+  <p class="disclaimer">
+    A simplified live demo: a pretend race car, a yes/no overtake score, and a safety lock on the battery.
+    The full four-layer architecture from the write-up is not all built here.
+  </p>
+
+  <main class="grid">
+    <section class="panel rot-panel" id="tour-rot">
+      <h2>Overtake Risk-Reward</h2>
+      <div class="rot-readout">
+        <svg class="gauge" viewBox="0 0 240 140" aria-hidden="true">
+          <path class="arc-bg" d="M20 120 A100 100 0 0 1 220 120" />
+          <path id="arc-fill" class="arc-fill" pathLength="314" d="M20 120 A100 100 0 0 1 220 120" />
+          <line id="needle" class="needle" x1="120" y1="120" x2="40" y2="120" />
+          <circle cx="120" cy="120" r="5" class="hub" />
+        </svg>
+        <div class="rot-num">
+          <div id="rot-value" class="mono huge">—</div>
+          <div id="mode-pill" class="mode harvest">HARVEST &amp; COOL</div>
+        </div>
+      </div>
+      <p class="mode-hint serif" id="mode-hint">Under 1: save battery. 1 to 1.5: hold pace. Over 1.5: overtake.</p>
+      <div class="factors" id="factors"></div>
+    </section>
+
+    <section class="panel chart-panel" id="tour-chart">
+      <div class="chart-head">
+        <h2>Stint evolution</h2>
+        <span class="muted">Battery, heat, and the overtake score over time</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart" width="640" height="220"></canvas>
+      </div>
+    </section>
+
+    <section class="panel power-panel" id="tour-power">
+      <h2>Safety filter</h2>
+      <div class="pwr-row">
+        <div>
+          <span class="lbl">Requested</span>
+          <span id="p-req" class="mono val">— kW</span>
+        </div>
+        <div>
+          <span class="lbl">Allowed</span>
+          <span id="p-safe" class="mono val red">— kW</span>
+        </div>
+      </div>
+      <div class="bars">
+        <div class="bar-track"><div id="bar-req" class="bar req"></div></div>
+        <div class="bar-track"><div id="bar-safe" class="bar safe"></div></div>
+      </div>
+      <div class="filter-meta">
+        <span id="clip-badge" class="badge">—</span>
+        <span id="solver" class="mono muted">KKT · — ms</span>
+      </div>
+      <div class="limits">
+        <div><span class="lbl">SOC</span><span id="soc" class="mono">—</span></div>
+        <div><span class="lbl">T<sub>core</sub></span><span id="tcore" class="mono">—</span></div>
+        <div><span class="lbl">T<sub>surf</sub></span><span id="tsurf" class="mono">—</span></div>
+        <div><span class="lbl">Lap quota</span><span id="quota" class="mono">—</span></div>
+        <div><span class="lbl">Gap</span><span id="gap" class="mono">—</span></div>
+        <div><span class="lbl">Tires</span><span id="tires" class="mono">—</span></div>
+      </div>
+    </section>
+
+    <section class="panel control-panel">
+      <h2>Run the stint</h2>
+      <div class="btns">
+        <button id="btn-play" class="primary">Play</button>
+        <button id="btn-step">Step 1s</button>
+        <button id="btn-lap">Step lap</button>
+        <button id="btn-reset" class="ghost">Reset</button>
+      </div>
+      <label class="slider">
+        <span>Playback <span id="speed-lbl" class="mono">10×</span></span>
+        <input id="speed" type="range" min="2" max="30" value="10" />
+      </label>
+      <label class="slider">
+        <span>Opponent aggression <span id="agg-lbl" class="mono">0.40</span></span>
+        <input id="agg" type="range" min="0" max="100" value="40" />
+      </label>
+      <label class="slider" id="tour-push">
+        <span>Driver push <span id="push-lbl" class="mono">0.45</span></span>
+        <input id="push" type="range" min="0" max="100" value="45" />
+      </label>
+      <p class="fine serif">
+        The sliders are you and the other driver. Battery % and temperature are simulated — you cannot type those in.
+      </p>
+    </section>
+
+    <section class="panel inspect-panel">
+      <h2>QP inspector</h2>
+      <p class="muted" id="strategy-note"></p>
+      <pre id="qp-box" class="mono inspect"></pre>
+    </section>
+  </main>
+  <div id="tour" class="tour hidden" aria-live="polite">
+    <div id="tour-spot" class="tour-spot" hidden></div>
+    <div id="tour-card" class="tour-card" role="dialog" aria-labelledby="tour-title">
+      <div id="tour-step" class="tour-kicker">1 / 8</div>
+      <h3 id="tour-title">Welcome</h3>
+      <p id="tour-body"></p>
+      <div class="tour-actions">
+        <button id="tour-skip" class="ghost" type="button">Skip</button>
+        <button id="tour-next" class="primary" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+  <script src="/static/app.js?v=4"></script>
+</body>
+</html>

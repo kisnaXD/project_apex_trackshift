@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from uuid import uuid4
 
@@ -94,12 +95,13 @@ def set_inputs(sid: str, body: InputBody) -> dict:
     return snap
 
 
-@app.get("/")
-def index() -> FileResponse:
-    return FileResponse(ROOT / "static" / "index.html")
+# On Vercel, public/ is served from the CDN so a function crash cannot take down "/".
+# Local uvicorn still needs these routes.
+if not os.environ.get("VERCEL"):
+    @app.get("/")
+    def index() -> FileResponse:
+        return FileResponse(ROOT / "static" / "index.html")
 
+    app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
 
-app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
-
-# Vercel Python looks for this name on some runtimes.
 handler = app

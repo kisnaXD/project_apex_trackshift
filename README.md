@@ -32,7 +32,7 @@ Push the driver slider while the pack is hot: requested power rises, the QP clip
 
 This repo includes `vercel.json` so Vercel runs the FastAPI app in `app.py` (not a static export). Connect the GitHub repo as a Vercel project; the FastAPI preset and Python 3.12 are set in-repo.
 
-Root directory: repo root. Python `3.12`. After deploy, the live site should serve `/` and `/api/health`.
+Root directory: repo root. Python `3.12`. After deploy, `/` is the dashboard and `/api/health` should return JSON.
 
 ### Render / Railway / Fly
 

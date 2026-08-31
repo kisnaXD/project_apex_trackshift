@@ -3,8 +3,7 @@
   "framework": "fastapi",
   "functions": {
     "app.py": {
-      "maxDuration": 60,
-      "includeFiles": "{static,apex}/**"
+      "maxDuration": 60
     }
   }
 }

@@ -3,6 +3,13 @@ from fastapi.testclient import TestClient
 from app import app
 
 
+def test_health_ok():
+    client = TestClient(app)
+    res = client.get("/api/health")
+    assert res.status_code == 200
+    assert res.json()["ok"] is True
+
+
 def test_index_page_is_served():
     client = TestClient(app)
     page = client.get("/")
