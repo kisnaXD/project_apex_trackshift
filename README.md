@@ -28,10 +28,14 @@ Push the driver slider while the pack is hot: requested power rises, the QP clip
 
 ## Deploy (public URL)
 
-The app is a single FastAPI process. On [Render](https://render.com) (or Railway / Fly):
+### Vercel
+
+This repo includes `vercel.json` so Vercel runs the FastAPI app (not a static export). Connect [kisnaXD/project_apex_trackshift](https://github.com/kisnaXD/project_apex_trackshift) as a Vercel project with the **FastAPI** preset, or let `vercel.json` set it.
+
+Root directory: repo root. Python `3.12`. After deploy, the live site should serve `/` and `/api/health`.
+
+### Render / Railway / Fly
 
 1. Push this folder to a GitHub repo.
 2. New Web Service → Docker, or native Python with `uvicorn app:app --host 0.0.0.0 --port $PORT`.
 3. Health check: `/api/health`.
-
-No cloud credentials were available in this workspace, so a live public URL was not created here. Local demo: http://127.0.0.1:8000
