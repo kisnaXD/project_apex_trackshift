@@ -7,7 +7,7 @@ This is **not** a claim that the full four-tier architecture is implemented. The
 ## Run locally
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install -r requirements.txt -r requirements-dev.txt
 python -m uvicorn app:app --reload --port 8000
 ```
 
@@ -21,7 +21,7 @@ python -m pytest -q
 
 - Two-state thermal pack: `C_c Ṫ_c = I²R − (T_c−T_s)/R_cs`, `C_s Ṫ_s = (T_c−T_s)/R_cs − (T_s−T_amb)/R_sa`
 - SOC and lap energy from integrated terminal power
-- CBF-QP solved by **OSQP** every step: `min ½(P−P_req)²` subject to linearized thermal and energy barrier inequalities
+- CBF-QP solved by **analytical KKT** every step (exact for this 1-variable power QP): `min ½(P−P_req)²` subject to linearized thermal, energy, and SOC barrier inequalities
 - `R_OT` from five live-state factors (clean-air gain, energy, thermal, tire, collision)
 
 Push the driver slider while the pack is hot: requested power rises, the QP clips, `T_core` stays under 60 °C.

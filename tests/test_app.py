@@ -10,7 +10,7 @@ def test_index_page_is_served():
     assert "APEX" in page.text
 
 
-def test_session_step_runs_real_osqp_solve():
+def test_session_step_runs_real_qp_solve():
     client = TestClient(app)
     created = client.post("/api/session")
     assert created.status_code == 200

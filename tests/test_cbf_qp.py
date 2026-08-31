@@ -51,7 +51,7 @@ def test_extreme_request_near_energy_quota_is_clipped_by_solver():
     assert "energy" in result.active_constraints
 
 
-def test_osqp_matches_analytical_kkt_on_thermal_clip():
+def test_kkt_matches_filter_on_thermal_clip():
     params = PackParams()
     hot = _state(t_core_c=params.t_core_limit_c - 0.8)
     result = filter_power(hot, p_req=340_000.0, params=params)

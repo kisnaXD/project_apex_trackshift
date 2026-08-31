@@ -86,7 +86,7 @@ function render(snap) {
     badge.textContent = "PASSED";
     badge.className = "badge pass";
   }
-  $("solver").textContent = `OSQP ${cbf.solver_status} · ${fmt(cbf.solve_time_ms, 2)} ms`;
+  $("solver").textContent = `KKT ${cbf.solver_status} · ${fmt(cbf.solve_time_ms, 2)} ms`;
 
   $("soc").textContent = pct(st.soc);
   $("tcore").textContent = `${fmt(st.t_core_c, 2)} °C`;
