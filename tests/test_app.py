@@ -3,6 +3,13 @@ from fastapi.testclient import TestClient
 from app import app
 
 
+def test_index_page_is_served():
+    client = TestClient(app)
+    page = client.get("/")
+    assert page.status_code == 200
+    assert "APEX" in page.text
+
+
 def test_session_step_runs_real_osqp_solve():
     client = TestClient(app)
     created = client.post("/api/session")

@@ -30,7 +30,7 @@ Push the driver slider while the pack is hot: requested power rises, the QP clip
 
 ### Vercel
 
-This repo includes `vercel.json` so Vercel runs the FastAPI app (not a static export). Connect [kisnaXD/project_apex_trackshift](https://github.com/kisnaXD/project_apex_trackshift) as a Vercel project with the **FastAPI** preset, or let `vercel.json` set it.
+This repo includes `vercel.json` so Vercel runs the FastAPI app in `app.py` (not a static export). Connect the GitHub repo as a Vercel project; the FastAPI preset and Python 3.12 are set in-repo.
 
 Root directory: repo root. Python `3.12`. After deploy, the live site should serve `/` and `/api/health`.
 

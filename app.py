@@ -100,3 +100,6 @@ def index() -> FileResponse:
 
 
 app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
+
+# Vercel Python looks for this name on some runtimes.
+handler = app
