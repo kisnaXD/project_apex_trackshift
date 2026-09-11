@@ -1,0 +1,368 @@
+[0.884s] Invoking command in '/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/src/eufs_racecar': PYTHONPATH=/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/eufs_racecar build --build-base /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build install --record /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/install.log --single-version-externally-managed install_data
+[1.266s] running egg_info
+[1.266s] creating ../../build/eufs_racecar/eufs_racecar.egg-info
+[1.267s] writing ../../build/eufs_racecar/eufs_racecar.egg-info/PKG-INFO
+[1.267s] writing dependency_links to ../../build/eufs_racecar/eufs_racecar.egg-info/dependency_links.txt
+[1.268s] writing requirements to ../../build/eufs_racecar/eufs_racecar.egg-info/requires.txt
+[1.268s] writing top-level names to ../../build/eufs_racecar/eufs_racecar.egg-info/top_level.txt
+[1.268s] writing manifest file '../../build/eufs_racecar/eufs_racecar.egg-info/SOURCES.txt'
+[1.274s] reading manifest file '../../build/eufs_racecar/eufs_racecar.egg-info/SOURCES.txt'
+[1.275s] writing manifest file '../../build/eufs_racecar/eufs_racecar.egg-info/SOURCES.txt'
+[1.276s] running build
+[1.276s] running build_py
+[1.276s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build
+[1.276s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build/lib
+[1.276s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build/lib/eufs_racecar
+[1.276s] copying eufs_racecar/__init__.py -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build/lib/eufs_racecar
+[1.276s] running install
+[1.276s] running install_lib
+[1.277s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/lib/python3.10/site-packages/eufs_racecar
+[1.277s] copying /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build/lib/eufs_racecar/__init__.py -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/lib/python3.10/site-packages/eufs_racecar
+[1.278s] byte-compiling /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/lib/python3.10/site-packages/eufs_racecar/__init__.py to __init__.cpython-310.pyc
+[1.279s] running install_data
+[1.280s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/ament_index
+[1.280s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/ament_index/resource_index
+[1.280s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/ament_index/resource_index/packages
+[1.281s] copying resource/eufs_racecar -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/ament_index/resource_index/packages
+[1.281s] copying package.xml -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar
+[1.281s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/launch
+[1.281s] copying launch/load_car.launch.py -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/launch
+[1.281s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/config
+[1.282s] copying config/forgez_battery.yaml -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/config
+[1.282s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/robots
+[1.282s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/robots/eufs
+[1.282s] copying robots/eufs/robot.urdf.xacro -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/robots/eufs
+[1.283s] copying robots/eufs/configDry.yaml -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/robots/eufs
+[1.283s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/urdf
+[1.283s] copying eufs_racecar/urdf/macros.xacro -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/urdf
+[1.283s] copying eufs_racecar/urdf/racecar.xacro -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/urdf
+[1.283s] copying eufs_racecar/urdf/forgez_battery.gazebo -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/urdf
+[1.283s] copying eufs_racecar/urdf/materials.xacro -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/urdf
+[1.284s] copying eufs_racecar/urdf/racecar.gazebo -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/urdf
+[1.284s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar
+[1.284s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.284s] copying eufs_racecar/meshes/chassis.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.285s] copying eufs_racecar/meshes/left_steering_hinge.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.285s] copying eufs_racecar/meshes/right_rear_wheel.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.285s] copying eufs_racecar/meshes/left_steering_hinge.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.285s] copying eufs_racecar/meshes/cone.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.285s] copying eufs_racecar/meshes/left_rear_wheel.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.285s] copying eufs_racecar/meshes/hokuyo.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.286s] copying eufs_racecar/meshes/parking_1.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.286s] copying eufs_racecar/meshes/left_front_wheel.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.286s] copying eufs_racecar/meshes/walker_racecourse.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.286s] copying eufs_racecar/meshes/right_front_wheel.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.286s] copying eufs_racecar/meshes/right_steering_hinge.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.287s] copying eufs_racecar/meshes/left_rear_wheel.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.287s] copying eufs_racecar/meshes/right_rear_wheel.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.287s] copying eufs_racecar/meshes/right_front_wheel.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.288s] copying eufs_racecar/meshes/right_steering_hinge.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.288s] copying eufs_racecar/meshes/left_front_wheel.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.288s] copying eufs_racecar/meshes/chassis.STL -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/meshes
+[1.289s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models
+[1.289s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/MIT_Tunnel
+[1.289s] copying eufs_racecar/models/MIT_Tunnel/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/MIT_Tunnel
+[1.290s] copying eufs_racecar/models/MIT_Tunnel/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/MIT_Tunnel
+[1.290s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/parking_1
+[1.290s] copying eufs_racecar/models/parking_1/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/parking_1
+[1.291s] copying eufs_racecar/models/parking_1/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/parking_1
+[1.291s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags
+[1.291s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16
+[1.291s] copying eufs_racecar/models/ar_tags/marker16/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16
+[1.291s] copying eufs_racecar/models/ar_tags/marker16/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16
+[1.292s] copying eufs_racecar/models/ar_tags/marker16/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16
+[1.292s] copying eufs_racecar/models/ar_tags/marker16/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16
+[1.292s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/meshes
+[1.292s] copying eufs_racecar/models/ar_tags/marker16/meshes/Marker16.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/meshes
+[1.292s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/materials
+[1.292s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/materials/textures
+[1.292s] copying eufs_racecar/models/ar_tags/marker16/materials/textures/Marker16.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/materials/textures
+[1.292s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/marker0
+[1.292s] copying eufs_racecar/models/ar_tags/marker16/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/marker0
+[1.292s] copying eufs_racecar/models/ar_tags/marker16/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/marker0
+[1.293s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/marker0/marker0
+[1.293s] copying eufs_racecar/models/ar_tags/marker16/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/marker0/marker0
+[1.294s] copying eufs_racecar/models/ar_tags/marker16/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker16/marker0/marker0
+[1.294s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6
+[1.294s] copying eufs_racecar/models/ar_tags/marker6/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6
+[1.294s] copying eufs_racecar/models/ar_tags/marker6/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6
+[1.294s] copying eufs_racecar/models/ar_tags/marker6/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6
+[1.294s] copying eufs_racecar/models/ar_tags/marker6/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6
+[1.294s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/meshes
+[1.294s] copying eufs_racecar/models/ar_tags/marker6/meshes/Marker6.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/meshes
+[1.294s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/materials
+[1.295s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/materials/textures
+[1.295s] copying eufs_racecar/models/ar_tags/marker6/materials/textures/Marker6.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/materials/textures
+[1.295s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/marker0
+[1.295s] copying eufs_racecar/models/ar_tags/marker6/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/marker0
+[1.295s] copying eufs_racecar/models/ar_tags/marker6/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/marker0
+[1.295s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/marker0/marker0
+[1.295s] copying eufs_racecar/models/ar_tags/marker6/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/marker0/marker0
+[1.295s] copying eufs_racecar/models/ar_tags/marker6/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker6/marker0/marker0
+[1.295s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1
+[1.295s] copying eufs_racecar/models/ar_tags/marker1/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1
+[1.296s] copying eufs_racecar/models/ar_tags/marker1/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1
+[1.296s] copying eufs_racecar/models/ar_tags/marker1/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1
+[1.296s] copying eufs_racecar/models/ar_tags/marker1/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1
+[1.296s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/meshes
+[1.296s] copying eufs_racecar/models/ar_tags/marker1/meshes/Marker1.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/meshes
+[1.296s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/materials
+[1.296s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/materials/textures
+[1.297s] copying eufs_racecar/models/ar_tags/marker1/materials/textures/Marker1.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/materials/textures
+[1.297s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/marker0
+[1.297s] copying eufs_racecar/models/ar_tags/marker1/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/marker0
+[1.297s] copying eufs_racecar/models/ar_tags/marker1/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/marker0
+[1.297s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/marker0/marker0
+[1.297s] copying eufs_racecar/models/ar_tags/marker1/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/marker0/marker0
+[1.297s] copying eufs_racecar/models/ar_tags/marker1/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker1/marker0/marker0
+[1.297s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12
+[1.298s] copying eufs_racecar/models/ar_tags/marker12/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12
+[1.299s] copying eufs_racecar/models/ar_tags/marker12/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12
+[1.299s] copying eufs_racecar/models/ar_tags/marker12/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12
+[1.299s] copying eufs_racecar/models/ar_tags/marker12/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12
+[1.300s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/meshes
+[1.300s] copying eufs_racecar/models/ar_tags/marker12/meshes/Marker12.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/meshes
+[1.300s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/materials
+[1.300s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/materials/textures
+[1.300s] copying eufs_racecar/models/ar_tags/marker12/materials/textures/Marker12.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/materials/textures
+[1.301s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/marker0
+[1.301s] copying eufs_racecar/models/ar_tags/marker12/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/marker0
+[1.302s] copying eufs_racecar/models/ar_tags/marker12/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/marker0
+[1.302s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/marker0/marker0
+[1.302s] copying eufs_racecar/models/ar_tags/marker12/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/marker0/marker0
+[1.302s] copying eufs_racecar/models/ar_tags/marker12/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker12/marker0/marker0
+[1.303s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9
+[1.303s] copying eufs_racecar/models/ar_tags/marker9/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9
+[1.303s] copying eufs_racecar/models/ar_tags/marker9/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9
+[1.303s] copying eufs_racecar/models/ar_tags/marker9/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9
+[1.303s] copying eufs_racecar/models/ar_tags/marker9/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9
+[1.304s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/meshes
+[1.304s] copying eufs_racecar/models/ar_tags/marker9/meshes/Marker9.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/meshes
+[1.304s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/materials
+[1.304s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/materials/textures
+[1.304s] copying eufs_racecar/models/ar_tags/marker9/materials/textures/Marker9.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/materials/textures
+[1.305s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/marker0
+[1.305s] copying eufs_racecar/models/ar_tags/marker9/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/marker0
+[1.305s] copying eufs_racecar/models/ar_tags/marker9/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/marker0
+[1.305s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/marker0/marker0
+[1.305s] copying eufs_racecar/models/ar_tags/marker9/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/marker0/marker0
+[1.306s] copying eufs_racecar/models/ar_tags/marker9/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker9/marker0/marker0
+[1.306s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10
+[1.306s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/meshes
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/meshes/Marker10.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/meshes
+[1.306s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/materials
+[1.306s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/materials/textures
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/materials/textures/Marker10.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/materials/textures
+[1.306s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/marker0
+[1.306s] copying eufs_racecar/models/ar_tags/marker10/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/marker0
+[1.307s] copying eufs_racecar/models/ar_tags/marker10/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/marker0
+[1.307s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/marker0/marker0
+[1.307s] copying eufs_racecar/models/ar_tags/marker10/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/marker0/marker0
+[1.307s] copying eufs_racecar/models/ar_tags/marker10/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker10/marker0/marker0
+[1.307s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5
+[1.307s] copying eufs_racecar/models/ar_tags/marker5/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5
+[1.307s] copying eufs_racecar/models/ar_tags/marker5/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5
+[1.307s] copying eufs_racecar/models/ar_tags/marker5/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5
+[1.308s] copying eufs_racecar/models/ar_tags/marker5/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5
+[1.308s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/meshes
+[1.308s] copying eufs_racecar/models/ar_tags/marker5/meshes/Marker5.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/meshes
+[1.308s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/materials
+[1.308s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/materials/textures
+[1.308s] copying eufs_racecar/models/ar_tags/marker5/materials/textures/Marker5.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/materials/textures
+[1.308s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/marker0
+[1.308s] copying eufs_racecar/models/ar_tags/marker5/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/marker0
+[1.308s] copying eufs_racecar/models/ar_tags/marker5/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/marker0
+[1.308s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/marker0/marker0
+[1.309s] copying eufs_racecar/models/ar_tags/marker5/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/marker0/marker0
+[1.309s] copying eufs_racecar/models/ar_tags/marker5/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker5/marker0/marker0
+[1.309s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7
+[1.309s] copying eufs_racecar/models/ar_tags/marker7/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7
+[1.309s] copying eufs_racecar/models/ar_tags/marker7/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7
+[1.309s] copying eufs_racecar/models/ar_tags/marker7/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7
+[1.309s] copying eufs_racecar/models/ar_tags/marker7/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7
+[1.310s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/meshes
+[1.310s] copying eufs_racecar/models/ar_tags/marker7/meshes/Marker7.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/meshes
+[1.310s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/materials
+[1.310s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/materials/textures
+[1.310s] copying eufs_racecar/models/ar_tags/marker7/materials/textures/Marker7.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/materials/textures
+[1.310s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/marker0
+[1.310s] copying eufs_racecar/models/ar_tags/marker7/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/marker0
+[1.310s] copying eufs_racecar/models/ar_tags/marker7/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/marker0
+[1.310s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/marker0/marker0
+[1.310s] copying eufs_racecar/models/ar_tags/marker7/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/marker0/marker0
+[1.310s] copying eufs_racecar/models/ar_tags/marker7/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker7/marker0/marker0
+[1.310s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2
+[1.311s] copying eufs_racecar/models/ar_tags/marker2/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2
+[1.311s] copying eufs_racecar/models/ar_tags/marker2/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2
+[1.311s] copying eufs_racecar/models/ar_tags/marker2/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2
+[1.311s] copying eufs_racecar/models/ar_tags/marker2/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2
+[1.311s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/meshes
+[1.311s] copying eufs_racecar/models/ar_tags/marker2/meshes/Marker2.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/meshes
+[1.311s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/materials
+[1.312s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/materials/textures
+[1.312s] copying eufs_racecar/models/ar_tags/marker2/materials/textures/Marker2.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/materials/textures
+[1.312s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/marker0
+[1.312s] copying eufs_racecar/models/ar_tags/marker2/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/marker0
+[1.312s] copying eufs_racecar/models/ar_tags/marker2/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/marker0
+[1.312s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/marker0/marker0
+[1.312s] copying eufs_racecar/models/ar_tags/marker2/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/marker0/marker0
+[1.312s] copying eufs_racecar/models/ar_tags/marker2/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker2/marker0/marker0
+[1.312s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8
+[1.313s] copying eufs_racecar/models/ar_tags/marker8/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8
+[1.313s] copying eufs_racecar/models/ar_tags/marker8/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8
+[1.314s] copying eufs_racecar/models/ar_tags/marker8/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8
+[1.314s] copying eufs_racecar/models/ar_tags/marker8/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8
+[1.314s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/meshes
+[1.314s] copying eufs_racecar/models/ar_tags/marker8/meshes/Marker8.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/meshes
+[1.314s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/materials
+[1.314s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/materials/textures
+[1.315s] copying eufs_racecar/models/ar_tags/marker8/materials/textures/Marker8.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/materials/textures
+[1.315s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/marker0
+[1.315s] copying eufs_racecar/models/ar_tags/marker8/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/marker0
+[1.315s] copying eufs_racecar/models/ar_tags/marker8/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/marker0
+[1.315s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/marker0/marker0
+[1.315s] copying eufs_racecar/models/ar_tags/marker8/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/marker0/marker0
+[1.315s] copying eufs_racecar/models/ar_tags/marker8/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker8/marker0/marker0
+[1.315s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14
+[1.316s] copying eufs_racecar/models/ar_tags/marker14/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14
+[1.316s] copying eufs_racecar/models/ar_tags/marker14/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14
+[1.316s] copying eufs_racecar/models/ar_tags/marker14/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14
+[1.316s] copying eufs_racecar/models/ar_tags/marker14/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14
+[1.316s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/meshes
+[1.316s] copying eufs_racecar/models/ar_tags/marker14/meshes/Marker14.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/meshes
+[1.316s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/materials
+[1.316s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/materials/textures
+[1.317s] copying eufs_racecar/models/ar_tags/marker14/materials/textures/Marker14.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/materials/textures
+[1.317s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/marker0
+[1.317s] copying eufs_racecar/models/ar_tags/marker14/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/marker0
+[1.317s] copying eufs_racecar/models/ar_tags/marker14/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/marker0
+[1.317s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/marker0/marker0
+[1.317s] copying eufs_racecar/models/ar_tags/marker14/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/marker0/marker0
+[1.317s] copying eufs_racecar/models/ar_tags/marker14/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker14/marker0/marker0
+[1.318s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13
+[1.318s] copying eufs_racecar/models/ar_tags/marker13/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13
+[1.318s] copying eufs_racecar/models/ar_tags/marker13/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13
+[1.318s] copying eufs_racecar/models/ar_tags/marker13/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13
+[1.318s] copying eufs_racecar/models/ar_tags/marker13/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13
+[1.318s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/meshes
+[1.319s] copying eufs_racecar/models/ar_tags/marker13/meshes/Marker13.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/meshes
+[1.319s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/materials
+[1.319s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/materials/textures
+[1.319s] copying eufs_racecar/models/ar_tags/marker13/materials/textures/Marker13.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/materials/textures
+[1.319s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/marker0
+[1.319s] copying eufs_racecar/models/ar_tags/marker13/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/marker0
+[1.319s] copying eufs_racecar/models/ar_tags/marker13/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/marker0
+[1.319s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/marker0/marker0
+[1.320s] copying eufs_racecar/models/ar_tags/marker13/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/marker0/marker0
+[1.320s] copying eufs_racecar/models/ar_tags/marker13/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker13/marker0/marker0
+[1.320s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17
+[1.320s] copying eufs_racecar/models/ar_tags/marker17/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17
+[1.320s] copying eufs_racecar/models/ar_tags/marker17/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17
+[1.320s] copying eufs_racecar/models/ar_tags/marker17/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17
+[1.320s] copying eufs_racecar/models/ar_tags/marker17/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17
+[1.320s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/meshes
+[1.321s] copying eufs_racecar/models/ar_tags/marker17/meshes/Marker17.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/meshes
+[1.321s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/materials
+[1.321s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/materials/textures
+[1.321s] copying eufs_racecar/models/ar_tags/marker17/materials/textures/Marker17.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/materials/textures
+[1.321s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/marker0
+[1.321s] copying eufs_racecar/models/ar_tags/marker17/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/marker0
+[1.321s] copying eufs_racecar/models/ar_tags/marker17/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/marker0
+[1.321s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/marker0/marker0
+[1.322s] copying eufs_racecar/models/ar_tags/marker17/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/marker0/marker0
+[1.322s] copying eufs_racecar/models/ar_tags/marker17/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker17/marker0/marker0
+[1.322s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15
+[1.322s] copying eufs_racecar/models/ar_tags/marker15/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15
+[1.322s] copying eufs_racecar/models/ar_tags/marker15/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15
+[1.322s] copying eufs_racecar/models/ar_tags/marker15/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15
+[1.322s] copying eufs_racecar/models/ar_tags/marker15/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15
+[1.322s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/meshes
+[1.323s] copying eufs_racecar/models/ar_tags/marker15/meshes/Marker15.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/meshes
+[1.323s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/materials
+[1.323s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/materials/textures
+[1.323s] copying eufs_racecar/models/ar_tags/marker15/materials/textures/Marker15.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/materials/textures
+[1.323s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/marker0
+[1.323s] copying eufs_racecar/models/ar_tags/marker15/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/marker0
+[1.323s] copying eufs_racecar/models/ar_tags/marker15/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/marker0
+[1.323s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/marker0/marker0
+[1.324s] copying eufs_racecar/models/ar_tags/marker15/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/marker0/marker0
+[1.324s] copying eufs_racecar/models/ar_tags/marker15/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker15/marker0/marker0
+[1.324s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11
+[1.324s] copying eufs_racecar/models/ar_tags/marker11/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11
+[1.324s] copying eufs_racecar/models/ar_tags/marker11/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11
+[1.324s] copying eufs_racecar/models/ar_tags/marker11/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11
+[1.324s] copying eufs_racecar/models/ar_tags/marker11/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11
+[1.324s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/meshes
+[1.325s] copying eufs_racecar/models/ar_tags/marker11/meshes/Marker11.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/meshes
+[1.325s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/materials
+[1.325s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/materials/textures
+[1.325s] copying eufs_racecar/models/ar_tags/marker11/materials/textures/Marker11.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/materials/textures
+[1.325s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/marker0
+[1.325s] copying eufs_racecar/models/ar_tags/marker11/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/marker0
+[1.325s] copying eufs_racecar/models/ar_tags/marker11/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/marker0
+[1.325s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/marker0/marker0
+[1.326s] copying eufs_racecar/models/ar_tags/marker11/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/marker0/marker0
+[1.326s] copying eufs_racecar/models/ar_tags/marker11/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker11/marker0/marker0
+[1.326s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4
+[1.326s] copying eufs_racecar/models/ar_tags/marker4/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4
+[1.326s] copying eufs_racecar/models/ar_tags/marker4/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4
+[1.326s] copying eufs_racecar/models/ar_tags/marker4/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4
+[1.326s] copying eufs_racecar/models/ar_tags/marker4/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4
+[1.327s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/meshes
+[1.327s] copying eufs_racecar/models/ar_tags/marker4/meshes/Marker4.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/meshes
+[1.327s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/materials
+[1.327s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/materials/textures
+[1.327s] copying eufs_racecar/models/ar_tags/marker4/materials/textures/Marker4.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/materials/textures
+[1.327s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/marker0
+[1.327s] copying eufs_racecar/models/ar_tags/marker4/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/marker0
+[1.327s] copying eufs_racecar/models/ar_tags/marker4/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/marker0
+[1.327s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/marker0/marker0
+[1.328s] copying eufs_racecar/models/ar_tags/marker4/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/marker0/marker0
+[1.328s] copying eufs_racecar/models/ar_tags/marker4/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker4/marker0/marker0
+[1.328s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0
+[1.328s] copying eufs_racecar/models/ar_tags/marker0/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0
+[1.328s] copying eufs_racecar/models/ar_tags/marker0/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0
+[1.328s] copying eufs_racecar/models/ar_tags/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0
+[1.328s] copying eufs_racecar/models/ar_tags/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0
+[1.329s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/meshes
+[1.329s] copying eufs_racecar/models/ar_tags/marker0/meshes/Marker0.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/meshes
+[1.329s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/materials
+[1.329s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/materials/textures
+[1.329s] copying eufs_racecar/models/ar_tags/marker0/materials/textures/Marker0.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/materials/textures
+[1.329s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/marker0
+[1.329s] copying eufs_racecar/models/ar_tags/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/marker0
+[1.330s] copying eufs_racecar/models/ar_tags/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/marker0
+[1.330s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/marker0/marker0
+[1.330s] copying eufs_racecar/models/ar_tags/marker0/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/marker0/marker0
+[1.330s] copying eufs_racecar/models/ar_tags/marker0/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker0/marker0/marker0
+[1.330s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3
+[1.330s] copying eufs_racecar/models/ar_tags/marker3/model-1_4.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3
+[1.330s] copying eufs_racecar/models/ar_tags/marker3/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3
+[1.330s] copying eufs_racecar/models/ar_tags/marker3/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3
+[1.331s] copying eufs_racecar/models/ar_tags/marker3/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3
+[1.331s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/meshes
+[1.331s] copying eufs_racecar/models/ar_tags/marker3/meshes/Marker3.dae -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/meshes
+[1.331s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/materials
+[1.331s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/materials/textures
+[1.331s] copying eufs_racecar/models/ar_tags/marker3/materials/textures/Marker3.png -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/materials/textures
+[1.331s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/marker0
+[1.331s] copying eufs_racecar/models/ar_tags/marker3/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/marker0
+[1.332s] copying eufs_racecar/models/ar_tags/marker3/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/marker0
+[1.332s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/marker0/marker0
+[1.332s] copying eufs_racecar/models/ar_tags/marker3/marker0/marker0/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/marker0/marker0
+[1.332s] copying eufs_racecar/models/ar_tags/marker3/marker0/marker0/model-1_5.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/ar_tags/marker3/marker0/marker0
+[1.332s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/walker_racecourse
+[1.332s] copying eufs_racecar/models/walker_racecourse/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/walker_racecourse
+[1.332s] copying eufs_racecar/models/walker_racecourse/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/walker_racecourse
+[1.332s] creating /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/cone
+[1.333s] copying eufs_racecar/models/cone/model.sdf -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/cone
+[1.333s] copying eufs_racecar/models/cone/model.config -> /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/share/eufs_racecar/eufs_racecar/models/cone
+[1.333s] running install_egg_info
+[1.333s] Copying ../../build/eufs_racecar/eufs_racecar.egg-info to /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/lib/python3.10/site-packages/eufs_racecar-2.1.0-py3.10.egg-info
+[1.333s] running install_scripts
+[1.353s] writing list of installed files to '/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/install.log'
+[1.391s] Invoked command in '/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/src/eufs_racecar' returned '0': PYTHONPATH=/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/eufs_racecar/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/eufs_racecar build --build-base /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/build install --record /home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_racecar/install.log --single-version-externally-managed install_data

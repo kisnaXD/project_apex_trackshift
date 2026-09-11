@@ -1,0 +1,22 @@
+# Forgez energy-management parameters (Harvest / Nominal / Attack).
+# T_core: target core temperature [degC]
+# E_lap:   lap energy budget [Wh]
+# R_OT:    pack internal resistance at operating temperature [Ohm]
+forgez_battery:
+  default_mode: Nominal
+  modes:
+    Harvest:
+      T_core: 25.0
+      E_lap: 180.0
+      R_OT: 0.035
+      max_power_w: 8000.0
+    Nominal:
+      T_core: 40.0
+      E_lap: 220.0
+      R_OT: 0.040
+      max_power_w: 12000.0
+    Attack:
+      T_core: 55.0
+      E_lap: 280.0
+      R_OT: 0.050
+      max_power_w: 18000.0

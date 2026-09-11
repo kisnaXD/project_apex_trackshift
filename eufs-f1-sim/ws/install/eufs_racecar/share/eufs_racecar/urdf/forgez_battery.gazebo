@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Forgez battery model on chassis (ctu-vras/gazebo_ros_battery, Humble port). -->
+  <xacro:arg name="forgez_mode" default="Nominal"/>
+  <xacro:arg name="forgez_T_core" default="40.0"/>
+  <xacro:arg name="forgez_E_lap" default="220.0"/>
+  <xacro:arg name="forgez_R_OT" default="0.040"/>
+
+  <gazebo reference="chassis">
+    <battery name="forgez_pack">
+      <voltage>22.2</voltage>
+      <initial_charge>5.5</initial_charge>
+    </battery>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_battery_discharge" filename="libgazebo_ros_battery_discharge.so">
+      <ros>
+        <namespace>/eufs</namespace>
+        <remapping>battery_state:=forgez/battery_state</remapping>
+        <remapping>charge_level_wh:=forgez/charge_level_wh</remapping>
+      </ros>
+      <update_rate>10</update_rate>
+      <link_name>chassis</link_name>
+      <battery_name>forgez_pack</battery_name>
+      <constant_coef>25.2</constant_coef>
+      <linear_coef>1.2</linear_coef>
+      <initial_charge>5.5</initial_charge>
+      <capacity>5.5</capacity>
+      <design_capacity>5.5</design_capacity>
+      <resistance>$(arg forgez_R_OT)</resistance>
+      <smooth_current_tau>1.5</smooth_current_tau>
+      <compute_temperature>true</compute_temperature>
+      <temperature>$(arg forgez_T_core)</temperature>
+      <heat_capacity>1200.0</heat_capacity>
+      <heat_dissipation_rate>8.0</heat_dissipation_rate>
+      <technology>LIPO</technology>
+      <forgez_mode>$(arg forgez_mode)</forgez_mode>
+      <forgez_E_lap_wh>$(arg forgez_E_lap)</forgez_E_lap_wh>
+      <forgez_T_core>$(arg forgez_T_core)</forgez_T_core>
+      <forgez_R_OT>$(arg forgez_R_OT)</forgez_R_OT>
+    </plugin>
+
+    <plugin name="gazebo_ros_mechanical_energy_battery_consumer" filename="libgazebo_ros_mechanical_energy_battery_consumer.so">
+      <ros>
+        <namespace>/eufs</namespace>
+      </ros>
+      <link_name>chassis</link_name>
+      <battery_name>forgez_pack</battery_name>
+      <consumer_name>drive_mechanical</consumer_name>
+      <efficiency>0.92</efficiency>
+      <friction>0.02</friction>
+      <consumer_idle_power>120.0</consumer_idle_power>
+      <publish_ros_topic>false</publish_ros_topic>
+    </plugin>
+  </gazebo>
+
+</robot>

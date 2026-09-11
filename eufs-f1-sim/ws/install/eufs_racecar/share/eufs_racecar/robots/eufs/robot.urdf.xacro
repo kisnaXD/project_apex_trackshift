@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="eufs" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="config_file" default="$(find eufs_racecar)/robots/eufs/configDry.yaml"/>
+  <xacro:arg name="forgez_mode" default="Nominal"/>
+  <xacro:arg name="forgez_T_core" default="40.0"/>
+  <xacro:arg name="forgez_E_lap" default="220.0"/>
+  <xacro:arg name="forgez_R_OT" default="0.040"/>
+
+  <xacro:include filename="$(find eufs_racecar)/urdf/racecar.xacro"/>
+  <xacro:include filename="$(find eufs_racecar)/urdf/forgez_battery.gazebo"/>
+
+</robot>

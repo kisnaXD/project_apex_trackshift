@@ -1,0 +1,13 @@
+[0.000000] (-) TimerEvent: {}
+[0.000178] (-) JobUnselected: {'identifier': 'eufs_launcher'}
+[0.000203] (-) JobUnselected: {'identifier': 'eufs_models'}
+[0.000253] (-) JobUnselected: {'identifier': 'eufs_msgs'}
+[0.000271] (-) JobUnselected: {'identifier': 'eufs_plugins'}
+[0.000288] (-) JobUnselected: {'identifier': 'eufs_rqt'}
+[0.000346] (-) JobUnselected: {'identifier': 'eufs_sensors'}
+[0.000362] (-) JobUnselected: {'identifier': 'eufs_tracks'}
+[0.000379] (-) JobUnselected: {'identifier': 'gazebo_ros_battery'}
+[0.000404] (eufs_racecar) JobQueued: {'identifier': 'eufs_racecar', 'dependencies': OrderedDict([('gazebo_ros_battery', '/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/install/gazebo_ros_battery')])}
+[0.000430] (eufs_racecar) JobStarted: {'identifier': 'eufs_racecar'}
+[0.005285] (eufs_racecar) JobEnded: {'identifier': 'eufs_racecar', 'rc': 1}
+[0.015748] (-) EventReactorShutdown: {}

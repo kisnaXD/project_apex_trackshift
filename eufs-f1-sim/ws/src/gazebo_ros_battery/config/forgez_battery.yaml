@@ -1,0 +1,15 @@
+forgez_battery:
+  default_mode: Nominal
+  modes:
+    Harvest:
+      T_core: 25.0
+      E_lap: 180.0
+      R_OT: 0.035
+    Nominal:
+      T_core: 40.0
+      E_lap: 220.0
+      R_OT: 0.040
+    Attack:
+      T_core: 55.0
+      E_lap: 280.0
+      R_OT: 0.050

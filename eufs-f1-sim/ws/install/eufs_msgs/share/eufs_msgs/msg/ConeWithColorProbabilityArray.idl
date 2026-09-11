@@ -1,0 +1,18 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from eufs_msgs/msg/ConeWithColorProbabilityArray.msg
+// generated code does not contain a copyright notice
+
+#include "eufs_msgs/msg/ConeWithColorProbability.idl"
+#include "std_msgs/msg/Header.idl"
+
+module eufs_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "Array of ConeWithColourProbability.")
+    struct ConeWithColorProbabilityArray {
+      std_msgs::msg::Header header;
+
+      sequence<eufs_msgs::msg::ConeWithColorProbability> cones;
+    };
+  };
+};

@@ -1,0 +1,4 @@
+# Stub vehicle model config kept for EUFS launcher compatibility.
+vehicle:
+  mass: 15.0
+  wheelbase: 0.33

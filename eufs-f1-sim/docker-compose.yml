@@ -1,0 +1,18 @@
+services:
+  eufs-f1-sim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eufs-f1-sim:lean
+    container_name: eufs-f1-sim
+    network_mode: host
+    ipc: host
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - QT_X11_NO_MITSHM=1
+      - EUFS_MASTER=/opt/eufs_ws
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    stdin_open: true
+    tty: true

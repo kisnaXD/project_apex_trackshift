@@ -1,0 +1,233 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-ca30b5648ea668c54388.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				},
+				{
+					"build" : "eufs_msgs__py",
+					"jsonFile" : "directory-eufs_msgs__py-696869f3008fee5d927d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_msgs/eufs_msgs__py",
+					"targetIndexes" : 
+					[
+						4
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1
+					],
+					"name" : "eufs_msgs",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_build_eufs_msgs_egg::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_build_eufs_msgs_egg-6539ddb88347051c7522.json",
+					"name" : "ament_cmake_python_build_eufs_msgs_egg",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_copy_eufs_msgs::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_copy_eufs_msgs-5019b29d0560ba063a24.json",
+					"name" : "ament_cmake_python_copy_eufs_msgs",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs-b234afed686b93a6a894.json",
+					"name" : "eufs_msgs",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__cpp-5d0a4e4d4beb8c888f0a.json",
+					"name" : "eufs_msgs__cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "eufs_msgs__py::@47684a0f065376a93ae6",
+					"jsonFile" : "target-eufs_msgs__py-7eb680dd12c07b2f6b1f.json",
+					"name" : "eufs_msgs__py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_generator_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_generator_c-80a95e51922787faa3fb.json",
+					"name" : "eufs_msgs__rosidl_generator_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_generator_py::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_generator_py-edb3c534e5a4369498ec.json",
+					"name" : "eufs_msgs__rosidl_generator_py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_c-8dd485cac79785dca661.json",
+					"name" : "eufs_msgs__rosidl_typesupport_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_c__pyext-479686f6bfdb78f7f1e8.json",
+					"name" : "eufs_msgs__rosidl_typesupport_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_cpp-8287fa960d6b0b3e63ba.json",
+					"name" : "eufs_msgs__rosidl_typesupport_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_fastrtps_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_fastrtps_c-00b511abe9930587355a.json",
+					"name" : "eufs_msgs__rosidl_typesupport_fastrtps_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_fastrtps_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_fastrtps_c__pyext-cab995644061495549b9.json",
+					"name" : "eufs_msgs__rosidl_typesupport_fastrtps_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_fastrtps_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_fastrtps_cpp-eed740737ec815bbbd00.json",
+					"name" : "eufs_msgs__rosidl_typesupport_fastrtps_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_introspection_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_introspection_c-2e82ea3d57f67c997814.json",
+					"name" : "eufs_msgs__rosidl_typesupport_introspection_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_introspection_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_introspection_c__pyext-e7caa6c62877d802e395.json",
+					"name" : "eufs_msgs__rosidl_typesupport_introspection_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs__rosidl_typesupport_introspection_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs__rosidl_typesupport_introspection_cpp-c70e048757bed517a023.json",
+					"name" : "eufs_msgs__rosidl_typesupport_introspection_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "eufs_msgs_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-eufs_msgs_uninstall-dee444ae234a5b72f08d.json",
+					"name" : "eufs_msgs_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-9be4ac336461ff9c01dd.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_msgs",
+		"source" : "/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/src/eufs_msgs"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

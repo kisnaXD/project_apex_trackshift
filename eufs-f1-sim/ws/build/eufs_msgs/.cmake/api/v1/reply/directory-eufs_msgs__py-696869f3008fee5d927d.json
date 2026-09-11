@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "eufs_msgs__py",
+		"source" : "/home/gera/Desktop/EUFS_FORK_CONTAINERIZED/eufs-f1-sim/ws/build/eufs_msgs/eufs_msgs__py"
+	}
+}

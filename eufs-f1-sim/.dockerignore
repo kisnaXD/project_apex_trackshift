@@ -1,0 +1,5 @@
+ws/
+src/
+.git
+**/__pycache__
+**/*.pyc

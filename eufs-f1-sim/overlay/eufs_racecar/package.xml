@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>eufs_racecar</name>
+  <version>2.1.0</version>
+  <description>MIT racecar model packaged as eufs_racecar for EUFS sim (lean slice).</description>
+  <maintainer email="eufs.f1.sim@example.com">EUFS F1 Sim</maintainer>
+  <license>MIT</license>
+
+  <depend>ament_index_python</depend>
+  <depend>xacro</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>joint_state_publisher</depend>
+  <depend>robot_state_publisher</depend>
+  <exec_depend>gazebo_ros</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
