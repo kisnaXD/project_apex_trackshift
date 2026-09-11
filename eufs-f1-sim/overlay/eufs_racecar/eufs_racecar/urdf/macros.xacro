@@ -5,26 +5,26 @@
 
 <xacro:macro name="chassis_inertial_params">
   <origin xyz="0.1477 0 0" rpy="0 0 0" />
-  <mass value="4.0" />
-  <inertia ixx="0.010609" ixy="0"          ixz="0"
-                          iyy="0.050409"   iyz="0"
-                                           izz="0.05865" />
+  <mass value="740.0" />
+  <inertia ixx="120.0" ixy="0"       ixz="0"
+                        iyy="450.0"  iyz="0"
+                                     izz="520.0" />
 </xacro:macro>
 
 <xacro:macro name="left_wheels_inertial_params">
   <origin xyz="0 0 -0.0225" rpy="0 0 0" />
-  <mass value="0.34055" />
-  <inertia ixx="0.00026046" ixy="0"          ixz="0"
-                            iyy="0.00026046" iyz="0"
-                                             izz="0.00041226" />
+  <mass value="12.0" />
+  <inertia ixx="0.35" ixy="0"     ixz="0"
+                       iyy="0.70"  iyz="0"
+                                   izz="0.35" />
 </xacro:macro>
 
 <xacro:macro name="right_wheels_inertial_params">
   <origin xyz="0 0 0.0225" rpy="0 0 0" />
-  <mass value="0.34055" />
-  <inertia ixx="0.00026046" ixy="0"          ixz="0"
-                            iyy="0.00026046" iyz="0"
-                                             izz="0.00041226" />
+  <mass value="12.0" />
+  <inertia ixx="0.35" ixy="0"     ixz="0"
+                       iyy="0.70"  iyz="0"
+                                   izz="0.35" />
 </xacro:macro>
 
 <xacro:macro name="steering_hinge_inertial_params">
@@ -50,6 +50,20 @@
   <origin xyz="0 0 0" rpy="0 0 0" />
   <geometry>
     <mesh filename="file://$(find eufs_racecar)/meshes/chassis.STL" />
+  </geometry>
+</xacro:macro>
+
+<xacro:macro name="front_wing_geometry">
+  <origin xyz="0 0 0" rpy="0 0 0" />
+  <geometry>
+    <mesh filename="file://$(find eufs_racecar)/meshes/front_wing.STL" />
+  </geometry>
+</xacro:macro>
+
+<xacro:macro name="rear_wing_geometry">
+  <origin xyz="0 0 0" rpy="0 0 0" />
+  <geometry>
+    <mesh filename="file://$(find eufs_racecar)/meshes/rear_wing.STL" />
   </geometry>
 </xacro:macro>
 
@@ -97,16 +111,16 @@
 </xacro:macro>
 
 <xacro:macro name="left_wheels_collision_geometry">
-  <origin xyz="0 0 -0.0225" rpy="0 0 0" />
+  <origin xyz="0 0 0" rpy="0 1.5708 0" />
   <geometry>
-    <cylinder length="0.045" radius="0.05" />
+    <cylinder length="0.40" radius="0.40" />
   </geometry>
 </xacro:macro>
 
 <xacro:macro name="right_wheels_collision_geometry">
-  <origin xyz="0 0 0.0225" rpy="0 0 0" />
+  <origin xyz="0 0 0" rpy="0 1.5708 0" />
   <geometry>
-    <cylinder length="0.045" radius="0.05" />
+    <cylinder length="0.40" radius="0.40" />
   </geometry>
 </xacro:macro>
 

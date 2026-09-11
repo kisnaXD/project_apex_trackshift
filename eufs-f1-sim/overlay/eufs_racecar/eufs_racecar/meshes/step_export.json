@@ -1,0 +1,92 @@
+{
+  "step_file": "/home/gera/Downloads/Assem step.STEP",
+  "tool": "cadquery-ocp (Open CASCADE 7.x) STEPControl + StlAPI",
+  "grabcad_url": "https://grabcad.com/library/mercedes-amg-petronas-f1-concept-2",
+  "solid_count": 33,
+  "wheelbase_m": 3.28,
+  "scale_factor": 0.0026202594177351787,
+  "wheel_centers_ros_m": {
+    "left_front": [
+      3.28,
+      0.58175369526662,
+      0.7682187927280851
+    ],
+    "right_front": [
+      3.2799999999999994,
+      -0.5817536952666196,
+      0.7682187927280856
+    ],
+    "left_rear": [
+      -4.3820586262732775e-05,
+      0.646567133649665,
+      0.8753169872196176
+    ],
+    "right_rear": [
+      4.3820586262288685e-05,
+      -0.646567133649665,
+      0.8765678760630431
+    ]
+  },
+  "assembly_bounds_ros_m": {
+    "min": [
+      -1.072179444733405,
+      -1.0551301314948716,
+      0.0
+    ],
+    "max": [
+      4.083106234855614,
+      1.0634844349677268,
+      1.6187047785275628
+    ]
+  },
+  "ground_z_m": 0.0,
+  "link_groups": {
+    "chassis": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      24
+    ],
+    "front_wing": [
+      28,
+      32
+    ],
+    "rear_wing": [
+      26,
+      30
+    ],
+    "left_front_wheel": [
+      22,
+      27
+    ],
+    "right_front_wheel": [
+      23,
+      31
+    ],
+    "left_rear_wheel": [
+      20,
+      25
+    ],
+    "right_rear_wheel": [
+      21,
+      29
+    ]
+  }
+}

@@ -7,7 +7,7 @@
   <xacro:arg name="forgez_E_lap" default="220.0"/>
   <xacro:arg name="forgez_R_OT" default="0.040"/>
 
-  <gazebo reference="chassis">
+  <gazebo reference="base_link">
     <battery name="forgez_pack">
       <voltage>22.2</voltage>
       <initial_charge>5.5</initial_charge>
@@ -22,7 +22,7 @@
         <remapping>charge_level_wh:=forgez/charge_level_wh</remapping>
       </ros>
       <update_rate>10</update_rate>
-      <link_name>chassis</link_name>
+      <link_name>base_link</link_name>
       <battery_name>forgez_pack</battery_name>
       <constant_coef>25.2</constant_coef>
       <linear_coef>1.2</linear_coef>
@@ -46,7 +46,7 @@
       <ros>
         <namespace>/eufs</namespace>
       </ros>
-      <link_name>chassis</link_name>
+      <link_name>base_link</link_name>
       <battery_name>forgez_pack</battery_name>
       <consumer_name>drive_mechanical</consumer_name>
       <efficiency>0.92</efficiency>

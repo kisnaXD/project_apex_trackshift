@@ -10,7 +10,7 @@
   <mu2 value="0.0"/>
   <kp  value="10000000.0" />
   <kd  value="1.0" />
-  <material>Gazebo/Blue</material>
+  <material>Gazebo/Red</material>
 </gazebo>
 
 <gazebo reference="left_rear_wheel">
@@ -91,7 +91,7 @@
     <!-- output -->
     <publish_odom>true</publish_odom>
     <publish_odom_tf>true</publish_odom_tf>
-    <publish_wheel_tf>true</publish_wheel_tf>
+    <publish_wheel_tf>false</publish_wheel_tf>
     <publish_distance>true</publish_distance>
 
     <odometry_frame>odom</odometry_frame>

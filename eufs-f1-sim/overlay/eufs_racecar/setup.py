@@ -14,9 +14,6 @@ def package_files(directory):
     return paths
 
 
-mesh_files = package_files('eufs_racecar/meshes') if os.path.isdir('eufs_racecar/meshes') else []
-model_files = package_files('eufs_racecar/models') if os.path.isdir('eufs_racecar/models') else []
-
 setup(
     name=package_name,
     version='2.1.0',
@@ -28,14 +25,15 @@ setup(
         (os.path.join('share', package_name, 'config'), glob('config/*')),
         (os.path.join('share', package_name, 'robots', 'eufs'), glob('robots/eufs/*')),
         (os.path.join('share', package_name, 'urdf'), glob('eufs_racecar/urdf/*')),
+        (os.path.join('share', package_name, 'meshes'), glob('eufs_racecar/meshes/*')),
     ] + [
-        (os.path.join('share', package_name, os.path.dirname(path)), [path])
-        for path in mesh_files + model_files
-    ],
+        (os.path.join('share', package_name, 'models', os.path.relpath(os.path.dirname(path), 'eufs_racecar/models')), [path])
+        for path in package_files('eufs_racecar/models')
+    ] if os.path.isdir('eufs_racecar/models') else [],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='EUFS F1 Sim',
     maintainer_email='eufs-f1-sim@local',
-    description='MIT racecar as eufs_racecar for EUFS sim lean slice',
+    description='Open-license F1 visual on eufs_racecar ackermann stack for EUFS sim',
     license='MIT',
 )

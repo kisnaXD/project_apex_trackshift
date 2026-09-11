@@ -15,7 +15,7 @@
   </link>
 
   <joint name="base_link_joint" type="fixed">
-    <origin xyz="0 0 0.05" rpy="0 0 0" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="base_link" />
     <child link="chassis" />
   </joint>
@@ -32,6 +32,32 @@
     <child link="chassis_inertia" />
   </joint>
 
+  <link name="front_wing">
+    <visual>
+      <xacro:front_wing_geometry />
+      <material name="black" />
+    </visual>
+  </link>
+
+  <joint name="front_wing_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="chassis" />
+    <child link="front_wing" />
+  </joint>
+
+  <link name="rear_wing">
+    <visual>
+      <xacro:rear_wing_geometry />
+      <material name="black" />
+    </visual>
+  </link>
+
+  <joint name="rear_wing_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="chassis" />
+    <child link="rear_wing" />
+  </joint>
+
   <!-- Add the left rear wheel with its joints and tranmissions -->
 
   <link name="left_rear_wheel">
@@ -42,13 +68,13 @@
       <xacro:left_rear_wheel_geometry />
       <material name="black" />
     </visual>
-    <collision>robot
+    <collision>
       <xacro:left_wheels_collision_geometry />
     </collision>
   </link>
 
   <joint name="left_rear_wheel_joint" type="continuous">
-    <origin xyz="0 0.1 0" rpy="1.5708 0 0" />
+    <origin xyz="0 0.647 0.875" rpy="1.5708 0 0" />
     <parent link="chassis" />
     <child link="left_rear_wheel" />
     <axis xyz="0 0 -1" />
@@ -73,7 +99,7 @@
   </link>
 
   <joint name="right_rear_wheel_joint" type="continuous">
-    <origin xyz="0 -0.1 0" rpy="1.5708 0 0" />
+    <origin xyz="0 -0.647 0.877" rpy="1.5708 0 0" />
     <parent link="chassis" />
     <child link="right_rear_wheel" />
     <axis xyz="0 0 -1" />
@@ -95,7 +121,7 @@
   </link>
 
   <joint name="left_steering_hinge_joint" type="revolute">
-    <origin xyz="0.325 0.1 0" rpy="0 1.5708 0" />
+    <origin xyz="3.28 0.582 0.768" rpy="0 1.5708 0" />
     <parent link="chassis" />
     <child link="left_steering_hinge" />
     <axis xyz="-1 0 0" />
@@ -117,7 +143,7 @@
   </link>
 
   <joint name="right_steering_hinge_joint" type="continuous">
-    <origin xyz="0.325 -0.1 0" rpy="0 1.5708 0" />
+    <origin xyz="3.28 -0.582 0.768" rpy="0 1.5708 0" />
     <parent link="chassis" />
     <child link="right_steering_hinge" />
     <axis xyz="-1 0 0" />
@@ -198,7 +224,7 @@
   </link>
 
   <joint name="hokuyo_joint" type="fixed">
-    <origin xyz="0.265 0.0 0.075" rpy="0 0 0"/>
+    <origin xyz="0.0 0.0 1.05" rpy="0 0 0"/>
     <parent link="chassis" />
     <child link="laser" />
     <axis xyz="0 0 1" />
@@ -228,7 +254,7 @@
   </link>
 
   <joint name="zed_camera_joint" type="fixed">
-    <origin xyz="0.390 0 0.04" rpy="0 0 0"/>
+    <origin xyz="0.35 0 0.95" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="zed_camera_link"/>
     <axis xyz="0 0 1" />

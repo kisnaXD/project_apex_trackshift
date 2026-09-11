@@ -1,6 +1,19 @@
 # EUFS F1 Sim — Lean Container Slice
 
-ROS 2 Humble + Gazebo Classic 11 simulation stack for EUFS tracks with an MIT racecar (`eufs_racecar`) and a Humble-ported [ctu-vras/gazebo_ros_battery](https://github.com/ctu-vras/gazebo_ros_battery) including Forgez `T_core`, `E_lap`, and `R_OT` modes (Harvest / Nominal / Attack).
+ROS 2 Humble + Gazebo Classic 11 simulation stack for EUFS tracks with a GrabCAD Mercedes F1 concept visual on `eufs_racecar` and a Humble-ported [ctu-vras/gazebo_ros_battery](https://github.com/ctu-vras/gazebo_ros_battery) including Forgez `T_core`, `E_lap`, and `R_OT` modes (Harvest / Nominal / Attack).
+
+## F1 vehicle mesh (source + license)
+
+1. Model: Mercedes-AMG Petronas F1 Concept 2 (GrabCAD community CAD).
+2. URL: https://grabcad.com/library/mercedes-amg-petronas-f1-concept-2
+3. STEP file: `Assem step.STEP` (from user Downloads).
+4. License: GrabCAD Community terms — educational/concept model; not official team CAD.
+5. Conversion tool: **cadquery-ocp** (Open CASCADE 7.x) — `STEPControl` read + `StlAPI` mesh export via `scripts/step_to_urdf_ocp.py`.
+6. Per-link visuals: chassis body, front wing, rear wing, four wheels (~5.1 m length, 3.28 m wheelbase).
+7. Meshes install flat to `share/eufs_racecar/meshes/`; URDF in `share/eufs_racecar/urdf/`.
+8. Ackermann drive, Hokuyo lidar, and Forgez battery plugins unchanged.
+9. Regenerate: `python3 scripts/step_to_urdf_ocp.py --step "/path/to/Assem step.STEP"` (needs `cadquery-ocp`).
+10. Attribution: `overlay/eufs_racecar/eufs_racecar/meshes/F1_MODEL_SOURCE.txt`.
 
 ## Locks
 
@@ -8,7 +21,7 @@ ROS 2 Humble + Gazebo Classic 11 simulation stack for EUFS tracks with an MIT ra
 |-----------|------------------|
 | EUFS sim | `gitlab.com/eufs/public/eufs_sim` tag `v2.1.0` |
 | EUFS msgs | `gitlab.com/eufs/public/eufs_msgs` tag `v2.0.0` |
-| Vehicle | `CihatAltiparmak/mit_racecar_gazebo_ros2` packaged as `eufs_racecar` |
+| Vehicle | GrabCAD Mercedes F1 STEP + `eufs_racecar` ackermann stack |
 | Battery | `ctu-vras/gazebo_ros_battery` (Humble port in `overlay/gazebo_ros_battery`) |
 | Platform | Ubuntu 22.04, ROS 2 Humble, Gazebo Classic 11 |
 
@@ -34,16 +47,16 @@ xhost +local:
 docker compose up
 ```
 
-Default launch: EUFS `small_track` with the MIT racecar and Forgez battery (Nominal mode).
+Default launch: EUFS `small_track` with the F1 visual and Forgez battery (Nominal mode).
 
 ### Other launches
 
 ```bash
 docker compose run --rm eufs-f1-sim bash -lc \
-  'ros2 launch eufs_tracks skidpad.launch.py gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml'
+  'ros2 launch eufs_tracks skidpad.launch gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml'
 
 docker compose run --rm eufs-f1-sim bash -lc \
-  'ros2 launch eufs_tracks small_track.launch.py forgez_mode:=Attack gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml'
+  'ros2 launch eufs_tracks small_track.launch forgez_mode:=Attack gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml'
 ```
 
 Forgez modes and parameters: `overlay/eufs_racecar/config/forgez_battery.yaml`.
@@ -59,9 +72,9 @@ Forgez modes and parameters: `overlay/eufs_racecar/config/forgez_battery.yaml`.
 eufs-f1-sim/
   Dockerfile
   docker-compose.yml
-  scripts/          prepare-workspace.sh, entrypoint.sh
+  scripts/          prepare-workspace.sh, entrypoint.sh, step_to_urdf_ocp.py
   overlay/
-    eufs_racecar/   MIT racecar as EUFS racecar package
+    eufs_racecar/   F1 visual meshes + EUFS racecar URDF/plugins
     gazebo_ros_battery/  Humble battery plugin + Forgez params
   ws/src/           populated at build time by prepare-workspace.sh
 ```
@@ -76,7 +89,7 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
-ros2 launch eufs_tracks small_track.launch.py gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml
+ros2 launch eufs_tracks small_track.launch gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml
 ```
 
 Requires `ros-humble-gazebo-ros-pkgs` (Gazebo Classic 11) on the host.
