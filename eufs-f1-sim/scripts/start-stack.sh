@@ -21,4 +21,4 @@ sleep 15
 docker compose ps
 echo
 echo "GUI processes (expect gzclient, rviz2, rqt_gui):"
-docker exec eufs-f1-sim bash -lc "pgrep -a gzclient; pgrep -a rviz2; pgrep -a rqt_gui" || true
+docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui' || true"

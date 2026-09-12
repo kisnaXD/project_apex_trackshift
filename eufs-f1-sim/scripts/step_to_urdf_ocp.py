@@ -226,6 +226,15 @@ def ros_transform(scale: float) -> gp_Trsf:
     return tr
 
 
+def rewrite_binary_stl(out_path: Path) -> None:
+    """RViz2 only loads binary STL; Open CASCADE often writes ASCII."""
+    from stl import mesh as stlmesh
+    from stl.stl import BINARY
+
+    loaded = stlmesh.Mesh.from_file(str(out_path))
+    loaded.save(str(out_path), mode=BINARY)
+
+
 def export_stl(shape, out_path: Path, transform: gp_Trsf, deflection_mm: float) -> None:
     transformed = BRepBuilderAPI_Transform(shape, transform, True).Shape()
     mesh = BRepMesh_IncrementalMesh(transformed, deflection_mm, False, 0.5, True)
@@ -233,8 +242,10 @@ def export_stl(shape, out_path: Path, transform: gp_Trsf, deflection_mm: float) 
     if not mesh.IsDone():
         raise RuntimeError(f"meshing failed for {out_path.name}")
     writer = StlAPI_Writer()
+    writer.ASCIIMode = False
     if not writer.Write(transformed, str(out_path)):
         raise RuntimeError(f"STL write failed: {out_path}")
+    rewrite_binary_stl(out_path)
 
 
 def apply_shift(point: tuple[float, float, float], shift: tuple[float, float, float]) -> tuple[float, float, float]:

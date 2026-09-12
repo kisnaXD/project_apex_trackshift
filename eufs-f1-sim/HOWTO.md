@@ -80,7 +80,7 @@ docker exec -e DISPLAY=$DISPLAY eufs-f1-sim bash -lc "gzclient"
 ```bash
 docker compose ps
 docker compose logs -f --tail=50
-docker exec eufs-f1-sim bash -lc 'pgrep -a gzclient; pgrep -a rviz2; pgrep -a rqt_gui'
+docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui'"
 ```
 
 Expect `eufs-f1-sim` **Up** and all three GUI processes running.
