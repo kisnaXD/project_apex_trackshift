@@ -75,7 +75,7 @@ ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 | Gazebo client | `gzclient` | After **Start**. Same `gzserver` / `cota.world` / one `eufs` model |
 | RViz2 | `rviz2 -d eufs_f1.rviz` | After **Start**. Fixed frame `map`, orbit looking down the COTA start straight (not glued to the car), RobotModel `/eufs/robot_description`, `/track_markers` |
 
-**Start** opens `gzclient` + RViz on the existing paused `gzserver` (same `DISPLAY`) and calls `/unpause_physics` **once**. gzclient then follows the `eufs` model so a 10s throttle does not leave the camera staring at an empty S/F. Physics then stays RUNNING until **Stop**, which zeros drive commands and calls `/pause_physics` **once**. The dashboard does **not** infer pause from `/clock` (that is what made the Physics field flicker Paused ↔ Running). Neither button starts a second Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
+**Start** opens `gzclient` + RViz on the existing paused `gzserver` (same `DISPLAY`) and calls `/unpause_physics` **once**. Both cameras look down the COTA start straight from behind S/F so the car drives away from the viewer. Physics then stays RUNNING until **Stop**, which zeros drive commands and calls `/pause_physics` **once**. The dashboard does **not** infer pause from `/clock` (that is what made the Physics field flicker Paused ↔ Running). Neither button starts a second Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
 
 - **Service name:** `eufs-f1-sim`
 - **Container name:** `eufs-f1-sim`

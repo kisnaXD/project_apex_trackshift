@@ -1,8 +1,9 @@
-"""Broadcast map→odom→base_link and wheel joints so RViz RobotModel works paused.
+"""Broadcast map→odom→base_link while Gazebo is paused.
 
 Gazebo's ackermann plugin does not publish odom TF until physics steps, and
 rclpy sim-time timers do not fire while /clock is frozen. This node uses a
 wall-clock timer and stamps transforms with /clock (0 while paused).
+Wheel joints come from gazebo_ros_joint_state_publisher so RViz can see them roll.
 """
 
 from __future__ import annotations
@@ -15,18 +16,8 @@ from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 from rosgraph_msgs.msg import Clock
-from sensor_msgs.msg import JointState
 from tf2_ros import TransformBroadcaster
 import rclpy
-
-WHEEL_JOINTS = (
-    'left_front_wheel_joint',
-    'right_front_wheel_joint',
-    'left_rear_wheel_joint',
-    'right_rear_wheel_joint',
-    'left_steering_hinge_joint',
-    'right_steering_hinge_joint',
-)
 
 
 def _yaw_to_quat(yaw: float):
@@ -51,9 +42,6 @@ class OdomTfPublisher(Node):
         )
         self._sim_stamp = None
         self._broadcaster = TransformBroadcaster(self)
-        self._joint_pub = self.create_publisher(
-            JointState, f'{ns}/joint_states' if ns else '/joint_states', 10,
-        )
         clock_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
         self.create_subscription(Clock, '/clock', self._on_clock, clock_qos)
         self.create_subscription(
@@ -101,13 +89,6 @@ class OdomTfPublisher(Node):
         base_tf.transform.rotation.z = self._qz
         base_tf.transform.rotation.w = self._qw
         self._broadcaster.sendTransform([map_tf, base_tf])
-
-        joints = JointState()
-        joints.header.stamp = now
-        joints.name = list(WHEEL_JOINTS)
-        joints.position = [0.0] * len(WHEEL_JOINTS)
-        joints.velocity = [0.0] * len(WHEEL_JOINTS)
-        self._joint_pub.publish(joints)
 
 
 def main(args=None):
