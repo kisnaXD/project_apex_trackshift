@@ -5,7 +5,7 @@
 1. RViz RobotModel is fed by `robot_state_publisher` on `/eufs/robot_description` (one xacro, `package://eufs_racecar/meshes/*.STL`). That topic is enough for RViz; it does not prove Gazebo spawned anything.
 2. Docker CMD used a second launch: `eufs_tracks/small_track.launch` starts `gazebo.launch.py` then includes `load_car`. Two files, two env graphs.
 3. That XML `set_env` **replaces** `GAZEBO_PLUGIN_PATH` with `/opt/ros/humble/lib` + `install/eufs_plugins` (no `/lib`, no `gazebo_ros_battery`). Forgez/energy-gate plugins fail; `spawn_entity` dies; Gazebo stays empty.
-4. Cone SDFs used `model://eufs_tracks/meshes/...` (not a Gazebo model). gzclient queries models.gazebosim.org and sits on the splash; RViz never loads those SDFs.
+4. The same `set_env` replaces `GAZEBO_MODEL_PATH` with `eufs_tracks/models` only, so `model://eufs_tracks/meshes/...` cones miss and gzclient can stick on splash / never show the car.
 5. `load_car` already published RSP + JSP (`use_sim_time`) and spawned from the namespaced topic, but it did **not** start gzserver/gzclient. RViz and Gazebo were not one process tree.
 6. Meshes are binary STL; RViz can load them. Gazebo never got a successful spawn of that same URDF.
 7. `gz model -l` vs `/eufs/robot_description` vs RViz RobotModel were therefore different: description present, model absent.
