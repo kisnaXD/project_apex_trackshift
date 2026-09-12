@@ -1,0 +1,156 @@
+track_id: "cota_layout_reference_v1"
+events:
+  - id: "start_finish"
+    type: "gate"
+    s_m: 0.0
+    x_m: 0.0
+    y_m: 0.0
+    heading_rad: -0.6745808541151297
+    notes: "Four big_orange cones on the orange F1 start/finish line (sector 1 start)."
+  - id: "turn_1"
+    type: "corner"
+    s_m: 713.284
+    x_m: 566.0446452083909
+    y_m: -422.1457578134259
+    heading_rad: 0.9391788055940128
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_2"
+    type: "corner"
+    s_m: 713.284
+    x_m: 566.0446452083909
+    y_m: -422.1457578134259
+    heading_rad: 0.9391788055940128
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_3"
+    type: "corner"
+    s_m: 952.814
+    x_m: 520.858839006482
+    y_m: -191.91202625917117
+    heading_rad: 1.2500185757029678
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_4"
+    type: "corner"
+    s_m: 952.814
+    x_m: 520.858839006482
+    y_m: -191.91202625917117
+    heading_rad: 1.2500185757029678
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_5"
+    type: "corner"
+    s_m: 1213.47
+    x_m: 723.1490429587041
+    y_m: -36.196030635406146
+    heading_rad: 0.7867458271773986
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_6"
+    type: "corner"
+    s_m: 1213.47
+    x_m: 723.1490429587041
+    y_m: -36.196030635406146
+    heading_rad: 0.7867458271773986
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_7"
+    type: "corner"
+    s_m: 1320.813
+    x_m: 776.6432910008207
+    y_m: 55.85412234890691
+    heading_rad: 0.7344003529095845
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_8"
+    type: "corner"
+    s_m: 1320.813
+    x_m: 776.6432910008207
+    y_m: 55.85412234890691
+    heading_rad: 0.7344003529095845
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_9"
+    type: "corner"
+    s_m: 1419.689
+    x_m: 858.5779763823764
+    y_m: 107.73588370858886
+    heading_rad: 1.1092363431808385
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_10"
+    type: "corner"
+    s_m: 1419.689
+    x_m: 858.5779763823764
+    y_m: 107.73588370858886
+    heading_rad: 1.1092363431808385
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_11"
+    type: "corner"
+    s_m: 1575.659
+    x_m: 928.663232290141
+    y_m: 239.1282841224131
+    heading_rad: 0.5378347932335685
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_12"
+    type: "corner"
+    s_m: 1575.659
+    x_m: 928.663232290141
+    y_m: 239.1282841224131
+    heading_rad: 0.5378347932335685
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_13"
+    type: "corner"
+    s_m: 1778.923
+    x_m: 1116.8878138041448
+    y_m: 204.58411845482374
+    heading_rad: 0.13182036675950382
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_14"
+    type: "corner"
+    s_m: 1778.923
+    x_m: 1116.8878138041448
+    y_m: 204.58411845482374
+    heading_rad: 0.13182036675950382
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_15"
+    type: "corner"
+    s_m: 1952.705
+    x_m: 1251.5645137690599
+    y_m: 304.0664170505113
+    heading_rad: -0.025819841394004596
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_16"
+    type: "corner"
+    s_m: 1952.705
+    x_m: 1251.5645137690599
+    y_m: 304.0664170505113
+    heading_rad: -0.025819841394004596
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_17"
+    type: "corner"
+    s_m: 2052.139
+    x_m: 1328.633699129491
+    y_m: 250.95776569536554
+    heading_rad: 0.08029615583577536
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_18"
+    type: "corner"
+    s_m: 2052.139
+    x_m: 1328.633699129491
+    y_m: 250.95776569536554
+    heading_rad: 0.08029615583577536
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_19"
+    type: "corner"
+    s_m: 3835.43
+    x_m: 590.9795212570091
+    y_m: 383.6741609804356
+    heading_rad: -2.255488416806182
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "turn_20"
+    type: "corner"
+    s_m: 3835.43
+    x_m: 590.9795212570091
+    y_m: 383.6741609804356
+    heading_rad: -2.255488416806182
+    notes: "Turn number from the COTA F1 course layout, projected onto the scaled centerline."
+  - id: "t1_uphill_approach"
+    type: "corner_sector"
+    s_m: 606.291
+    x_m: 473.1194542142933
+    y_m: -379.13944465999197
+    heading_rad: -0.6859028736883783
+    notes: "FIA uphill Turn 1 approach; elevation is not modelled (z unknown/zero)."

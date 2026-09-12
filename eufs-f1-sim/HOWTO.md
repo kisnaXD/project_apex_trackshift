@@ -48,22 +48,28 @@ sg docker -c './scripts/start-stack.sh'
 
 That is the only start path. It builds and starts the `eufs-f1-sim` compose service. Compose CMD is:
 
-`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota cars:=1`
+`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota num_cars:=1`
 
-`load_car.launch.py` is the only launch. It starts gzserver/gzclient, the track map (`track_marker_publisher`), the stock PyQt5 start window (`start_dashboard`), one spawn, RViz, and rqt. Do not add a second Gazebo launch or a second compose service.
+`load_car.launch.py` is the only launch. It starts gzserver/gzclient on the selected track world, the cone map (`track_marker_publisher`), one spawn, RViz, and rqt. Do not start `eufs_tracks/small_track.launch` or any second Gazebo stack.
 
-Override the launch args from the host without editing files:
+## Track args
+
+| Arg | Values | Default |
+|-----|--------|---------|
+| `track` | `cota` (Circuit of The Americas Grand Prix layout) or `small_track` | `cota` |
+| `num_cars` | `1` | `1` |
 
 ```bash
-TRACK=small_track CARS=1 sg docker -c './scripts/start-stack.sh'
+ros2 launch eufs_racecar load_car.launch.py track:=cota num_cars:=1 gazebo_gui:=true show_rqt_gui:=true rviz:=true
+ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 ```
 
-If `cota` is not in the launch file yet, still pass `track:=cota` (unused launch args are ignored until the track selector lands).
+`track:=cota` loads `eufs_tracks` world `cota.world` and model `models/cota/model.sdf`. The four `big_orange` cones sit on the orange start/finish line; the car spawns with its front bumper behind that gate. Missing COTA files or hash mismatch fail the launch (no fallback to `small_track`).
 
 | GUI | Process | Purpose |
 |-----|---------|---------|
 | Start window | `start_dashboard` | Track `cota` / `small_track`, Cars=1, Start/Stop |
-| Gazebo | `gzserver` + `gzclient` | Track world + one `eufs` model |
+| Gazebo | `gzserver` + `gzclient` | `track:=cota` world + one `eufs` model |
 | RViz2 | `rviz2 -d eufs_f1.rviz` | RobotModel on `/eufs/robot_description` plus `/track_markers` |
 | rqt | `rqt_gui` | EUFS Robot Steering + Mission Control |
 
@@ -88,7 +94,7 @@ docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
 docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list; ros2 topic list"
 ```
 
-Expect one `eufs` model on the track, one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
+Expect one `eufs` model on the COTA orange start/finish gate (`timeout 5 gz model -m eufs -p` and `timeout 5 gz model -l` should list `eufs` and `cota`), one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
 
 `load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. Do not run `gz model -m eufs -p` against a live gzclient; it can freeze the GUI. `timeout 5 gz model -l` is enough.
 
@@ -115,7 +121,7 @@ Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` with `rviz2 -d` a
 | View target | `base_link` (third-person Orbit view) |
 | RobotModel | `/eufs/robot_description` (Transient Local) |
 | TF | all frames |
-| Track | `/track_markers` (71 transient-local cone markers) |
+| Track | `/track_markers` (COTA EUFS cones from the same SDF Gazebo loaded) |
 | Odometry | `/eufs/odom` |
 
 ## Driving
@@ -154,7 +160,7 @@ colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
 xhost +local:
-ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota cars:=1
+ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota num_cars:=1
 ```
 
 ## Version locks

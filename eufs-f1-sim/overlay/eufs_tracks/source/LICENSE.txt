@@ -1,0 +1,5 @@
+Source map: Wikimedia File:2022 F1 CourseLayout COTA.svg
+License: Creative Commons Attribution-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-sa/4.0/
+Author: ごひょううべこ (14 October 2022)
+This derived COTA EUFS cone layout is a metric approximation of that plan view.

@@ -1,5 +1,6 @@
 """Single EUFS F1 launch: Gazebo + RViz + one robot_description + one spawn."""
 
+from math import cos, sin
 from os import environ
 from os.path import join
 import subprocess
@@ -20,6 +21,8 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+
+from eufs_racecar.track_select import resolve_track
 
 
 def _arg(context, name):
@@ -101,7 +104,7 @@ def _set_visual_paint(material_el, paint):
     ET.SubElement(material_el, 'lighting').text = '1'
 
 
-def _sdf_with_rviz_paint(urdf_path):
+def _sdf_with_rviz_paint(urdf_path, sdf_path):
     """Force silver/black on named links. URDF→SDF otherwise leaves STLs Gazebo-white."""
     converted = subprocess.run(
         ['gz', 'sdf', '-p', urdf_path],
@@ -125,7 +128,6 @@ def _sdf_with_rviz_paint(urdf_path):
             if material_el is None:
                 material_el = ET.SubElement(visual, 'material')
             _set_visual_paint(material_el, paint)
-    sdf_path = '/tmp/eufs_robot_description.sdf'
     ET.indent(root, space='  ')
     with open(sdf_path, 'w', encoding='utf-8') as stream:
         stream.write("<?xml version='1.0'?>\n")
@@ -165,17 +167,9 @@ def _prepare_gazebo_env():
     environ['LIBGL_DRI3_DISABLE'] = '1'
 
 
-def spawn_car(context, *args, **kwargs):
-    namespace = _arg(context, 'namespace')
+def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publish_tf):
     namespace_clean, namespace_path = _namespace_path(namespace)
-    entity = _arg(context, 'robot_name') or namespace_clean or 'eufs'
-    x = _arg(context, 'x')
-    y = _arg(context, 'y')
-    z = _arg(context, 'z')
-    roll = _arg(context, 'roll')
-    pitch = _arg(context, 'pitch')
-    yaw = _arg(context, 'yaw')
-    forgez_mode = _arg(context, 'forgez_mode')
+    entity = entity or namespace_clean or 'eufs'
     config_file = join(get_package_share_directory('eufs_racecar'), 'robots', 'eufs', 'configDry.yaml')
 
     if forgez_mode == 'auto':
@@ -205,13 +199,15 @@ def spawn_car(context, *args, **kwargs):
         'package://eufs_racecar/meshes/',
         f'file://{racecar_meshes}/',
     )
-    urdf_path = '/tmp/eufs_robot_description.urdf'
+    stem = namespace_clean or 'root'
+    urdf_path = f'/tmp/eufs_robot_description_{stem}.urdf'
+    sdf_path = f'/tmp/eufs_robot_description_{stem}.sdf'
     with open(urdf_path, 'w', encoding='utf-8') as stream:
         stream.write(gazebo_description)
-    sdf_path = _sdf_with_rviz_paint(urdf_path)
+    _sdf_with_rviz_paint(urdf_path, sdf_path)
     joint_states_topic = f'{namespace_path}/joint_states' if namespace_path else '/joint_states'
 
-    return [
+    nodes = [
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
@@ -226,17 +222,17 @@ def spawn_car(context, *args, **kwargs):
         Node(
             package='gazebo_ros',
             executable='spawn_entity.py',
-            name='spawn_robot',
+            name=f'spawn_robot_{stem}',
             output='screen',
             arguments=[
                 '-entity', entity,
                 '-file', sdf_path,
-                '-x', x,
-                '-y', y,
-                '-z', z,
-                '-R', roll,
-                '-P', pitch,
-                '-Y', yaw,
+                '-x', str(x),
+                '-y', str(y),
+                '-z', str(z),
+                '-R', str(roll),
+                '-P', str(pitch),
+                '-Y', str(yaw),
                 '-spawn_service_timeout', '60.0',
                 '--ros-args', '--log-level', 'warn',
             ],
@@ -254,18 +250,39 @@ def spawn_car(context, *args, **kwargs):
             }],
             remappings=[('/joint_states', joint_states_topic)],
         ),
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='map_to_odom_publisher',
-            output='screen',
-            arguments=['0.0', '0.0', '0.0', '0.0', '0', '0', 'map', 'odom'],
-        ),
     ]
+    if publish_tf:
+        nodes.append(
+            Node(
+                package='tf2_ros',
+                executable='static_transform_publisher',
+                name='map_to_odom_publisher',
+                output='screen',
+                arguments=['0.0', '0.0', '0.0', '0.0', '0', '0', 'map', 'odom'],
+            ),
+        )
+    return nodes
 
 
-def generate_launch_description():
-    _prepare_gazebo_env()
+def _launch_stack(context, *args, **kwargs):
+    track = _arg(context, 'track')
+    num_cars = int(_arg(context, 'num_cars') or _arg(context, 'cars') or '1')
+    if num_cars < 1:
+        raise RuntimeError('num_cars must be >= 1')
+    assets = resolve_track(track)
+
+    world = _arg(context, 'world') or assets['world']
+    track_file = _arg(context, 'track_file') or assets['track_file']
+    x = float(_arg(context, 'x') or assets['x'])
+    y = float(_arg(context, 'y') or assets['y'])
+    yaw = float(_arg(context, 'yaw') or assets['yaw'])
+    z = _arg(context, 'z')
+    roll = _arg(context, 'roll')
+    pitch = _arg(context, 'pitch')
+    forgez_mode = _arg(context, 'forgez_mode')
+    base_ns = _arg(context, 'namespace') or 'eufs'
+    robot_name = _arg(context, 'robot_name')
+    left = (-sin(yaw), cos(yaw))
 
     rqt_perspective_file = join(
         get_package_share_directory('eufs_rqt'), 'config', 'eufs_sim.perspective',
@@ -273,41 +290,13 @@ def generate_launch_description():
     rviz_config_file = join(
         get_package_share_directory('eufs_racecar'), 'config', 'eufs_f1.rviz',
     )
-    default_world = join(
-        get_package_share_directory('eufs_tracks'), 'worlds', 'small_track.world',
-    )
     gz_launch_dir = join(get_package_share_directory('gazebo_ros'), 'launch')
 
-    return LaunchDescription([
-        DeclareLaunchArgument('namespace', default_value='eufs'),
-        DeclareLaunchArgument('launch_group', default_value='default'),
-        DeclareLaunchArgument('robot_name', default_value='eufs'),
-        DeclareLaunchArgument('vehicleModel', default_value='Ackermann'),
-        DeclareLaunchArgument('commandMode', default_value='velocity'),
-        DeclareLaunchArgument('vehicleModelConfig', default_value='configDry.yaml'),
-        DeclareLaunchArgument('publish_gt_tf', default_value='false'),
-        DeclareLaunchArgument('pub_ground_truth', default_value='true'),
-        DeclareLaunchArgument('show_rqt_gui', default_value='true'),
-        DeclareLaunchArgument('rviz', default_value='true'),
-        DeclareLaunchArgument('gazebo_gui', default_value='true'),
-        DeclareLaunchArgument('world', default_value=default_world),
-        DeclareLaunchArgument(
-            'track_file',
-            default_value=join(
-                get_package_share_directory('eufs_tracks'),
-                'models', 'small_track', 'model.sdf'),
-        ),
-        DeclareLaunchArgument('forgez_mode', default_value='auto'),
-        DeclareLaunchArgument('x', default_value='-13.0'),
-        DeclareLaunchArgument('y', default_value='10.3'),
-        DeclareLaunchArgument('z', default_value='0.1'),
-        DeclareLaunchArgument('roll', default_value='0'),
-        DeclareLaunchArgument('pitch', default_value='0'),
-        DeclareLaunchArgument('yaw', default_value='0'),
+    actions = [
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzserver.launch.py')),
             launch_arguments={
-                'world': LaunchConfiguration('world'),
+                'world': world,
                 'verbose': 'false',
                 'pause': 'false',
             }.items(),
@@ -350,7 +339,7 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'use_sim_time': True,
-                'track_file': LaunchConfiguration('track_file'),
+                'track_file': track_file,
                 'frame_id': 'map',
                 'publish_rate': 1.0,
             }],
@@ -363,10 +352,61 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'use_sim_time': True,
-                'track': LaunchConfiguration('track', default='cota'),
-                'cars': LaunchConfiguration('cars', default='1'),
-                'namespace': LaunchConfiguration('namespace'),
+                'track': track,
+                'cars': str(num_cars),
+                'namespace': base_ns,
             }],
         ),
-        OpaqueFunction(function=spawn_car),
+    ]
+    for index in range(num_cars):
+        namespace = base_ns if index == 0 else f'{base_ns}{index + 1}'
+        entity = (robot_name or namespace) if index == 0 else f'{robot_name or base_ns}{index + 1}'
+        actions.extend(
+            _spawn_nodes(
+                namespace=namespace,
+                entity=entity,
+                x=x + left[0] * 3.0 * index,
+                y=y + left[1] * 3.0 * index,
+                z=z,
+                roll=roll,
+                pitch=pitch,
+                yaw=yaw,
+                forgez_mode=forgez_mode,
+                publish_tf=(index == 0),
+            )
+        )
+    return actions
+
+
+def generate_launch_description():
+    _prepare_gazebo_env()
+    return LaunchDescription([
+        DeclareLaunchArgument('namespace', default_value='eufs'),
+        DeclareLaunchArgument('launch_group', default_value='default'),
+        DeclareLaunchArgument('robot_name', default_value='eufs'),
+        DeclareLaunchArgument('vehicleModel', default_value='Ackermann'),
+        DeclareLaunchArgument('commandMode', default_value='velocity'),
+        DeclareLaunchArgument('vehicleModelConfig', default_value='configDry.yaml'),
+        DeclareLaunchArgument('publish_gt_tf', default_value='false'),
+        DeclareLaunchArgument('pub_ground_truth', default_value='true'),
+        DeclareLaunchArgument('show_rqt_gui', default_value='true'),
+        DeclareLaunchArgument('rviz', default_value='true'),
+        DeclareLaunchArgument('gazebo_gui', default_value='true'),
+        DeclareLaunchArgument(
+            'track',
+            default_value='cota',
+            description='cota or small_track. Selected on this launch only; no eufs_tracks/*.launch.',
+        ),
+        DeclareLaunchArgument('num_cars', default_value='1'),
+        DeclareLaunchArgument('cars', default_value='1'),
+        DeclareLaunchArgument('world', default_value=''),
+        DeclareLaunchArgument('track_file', default_value=''),
+        DeclareLaunchArgument('forgez_mode', default_value='auto'),
+        DeclareLaunchArgument('x', default_value=''),
+        DeclareLaunchArgument('y', default_value=''),
+        DeclareLaunchArgument('z', default_value='0.1'),
+        DeclareLaunchArgument('roll', default_value='0'),
+        DeclareLaunchArgument('pitch', default_value='0'),
+        DeclareLaunchArgument('yaw', default_value=''),
+        OpaqueFunction(function=_launch_stack),
     ])

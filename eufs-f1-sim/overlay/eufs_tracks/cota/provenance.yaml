@@ -1,0 +1,59 @@
+track_id: "cota_layout_reference_v1"
+selector_name: "cota"
+fidelity: "layout_reference"
+frame: "cota_local_enu"
+origin: "Orange start/finish line (F1 sector-1 start) after y-up flip and FIA scale"
+yaw_convention: "counter-clockwise from +x"
+elevation: "unknown/zero — 2D COTA plan view does not reproduce gradients"
+lap_length_m: 5513.0
+fia_reference_lap_length_m: 5513.0
+fit_error_m: 0.0
+turn_count_source: 20
+direction: "counter-clockwise COTA Grand Prix layout"
+bbox_m:
+  x_min: -73.94329284265407
+  x_max: 1756.845547722315
+  y_min: -425.1296626785347
+  y_max: 612.6474580739008
+cone_policy:
+  blue: "left boundary along travel direction"
+  yellow: "right boundary along travel direction"
+  big_orange: "four-cone gate measured on the orange start/finish line"
+  spacing_m: 8.0
+  spacing_min_m: 5.0
+  half_width_m: 7.0
+  width_note: "authored constant 14 m envelope from the plan view, not surveyed boundaries"
+  collision_mode: "cone_cylinder"
+spawn:
+  front_extent_m: 4.4
+  gate_clearance_m: 1.0
+  gate_x_m: 0.0
+  gate_y_m: 0.0
+  gate_heading_rad: -0.6745808541151297
+  spawn_s_m: 5507.599999999997
+  spawn_x_m: -4.217231550698868
+  spawn_y_m: 3.3726781713928813
+  spawn_yaw_rad: -0.6745808541151297
+  direction_check: "increasing_s"
+counts:
+  blue: 711
+  yellow: 711
+  big_orange: 4
+  car_start: 1
+hashes:
+  csv: "8b0024c60d6d542ccea62aa5b969d76d67432ff33c05174ebfb57cff7205fa6e"
+  model_sdf: "fc5630cb5587c3e1c1407ca011ac1173f669d8b1fa5bf8f46ce06df9b48b1ea5"
+  world: "f420881f92fb3d5c594718e591df62f3e5fc43aa62161f64870646029115e7c0"
+source_urls:
+  - "https://commons.wikimedia.org/wiki/File:2022_F1_CourseLayout_COTA.svg"
+  - "https://www.fia.com/sites/default/files/2017_usa_preview_0.pdf"
+  - "https://www.fia.com/sites/default/files/final_formula1crypto.commiamigrandprix2024_lo_0.pdf"
+license_note: "Plan-view SVG is CC BY-SA 4.0. Derived EUFS csv/sdf/world are a layout_reference of Circuit of The Americas, not TUMFTM GPS."
+retrieved_at: "2026-09-12"
+generator: "eufs-f1-sim/scripts/build_cota_track.py"
+scale_m_per_svg_unit: 3.763754875263249
+limitations:
+  - "Digitized from the published COTA F1 plan view; not a surveyed boundary."
+  - "TUMFTM Austin.csv was not used."
+  - "z_m is unknown/zero."
+  - "Results are integration geometry, not COTA lap-time claims."

@@ -26,6 +26,23 @@ cp "${ROOT}/overlay/patches/eufs_plugins_CMakeLists.txt" "${SRC}/eufs_sim/eufs_p
 sed -i "s|-40 40 20 0 0.667643 -1|-22 8 6 0 0.45 0.55|g" \
   "${SRC}/eufs_sim/eufs_tracks/worlds/small_track.world" || true
 
+# COTA Grand Prix cone track, selected by load_car.launch.py track:=cota
+_COTA_OVERLAY="${ROOT}/overlay/eufs_tracks"
+_TRACKS="${SRC}/eufs_sim/eufs_tracks"
+if [[ -d "${_COTA_OVERLAY}" ]]; then
+  mkdir -p "${_TRACKS}/csv" "${_TRACKS}/worlds" "${_TRACKS}/models/cota" "${_TRACKS}/cota"
+  cp -a "${_COTA_OVERLAY}/csv/." "${_TRACKS}/csv/" 2>/dev/null || true
+  cp -a "${_COTA_OVERLAY}/worlds/." "${_TRACKS}/worlds/" 2>/dev/null || true
+  cp -a "${_COTA_OVERLAY}/models/." "${_TRACKS}/models/" 2>/dev/null || true
+  if [[ -d "${_COTA_OVERLAY}/cota" ]]; then
+    cp -a "${_COTA_OVERLAY}/cota/." "${_TRACKS}/cota/"
+  fi
+  if [[ -d "${_COTA_OVERLAY}/source" ]]; then
+    mkdir -p "${_TRACKS}/source"
+    cp -a "${_COTA_OVERLAY}/source/." "${_TRACKS}/source/"
+  fi
+fi
+
 # Gazebo Classic looks up <material>EUFSF1/Silver</material> on GAZEBO_MATERIAL_PATH.
 _mat_line='  <set_env name="GAZEBO_MATERIAL_PATH" value="$(find-pkg-share eufs_racecar)/materials/scripts:/usr/share/gazebo-11/media/materials/scripts"/>'
 for _launch in "${SRC}/eufs_sim/eufs_tracks/launch/"*.launch; do
