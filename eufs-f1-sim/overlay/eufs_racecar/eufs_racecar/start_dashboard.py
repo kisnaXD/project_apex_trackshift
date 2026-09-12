@@ -4,6 +4,7 @@ Start/Stop pause and unpause the Gazebo instance that launch already started.
 This node never starts Gazebo or another launch file.
 """
 
+import os
 import sys
 
 from geometry_msgs.msg import Twist
@@ -29,7 +30,8 @@ class StartDashboard(Node):
     def __init__(self):
         super().__init__('start_dashboard')
         self.declare_parameter('track', 'cota')
-        self.declare_parameter('cars', 1)
+        # Humble launch YAML stringifies integers; declare a string and coerce.
+        self.declare_parameter('cars', '1')
         self.declare_parameter('namespace', 'eufs')
         self.pause_cli = self.create_client(Empty, '/pause_physics')
         self.unpause_cli = self.create_client(Empty, '/unpause_physics')
@@ -116,11 +118,18 @@ class StartWindow(QWidget):
 
 
 def main(args=None):
+    if not os.environ.get('DISPLAY'):
+        os.environ['DISPLAY'] = ':0'
     rclpy.init(args=args)
     app = QApplication(sys.argv)
     node = StartDashboard()
     window = StartWindow(node)
     window.show()
+    window.raise_()
+    window.activateWindow()
+    node.get_logger().info(
+        f'EUFS F1 Start window shown on DISPLAY={os.environ.get("DISPLAY")}'
+    )
     timer = QTimer()
     timer.timeout.connect(lambda: rclpy.spin_once(node, timeout_sec=0.0))
     timer.start(50)

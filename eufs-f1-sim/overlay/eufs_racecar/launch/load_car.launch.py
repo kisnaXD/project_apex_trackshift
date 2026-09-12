@@ -350,10 +350,16 @@ def _launch_stack(context, *args, **kwargs):
             executable='start_dashboard',
             name='start_dashboard',
             output='screen',
+            additional_env={
+                'DISPLAY': environ.get('DISPLAY', ':0'),
+                'QT_X11_NO_MITSHM': environ.get('QT_X11_NO_MITSHM', '1'),
+                'LIBGL_DRI3_DISABLE': environ.get('LIBGL_DRI3_DISABLE', '1'),
+            },
             parameters=[{
                 'use_sim_time': True,
                 'track': track,
-                'cars': num_cars,
+                # String: Humble params YAML cannot override an INTEGER default.
+                'cars': str(num_cars),
                 'namespace': base_ns,
             }],
         ),

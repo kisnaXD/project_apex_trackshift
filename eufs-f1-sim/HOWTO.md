@@ -50,7 +50,7 @@ That is the only start path. It builds and starts the `eufs-f1-sim` compose serv
 
 `ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota num_cars:=1`
 
-`load_car.launch.py` is the only launch. It starts gzserver/gzclient on the selected track world, the cone map (`track_marker_publisher`), one spawn, RViz, and rqt. Do not start `eufs_tracks/small_track.launch` or any second Gazebo stack.
+`load_car.launch.py` is the only launch. It starts gzserver/gzclient on the selected track world, the stock PyQt5 `start_dashboard` Node (window title **EUFS F1 Start**), the cone map (`track_marker_publisher`), one spawn, RViz, and rqt. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack. The dashboard is not `eufs_start_gui` / `eufs_launcher` — those launch a second sim.
 
 ## Track args
 
@@ -81,7 +81,9 @@ Start unpauses `/unpause_physics` on the Gazebo that launch already started. Sto
 
 ## Dashboard
 
-`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node, next to the track map (`track_marker_publisher`). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling.
+`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node on the **same** launch as `track:=cota` (not a second process tree). It uses the container `DISPLAY` (compose passes `${DISPLAY:-:0}` and `/tmp/.X11-unix`, same as gzclient/rviz). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling.
+
+Humble launch YAML stringifies integers. `cars` is declared and passed as a **string** (`'1'`), then coerced with `int()` in the node. An INTEGER default with a string override kills the process before `window.show()`, which is why COTA could come up with Gazebo/RViz and no start window.
 
 Start calls `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and calls `/pause_physics`. The buttons do not start Gazebo, do not run a second launch, and do not start `eufs_launcher`.
 
@@ -89,12 +91,15 @@ Start calls `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and calls `/pa
 
 ```bash
 docker compose ps
+docker exec eufs-f1-sim bash -lc 'echo DISPLAY=$DISPLAY'
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui|start_dashboard'"
+docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list | grep start_dashboard"
+DISPLAY="${DISPLAY:-:0}" xwininfo -root -tree | grep -F 'EUFS F1 Start'
 docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
 docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list; ros2 topic list"
 ```
 
-Expect one `eufs` model on the COTA orange start/finish gate (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`, `timeout 6 gz model -m track -p` at `0 0 0.5` in `cota.world`), one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
+Expect `start_dashboard` still running (not `process has died`), `DISPLAY` the same as gzclient/rviz (`:0` unless you exported another), an X11 window titled **EUFS F1 Start**, `/start_dashboard` in `ros2 node list`, one `eufs` model on the COTA orange start/finish gate (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`, `timeout 6 gz model -m track -p` at `0 0 0.5` in `cota.world`), one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
 
 `load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. This Gazebo Classic `gz model` has no `-l` list flag; `timeout 6 gz model -m eufs -p` is enough.
 
