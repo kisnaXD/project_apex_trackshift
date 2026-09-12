@@ -8,6 +8,7 @@ import math
 import os
 import subprocess
 import sys
+import time
 
 from ackermann_msgs.msg import AckermannDriveStamped
 from ament_index_python.packages import get_package_share_directory
@@ -280,8 +281,10 @@ class StartDashboard(Node):
     def _start_guis(self):
         env = self._gui_env()
         if not _pgrep('gzclient'):
+            # No extra GUI plugins: libgazebo_ros_eol_gui can abort gzserver
+            # if the client attaches while COTA is still loading.
             proc = subprocess.Popen(
-                ['gzclient', '--gui-client-plugin=libgazebo_ros_eol_gui.so'],
+                ['gzclient'],
                 env=env,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
@@ -300,6 +303,15 @@ class StartDashboard(Node):
             )
             self._gui_procs.append(proc)
             self.get_logger().info(f'rviz2 pid={proc.pid} DISPLAY={env["DISPLAY"]}')
+
+    def physics_services_ready(self):
+        return self.unpause_cli.service_is_ready() and self.pause_cli.service_is_ready()
+
+    def spawn_finished(self):
+        return not _pgrep('spawn_entity.py')
+
+    def gazebo_ready(self):
+        return _pgrep('gzserver') and self.physics_services_ready() and self.spawn_finished()
 
     def _call_empty(self, client):
         if not client.wait_for_service(timeout_sec=0.5):
@@ -330,9 +342,14 @@ class StartDashboard(Node):
         self.ack_pub.publish(ack)
 
     def start_sim(self):
-        self._start_guis()
+        if not self.gazebo_ready():
+            self.get_logger().warn('gzserver not ready; not starting gzclient')
+            return False
+        # Unpause first so /clock and odom→base_link TF exist before RViz.
         self._physics_wanted = True
-        return self._call_empty(self.unpause_cli)
+        unpaused = self._call_empty(self.unpause_cli)
+        self._start_guis()
+        return unpaused
 
     def stop_sim(self):
         self._throttle_active = False
@@ -406,6 +423,8 @@ class DemoWindow(QWidget):
         self.cars.setValue(min(1, node.cars()))
 
         start = QPushButton('Start')
+        self.start_btn = start
+        start.setEnabled(False)
         stop = QPushButton('Stop')
         stop.setObjectName('stop')
         throttle = QPushButton('10s front throttle')
@@ -472,8 +491,8 @@ class DemoWindow(QWidget):
         tgrid.addWidget(sec_t, 0, 0, 1, 4)
 
         self.status = QLabel(
-            'Click Start to open Gazebo and RViz. 10s front throttle commands '
-            f'{node.ack_topic} (accel+steer) and {node.cmd_topic} (target speed).'
+            'Loading COTA in gzserver. Start enables after the car spawns — '
+            'do not open Gazebo/RViz until then.'
         )
         self.status.setObjectName('status')
         self.status.setWordWrap(True)
@@ -491,19 +510,44 @@ class DemoWindow(QWidget):
         self._drive_timer = QTimer(self)
         self._drive_timer.timeout.connect(self._drive_tick)
 
+        self._ready_timer = QTimer(self)
+        self._ready_timer.timeout.connect(self._poll_gazebo_ready)
+        self._ready_timer.start(500)
+
         self._ui = QTimer(self)
         self._ui.timeout.connect(self._refresh)
         self._ui.start(100)
         self._refresh()
 
+    def _poll_gazebo_ready(self):
+        if not self.node.gazebo_ready():
+            return
+        self.start_btn.setEnabled(True)
+        self.status.setText(
+            'Gazebo ready (car spawned). Click Start for gzclient + RViz.'
+        )
+        self._ready_timer.stop()
+
     def _on_start(self):
+        if not self.node.gazebo_ready():
+            self.status.setText('Still loading COTA — wait until Start enables.')
+            self.start_btn.setEnabled(False)
+            if not self._ready_timer.isActive():
+                self._ready_timer.start(500)
+            return
+        self.status.setText('Attaching gzclient + RViz to the existing gzserver...')
+        QApplication.processEvents()
+        settle = time.time() + 1.5
+        while time.time() < settle:
+            QApplication.processEvents()
+            time.sleep(0.05)
         if self.node.start_sim():
             self.status.setText(
                 f'RUNNING track={self.track.currentText()} cars={self.cars.value()}  '
                 'physics stays running until Stop'
             )
         else:
-            self.status.setText('Opened GUIs; /unpause_physics not ready')
+            self.status.setText('gzserver not ready — Start aborted so Gazebo was not killed')
 
     def _on_stop(self):
         self._drive_timer.stop()

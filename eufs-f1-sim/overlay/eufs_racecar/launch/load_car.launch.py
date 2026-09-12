@@ -204,6 +204,7 @@ def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publ
     with open(urdf_path, 'w', encoding='utf-8') as stream:
         stream.write(gazebo_description)
     _sdf_with_rviz_paint(urdf_path, sdf_path)
+    joint_states_topic = f'{_ns_path}/joint_states' if _ns_path else '/joint_states'
 
     nodes = [
         Node(
@@ -216,6 +217,19 @@ def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publ
                 'use_sim_time': True,
                 'robot_description': robot_description,
             }],
+        ),
+        Node(
+            package='joint_state_publisher',
+            executable='joint_state_publisher',
+            namespace=namespace_clean,
+            name='joint_state_publisher',
+            output='screen',
+            parameters=[{
+                'use_sim_time': True,
+                'robot_description': robot_description,
+                'rate': 50,
+            }],
+            remappings=[('/joint_states', joint_states_topic)],
         ),
         Node(
             package='gazebo_ros',
@@ -231,7 +245,7 @@ def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publ
                 '-R', str(roll),
                 '-P', str(pitch),
                 '-Y', str(yaw),
-                '-spawn_service_timeout', '60.0',
+                '-timeout', '180.0',
                 '--ros-args', '--log-level', 'warn',
             ],
         ),
