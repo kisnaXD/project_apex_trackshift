@@ -94,14 +94,29 @@ docker compose down
 
 Do **not** run `docker system prune`, disk wipes, or unbounded Docker operations as part of normal use.
 
+## RViz
+
+Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` (not `~/.rviz2/default.rviz`).
+
+| Display | Topic / frame |
+|---------|----------------|
+| Fixed frame | `odom` (ackermann plugin publishes `odom` → `base_link`) |
+| RobotModel | `/robot_description` |
+| TF | all frames |
+| Grid | XY in `odom` |
+| LaserScan | `/scan` |
+| Odometry | `/odom` |
+
+Do not use `base_footprint` — this racecar URDF has `base_link` only.
+
 ## F1 mesh from GrabCAD STEP
 
-Regenerate grouped meshes (chassis + wings + four wheels; no floating leftover solids):
+The GrabCAD STEP is **Y-up**. `scripts/step_to_urdf_ocp.py` maps CAD → ROS as `X=-Z`, `Y=-X`, `Z=+Y` (proper rotation, +Z up) so wheels sit on the ground under the body. Regenerating STLs updates visuals, wheel collisions, and lidar/camera height together — do not apply a visual-only RPY flip.
 
 ```bash
 cd eufs-f1-sim
 python3 scripts/step_to_urdf_ocp.py --step "/home/gera/Downloads/Assem step.STEP"
-docker compose build && sg docker -c 'docker compose up -d --force-recreate'
+sg docker -c 'docker compose build && docker compose up -d --force-recreate'
 ```
 
 ## Alternate launches

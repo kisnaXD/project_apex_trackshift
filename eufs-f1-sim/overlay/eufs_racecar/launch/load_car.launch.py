@@ -1,4 +1,3 @@
-import os
 from os.path import join
 
 import yaml
@@ -67,6 +66,7 @@ def spawn_car(context, *args, **kwargs):
                 'use_sim_time': True,
                 'robot_description': robot_description,
             }],
+            remappings=[('/joint_states', '/eufs/joint_states')],
         ),
         Node(
             package='gazebo_ros',
@@ -104,13 +104,10 @@ def generate_launch_description():
         'eufs_sim.perspective',
     )
     rviz_config_file = join(
-        get_package_share_directory('eufs_launcher'),
+        get_package_share_directory('eufs_racecar'),
         'config',
-        'default.rviz',
+        'eufs_f1.rviz',
     )
-    default_user_config_file = join(os.path.expanduser('~'), '.rviz2', 'default.rviz')
-    if os.path.isfile(default_user_config_file):
-        rviz_config_file = default_user_config_file
 
     return LaunchDescription([
         DeclareLaunchArgument('namespace', default_value='eufs'),
@@ -136,6 +133,7 @@ def generate_launch_description():
             executable='rviz2',
             name='rviz',
             arguments=['-d', rviz_config_file],
+            parameters=[{'use_sim_time': True}],
             condition=IfCondition(LaunchConfiguration('rviz')),
         ),
         Node(

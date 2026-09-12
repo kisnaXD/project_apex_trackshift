@@ -117,10 +117,11 @@ def classify_solids(solids: list) -> dict[str, set[int]]:
             groups["front_wing" if is_front else "rear_wing"].add(info.index)
             continue
 
+        # Y_ros = -X_cad, so CAD +X (left in the STEP file) is ROS right.
         if is_front:
-            groups["left_front_wheel" if cx > 0 else "right_front_wheel"].add(info.index)
+            groups["right_front_wheel" if cx > 0 else "left_front_wheel"].add(info.index)
         else:
-            groups["left_rear_wheel" if cx > 0 else "right_rear_wheel"].add(info.index)
+            groups["right_rear_wheel" if cx > 0 else "left_rear_wheel"].add(info.index)
 
     groups["chassis"] = chassis
 
@@ -137,8 +138,18 @@ def classify_solids(solids: list) -> dict[str, set[int]]:
 
 
 def cad_mm_to_ros_m(x: float, y: float, z: float, scale: float) -> tuple[float, float, float]:
-    """CAD: Z forward (low=front), X left, Y down  ->  ROS: X forward, Y left, Z up (m)."""
-    return (-z * scale, x * scale, -y * scale)
+    """CAD (Y-up) → ROS (Z-up), metres.
+
+    STEP frame: +X left, +Y up, +Z aft (low Z = front).
+    ROS frame:  +X forward, +Y left, +Z up.
+
+    This is a proper rotation (det > 0): π about ROS X applied to the old
+    Y-down mapping that exported the car inverted (halo below, wheels on top).
+      X_ros = -Z_cad
+      Y_ros = -X_cad
+      Z_ros =  Y_cad
+    """
+    return (-z * scale, -x * scale, y * scale)
 
 
 def make_compound(solids: list) -> TopoDS_Compound:
@@ -205,11 +216,12 @@ def wheelbase_mm(solids: list, link_groups: dict[str, set[int]]) -> float:
 
 
 def ros_transform(scale: float) -> gp_Trsf:
+    """Same mapping as cad_mm_to_ros_m: CAD Y-up → ROS Z-up, det > 0."""
     tr = gp_Trsf()
     tr.SetValues(
         0, 0, -scale, 0,
-        scale, 0, 0, 0,
-        0, -scale, 0, 0,
+        -scale, 0, 0, 0,
+        0, scale, 0, 0,
     )
     return tr
 
@@ -281,7 +293,11 @@ def patch_wheel_collision_macros(macros_path: Path, wheel_radius: float) -> None
     macros_path.write_text(text, encoding="utf-8")
 
 
-def patch_racecar_xacro(xacro_path: Path, joints: dict[str, tuple[float, float, float]]) -> None:
+def patch_racecar_xacro(
+    xacro_path: Path,
+    joints: dict[str, tuple[float, float, float]],
+    sensor_z: float,
+) -> None:
     text = xacro_path.read_text(encoding="utf-8")
     replacements = {
         "left_rear_wheel_joint": (joints["left_rear_wheel"], "1.5708 0 0"),
@@ -295,6 +311,24 @@ def patch_racecar_xacro(xacro_path: Path, joints: dict[str, tuple[float, float, 
         new_text, count = re.subn(pattern, repl, text, count=1)
         if count != 1:
             raise RuntimeError(f"Failed to patch joint {joint_name} in {xacro_path}")
+        text = new_text
+
+    laser_z = sensor_z
+    camera_z = max(0.3, sensor_z - 0.10)
+    sensor_patches = (
+        (
+            r'(<joint name="hokuyo_joint" type="fixed">\s*<origin xyz=")[^"]+(" rpy="0 0 0"/>)',
+            rf'\g<1>0.0 0.0 {laser_z:.4f}\g<2>',
+        ),
+        (
+            r'(<joint name="zed_camera_joint" type="fixed">\s*<origin xyz=")[^"]+(" rpy="0 0 0"/>)',
+            rf'\g<1>0.35 0 {camera_z:.4f}\g<2>',
+        ),
+    )
+    for pattern, repl in sensor_patches:
+        new_text, count = re.subn(pattern, repl, text, count=1)
+        if count != 1:
+            raise RuntimeError(f"Failed to patch sensor joint in {xacro_path}: {pattern}")
         text = new_text
 
     xacro_path.write_text(text, encoding="utf-8")
@@ -399,10 +433,38 @@ def main() -> int:
     all_lo = apply_shift(all_lo, shift_tuple)
     all_hi = apply_shift(all_hi, shift_tuple)
 
+    chassis_z = z_extent(corners_shifted(
+        [solids[i] for i in link_groups["chassis"]], scale, shift_tuple
+    ))
+    wheel_z_centers = [joint_positions[name][2] for name in WHEEL_LINKS]
+    mean_wheel_z = sum(wheel_z_centers) / len(wheel_z_centers)
+    left_y = joint_positions["left_rear_wheel"][1]
+    right_y = joint_positions["right_rear_wheel"][1]
+    if mean_wheel_z >= chassis_z[1]:
+        raise RuntimeError(
+            f"Car still inverted after Y-up map: wheels z={mean_wheel_z:.3f} "
+            f">= chassis top {chassis_z[1]:.3f}"
+        )
+    if chassis_z[0] < -0.25:
+        raise RuntimeError(
+            f"Chassis still hangs below ground after Y-up map: zmin={chassis_z[0]:.3f}"
+        )
+    if left_y <= 0 or right_y >= 0:
+        raise RuntimeError(
+            f"Left/right swapped after Y-up map: left_y={left_y:.3f} right_y={right_y:.3f}"
+        )
+
+    sensor_z = max(mean_wheel_z + wheel_radius, chassis_z[1] - 0.05)
+    print(
+        f"Upright check OK: chassis z~[{chassis_z[0]:.3f},{chassis_z[1]:.3f}] "
+        f"wheels z~{mean_wheel_z:.3f} lidar z={sensor_z:.3f}"
+    )
+
     meta = {
         "step_file": str(args.step),
         "tool": "cadquery-ocp (Open CASCADE 7.x) STEPControl + StlAPI",
         "grabcad_url": "https://grabcad.com/library/mercedes-amg-petronas-f1-concept-2",
+        "cad_to_ros": "X=-Z_cad, Y=-X_cad, Z=+Y_cad (CAD Y-up → ROS Z-up, det>0)",
         "solid_count": len(solids),
         "wheelbase_m": args.wheelbase,
         "scale_factor": scale,
@@ -414,6 +476,8 @@ def main() -> int:
             "right_rear": list(joint_positions["right_rear_wheel"]),
         },
         "assembly_bounds_ros_m": {"min": list(all_lo), "max": list(all_hi)},
+        "chassis_z_m": {"min": chassis_z[0], "max": chassis_z[1]},
+        "lidar_z_m": sensor_z,
         "ground_z_m": 0.0,
         "link_groups": {k: sorted(v) for k, v in link_groups.items()},
     }
@@ -424,7 +488,7 @@ def main() -> int:
     print(f"Wheel radius ~{wheel_radius:.3f} m")
 
     if args.patch_xacro.is_file():
-        patch_racecar_xacro(args.patch_xacro, joint_positions)
+        patch_racecar_xacro(args.patch_xacro, joint_positions, sensor_z)
         print(f"Patched joints in {args.patch_xacro}")
     if args.patch_macros.is_file():
         patch_wheel_collision_macros(args.patch_macros, wheel_radius)
