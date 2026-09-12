@@ -4,14 +4,16 @@
 #
 # Host:  sg docker -c './scripts/drive_straight_10s.sh'
 # Inside the container the same file runs the ROS commands directly.
-set -euo pipefail
+set -eo pipefail
 
 SPEED="${SPEED:-1.0}"
 DURATION="${DURATION:-10}"
 
 _inside() {
+  set +u
   source /opt/ros/humble/setup.bash
   source /opt/eufs_ws/install/setup.bash
+  set -u
   echo "Unpausing physics, then publishing linear.x=${SPEED} for ${DURATION}s on /eufs/cmd_vel"
   ros2 service call /unpause_physics std_srvs/srv/Empty >/dev/null || true
   timeout "${DURATION}" ros2 topic pub -r 10 /eufs/cmd_vel geometry_msgs/msg/Twist \
