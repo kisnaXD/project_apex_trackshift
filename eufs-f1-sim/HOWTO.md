@@ -94,9 +94,9 @@ docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
 docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list; ros2 topic list"
 ```
 
-Expect one `eufs` model on the COTA orange start/finish gate (`timeout 5 gz model -m eufs -p` and `timeout 5 gz model -l` should list `eufs` and `cota`), one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
+Expect one `eufs` model on the COTA orange start/finish gate (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`, `timeout 6 gz model -m track -p` at `0 0 0.5` in `cota.world`), one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
 
-`load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. Do not run `gz model -m eufs -p` against a live gzclient; it can freeze the GUI. `timeout 5 gz model -l` is enough.
+`load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. This Gazebo Classic `gz model` has no `-l` list flag; `timeout 6 gz model -m eufs -p` is enough.
 
 In **gzclient** the chassis and wings should read **silver** (RViz `0.75 0.75 0.78`) and the tires **black**. Classic binds STL color from `EUFSF1/Silver` / `EUFSF1/TireBlack` in `gazebo.material` (entrypoint appends `eufs_f1.material`) plus the same RGBA on each visual. Scene ambient is `0.40` so silver does not wash to white.
 

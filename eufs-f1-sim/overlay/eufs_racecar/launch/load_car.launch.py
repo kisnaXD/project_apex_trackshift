@@ -353,7 +353,7 @@ def _launch_stack(context, *args, **kwargs):
             parameters=[{
                 'use_sim_time': True,
                 'track': track,
-                'cars': str(num_cars),
+                'cars': num_cars,
                 'namespace': base_ns,
             }],
         ),
