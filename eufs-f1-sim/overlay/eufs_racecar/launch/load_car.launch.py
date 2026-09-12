@@ -2,6 +2,8 @@
 
 from os import environ
 from os.path import join
+import re
+import subprocess
 
 import yaml
 import xacro
@@ -55,8 +57,47 @@ def _lib_or_empty(package_name):
         return ''
 
 
+def _sdf_with_rviz_paint(urdf_path):
+    """URDF to SDF hardcodes gazebo.material, which has no EUFSF1/Silver."""
+    converted = subprocess.run(
+        ['gz', 'sdf', '-p', urdf_path],
+        check=True, capture_output=True, text=True,
+    )
+    script = join(
+        get_package_share_directory('eufs_racecar'),
+        'materials', 'scripts', 'eufs_f1.material',
+    )
+    sdf = converted.stdout.replace(
+        'file://media/materials/scripts/gazebo.material',
+        f'file://{script}',
+    )
+    paints = {
+        'EUFSF1/Silver': (
+            '0.75 0.75 0.78 1',
+            '0.75 0.75 0.78 1',
+            '0.90 0.90 0.95 1',
+        ),
+        'EUFSF1/TireBlack': (
+            '0.05 0.05 0.05 1',
+            '0.05 0.05 0.05 1',
+            '0.08 0.08 0.08 1',
+        ),
+    }
+    for name, (ambient, diffuse, specular) in paints.items():
+        sdf = re.sub(
+            rf'(<name>{re.escape(name)}</name>\s*<uri>file://[^<]+</uri>\s*</script>)',
+            rf'\1\n            <ambient>{ambient}</ambient>\n'
+            rf'            <diffuse>{diffuse}</diffuse>\n'
+            rf'            <specular>{specular}</specular>',
+            sdf,
+        )
+    sdf_path = '/tmp/eufs_robot_description.sdf'
+    with open(sdf_path, 'w', encoding='utf-8') as stream:
+        stream.write(sdf)
+    return sdf_path
+
+
 def _prepare_gazebo_env():
-    """Keep battery/energy-gate plugins and track meshes on ONE Gazebo path graph."""
     racecar = _share_or_empty('eufs_racecar')
     tracks = _share_or_empty('eufs_tracks')
     sensors = _share_or_empty('eufs_sensors')
@@ -64,18 +105,8 @@ def _prepare_gazebo_env():
     plugins_lib = _lib_or_empty('eufs_plugins')
     humble_lib = '/opt/ros/humble/lib'
 
-    _prepend_env(
-        'GAZEBO_PLUGIN_PATH',
-        battery_lib,
-        plugins_lib,
-        humble_lib,
-    )
-    _prepend_env(
-        'GAZEBO_MODEL_PATH',
-        join(tracks, 'models') if tracks else '',
-        tracks,
-        racecar,
-    )
+    _prepend_env('GAZEBO_PLUGIN_PATH', battery_lib, plugins_lib, humble_lib)
+    _prepend_env('GAZEBO_MODEL_PATH', join(tracks, 'models') if tracks else '', tracks, racecar)
     _prepend_env(
         'GAZEBO_MATERIAL_PATH',
         join(racecar, 'materials', 'scripts') if racecar else '',
@@ -132,7 +163,7 @@ def spawn_car(context, *args, **kwargs):
     urdf_path = '/tmp/eufs_robot_description.urdf'
     with open(urdf_path, 'w', encoding='utf-8') as stream:
         stream.write(robot_description)
-
+    sdf_path = _sdf_with_rviz_paint(urdf_path)
     joint_states_topic = f'{namespace_path}/joint_states' if namespace_path else '/joint_states'
 
     return [
@@ -154,7 +185,7 @@ def spawn_car(context, *args, **kwargs):
             output='screen',
             arguments=[
                 '-entity', entity,
-                '-file', urdf_path,
+                '-file', sdf_path,
                 '-x', x,
                 '-y', y,
                 '-z', z,
@@ -183,16 +214,7 @@ def spawn_car(context, *args, **kwargs):
             executable='static_transform_publisher',
             name='map_to_odom_publisher',
             output='screen',
-            arguments=[
-                '0.0',
-                '0.0',
-                '0.0',
-                '0.0',
-                '0',
-                '0',
-                'map',
-                'odom',
-            ],
+            arguments=['0.0', '0.0', '0.0', '0.0', '0', '0', 'map', 'odom'],
         ),
     ]
 
@@ -201,19 +223,13 @@ def generate_launch_description():
     _prepare_gazebo_env()
 
     rqt_perspective_file = join(
-        get_package_share_directory('eufs_rqt'),
-        'config',
-        'eufs_sim.perspective',
+        get_package_share_directory('eufs_rqt'), 'config', 'eufs_sim.perspective',
     )
     rviz_config_file = join(
-        get_package_share_directory('eufs_racecar'),
-        'config',
-        'eufs_f1.rviz',
+        get_package_share_directory('eufs_racecar'), 'config', 'eufs_f1.rviz',
     )
     default_world = join(
-        get_package_share_directory('eufs_tracks'),
-        'worlds',
-        'small_track.world',
+        get_package_share_directory('eufs_tracks'), 'worlds', 'small_track.world',
     )
     gz_launch_dir = join(get_package_share_directory('gazebo_ros'), 'launch')
 
@@ -229,20 +245,14 @@ def generate_launch_description():
         DeclareLaunchArgument('show_rqt_gui', default_value='true'),
         DeclareLaunchArgument('rviz', default_value='true'),
         DeclareLaunchArgument('gazebo_gui', default_value='true'),
-        DeclareLaunchArgument(
-            'world',
-            default_value=default_world,
-            description='Gazebo Classic world shared with RViz track markers',
-        ),
+        DeclareLaunchArgument('world', default_value=default_world),
         DeclareLaunchArgument(
             'track_file',
             default_value=join(
                 get_package_share_directory('eufs_tracks'),
                 'models', 'small_track', 'model.sdf'),
-            description='SDF track model used for the stock RViz MarkerArray display',
         ),
-        DeclareLaunchArgument('forgez_mode', default_value='auto',
-                              description='Forgez mode: Harvest, Nominal, Attack, or auto'),
+        DeclareLaunchArgument('forgez_mode', default_value='auto'),
         DeclareLaunchArgument('x', default_value='-13.0'),
         DeclareLaunchArgument('y', default_value='10.3'),
         DeclareLaunchArgument('z', default_value='0.1'),
@@ -260,9 +270,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzclient.launch.py')),
             condition=IfCondition(LaunchConfiguration('gazebo_gui')),
-            launch_arguments={
-                'verbose': 'false',
-            }.items(),
+            launch_arguments={'verbose': 'false'}.items(),
         ),
         Node(
             package='rviz2',

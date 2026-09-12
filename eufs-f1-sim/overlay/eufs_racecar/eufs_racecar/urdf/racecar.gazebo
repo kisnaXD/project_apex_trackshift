@@ -2,11 +2,11 @@
 <robot name="racecar" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 <xacro:arg name="is_lidar_enable" default="true" />
+<xacro:arg name="forgez_max_power_w" default="12000.0" />
+<xacro:arg name="robot_namespace" default="eufs" />
 
-<!-- Gazebo Classic materials: string names resolved via GAZEBO_MATERIAL_PATH
-     (eufs_f1.material) plus the built-in gazebo.material scripts. Nested
-     <script>/<ambient> blobs are ignored by the URDF→SDF converter and
-     leave STL visuals white in gzclient. -->
+<!-- Classic paints STL visuals from <material>NAME</material> looked up in
+     gazebo.material (entrypoint appends EUFSF1/Silver and EUFSF1/TireBlack). -->
 
 <gazebo reference="chassis">
   <mu1 value="0.0"/>
@@ -14,14 +14,47 @@
   <kp  value="10000000.0" />
   <kd  value="1.0" />
   <material>EUFSF1/Silver</material>
+  <visual>
+    <material>
+      <ambient>0.75 0.75 0.78 1</ambient>
+      <diffuse>0.75 0.75 0.78 1</diffuse>
+      <specular>0.90 0.90 0.95 1</specular>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/Silver</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <gazebo reference="front_wing">
   <material>EUFSF1/Silver</material>
+  <visual>
+    <material>
+      <ambient>0.75 0.75 0.78 1</ambient>
+      <diffuse>0.75 0.75 0.78 1</diffuse>
+      <specular>0.90 0.90 0.95 1</specular>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/Silver</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <gazebo reference="rear_wing">
   <material>EUFSF1/Silver</material>
+  <visual>
+    <material>
+      <ambient>0.75 0.75 0.78 1</ambient>
+      <diffuse>0.75 0.75 0.78 1</diffuse>
+      <specular>0.90 0.90 0.95 1</specular>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/Silver</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <gazebo reference="left_rear_wheel">
@@ -31,6 +64,16 @@
   <kd  value="1.0" />
   <fdir1 value="1 0 0"/>
   <material>EUFSF1/TireBlack</material>
+  <visual>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/TireBlack</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <gazebo reference="right_rear_wheel">
@@ -40,6 +83,16 @@
   <kd  value="1.0" />
   <fdir1 value="1 0 0"/>
   <material>EUFSF1/TireBlack</material>
+  <visual>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/TireBlack</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <gazebo reference="left_front_wheel">
@@ -49,6 +102,16 @@
   <kd  value="1.0" />
   <fdir1 value="0 0 1"/>
   <material>EUFSF1/TireBlack</material>
+  <visual>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/TireBlack</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <gazebo reference="right_front_wheel">
@@ -58,15 +121,50 @@
   <kd  value="1.0" />
   <fdir1 value="0 0 1"/>
   <material>EUFSF1/TireBlack</material>
+  <visual>
+    <material>
+      <ambient>0.05 0.05 0.05 1</ambient>
+      <diffuse>0.05 0.05 0.05 1</diffuse>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>EUFSF1/TireBlack</name>
+      </script>
+    </material>
+  </visual>
 </gazebo>
 
 <!-- Gazebo plugins -->
 
 <gazebo>
+  <plugin name="gazebo_ros_energy_aware_ackermann_gate" filename="libgazebo_ros_energy_aware_ackermann_gate.so">
+    <ros>
+      <namespace>$(arg robot_namespace)</namespace>
+      <remapping>input_cmd_vel:=cmd_vel</remapping>
+      <remapping>output_cmd_vel:=energy_cmd_vel</remapping>
+      <remapping>battery_state:=forgez/battery_state</remapping>
+      <remapping>gate_derate_reason:=forgez/gate_derate_reason</remapping>
+    </ros>
+    <update_rate>50.0</update_rate>
+    <link_name>base_link</link_name>
+    <vehicle_mass_kg>788.0</vehicle_mass_kg>
+    <max_deploy_power_w>$(arg forgez_max_power_w)</max_deploy_power_w>
+    <reserve_energy_wh>20.0</reserve_energy_wh>
+    <reserve_buffer_wh>60.0</reserve_buffer_wh>
+    <thermal_derate_temperature>90.0</thermal_derate_temperature>
+    <shutdown_temperature>105.0</shutdown_temperature>
+    <max_launch_accel_mps2>8.0</max_launch_accel_mps2>
+    <max_brake_accel_mps2>12.0</max_brake_accel_mps2>
+    <drag_coefficient_area>1.35</drag_coefficient_area>
+    <air_density>1.225</air_density>
+    <rolling_resistance_coefficient>0.015</rolling_resistance_coefficient>
+    <max_speed_mps>80.0</max_speed_mps>
+  </plugin>
+
   <plugin name="gazebo_ros_ackermann_drive" filename="libgazebo_ros_ackermann_drive.so">
 
     <ros>
-      <remapping>cmd_vel:=cmd_vel</remapping>
+      <namespace>$(arg robot_namespace)</namespace>
+      <remapping>cmd_vel:=energy_cmd_vel</remapping>
       <remapping>odom:=odom</remapping>
       <remapping>distance:=distance</remapping>
     </ros>
@@ -89,7 +187,7 @@
     <max_steering_angle>7.85</max_steering_angle>
 
     <!-- Max absolute linear speed in m/s -->
-    <max_speed>20</max_speed>
+    <max_speed>80</max_speed>
 
     <!-- PID tuning -->
     <left_steering_pid_gain>50.0 5.0 0.1</left_steering_pid_gain>
@@ -110,43 +208,5 @@
 
   </plugin>
 </gazebo>
-
-<!-- hokuyo -->
-<xacro:if value="$(arg is_lidar_enable)">
-  <gazebo reference="laser">
-    <material>Gazebo/Grey</material>
-    <sensor type="ray" name="hokuyo_sensor">
-      <pose>0 0 0.0124 0 0 0</pose>
-      <visualize>true</visualize>
-      <update_rate>40</update_rate>
-      <ray>
-        <scan>
-          <horizontal>
-            <samples>1081</samples>
-            <resolution>1</resolution>
-            <min_angle>-2.3561944902</min_angle>
-            <max_angle>2.3561944902</max_angle>
-          </horizontal>
-        </scan>
-        <range>
-          <min>0.1</min>
-          <max>10.0</max>
-          <resolution>0.01</resolution>
-        </range>
-        <noise>
-          <mean>0.0</mean>
-          <stddev>0.01</stddev>
-        </noise>
-      </ray>
-      <plugin name="gazebo_ros_hokuyo_controller" filename="libgazebo_ros_ray_sensor.so">
-        <ros>
-          <remapping>~/out:=/scan</remapping>
-        </ros>
-        <output_type>sensor_msgs/LaserScan</output_type>
-        <frame_name>laser</frame_name>
-      </plugin>
-    </sensor>
-  </gazebo>
-</xacro:if>
 
 </robot>
