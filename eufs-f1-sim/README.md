@@ -11,7 +11,7 @@ ROS 2 Humble + Gazebo Classic 11 simulation stack for EUFS tracks with a GrabCAD
 5. Conversion tool: **cadquery-ocp** (Open CASCADE 7.x) — `STEPControl` read + `StlAPI` mesh export via `scripts/step_to_urdf_ocp.py`.
 6. Per-link visuals: chassis body, front wing, rear wing, four wheels (~5.1 m length, 3.28 m wheelbase).
 7. Meshes install flat to `share/eufs_racecar/meshes/`; URDF in `share/eufs_racecar/urdf/`.
-8. Ackermann drive, Hokuyo lidar, and Forgez battery plugins unchanged.
+8. Ackermann drive and Forgez battery plugins; perception sensors are omitted from the demo so the car and track remain the focus.
 9. Regenerate: `python3 scripts/step_to_urdf_ocp.py --step "/path/to/Assem step.STEP"` (needs `cadquery-ocp`).
 10. Attribution: `overlay/eufs_racecar/eufs_racecar/meshes/F1_MODEL_SOURCE.txt`.
 
@@ -42,22 +42,25 @@ docker compose build
 
 ## Run
 
+Single start path (Gazebo + RViz + one spawn):
+
 ```bash
+cd eufs-f1-sim
 xhost +local:
-docker compose up
+export DISPLAY=:0
+sg docker -c './scripts/start-stack.sh'
 ```
 
-Default launch: EUFS `small_track` with the F1 visual and Forgez battery (Nominal mode).
+Compose CMD is `ros2 launch eufs_racecar load_car.launch.py`. That one file
+starts gzserver+gzclient, publishes `/eufs/robot_description`, spawns that URDF
+once, and opens RViz (`eufs_f1.rviz`) plus rqt. Do not start `eufs_tracks/*.launch`
+alongside it.
 
-### Other launches
-
-```bash
-docker compose run --rm eufs-f1-sim bash -lc \
-  'ros2 launch eufs_tracks skidpad.launch gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml'
-
-docker compose run --rm eufs-f1-sim bash -lc \
-  'ros2 launch eufs_tracks small_track.launch forgez_mode:=Attack gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml'
-```
+The demo publishes 71 stock RViz cone markers on `/track_markers`, uses `map` as
+the fixed frame, and publishes the car description on `/eufs/robot_description`.
+Gazebo odometry is already in world coordinates, so `map -> odom` is identity.
+Drive with a `geometry_msgs/Twist` on `/eufs/cmd_vel`; send a zero command when
+releasing control.
 
 Forgez modes and parameters: `overlay/eufs_racecar/config/forgez_battery.yaml`.
 
@@ -89,7 +92,8 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
-ros2 launch eufs_tracks small_track.launch gazebo_gui:=true show_rqt_gui:=false vehicleModelConfig:=configDry.yaml
+xhost +local:
+ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true
 ```
 
 Requires `ros-humble-gazebo-ros-pkgs` (Gazebo Classic 11) on the host.

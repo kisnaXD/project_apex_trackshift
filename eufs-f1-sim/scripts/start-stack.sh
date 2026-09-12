@@ -17,8 +17,11 @@ else
 fi
 
 echo "Waiting for stack..."
-sleep 15
+sleep 20
 docker compose ps
 echo
 echo "GUI processes (expect gzclient, rviz2, rqt_gui):"
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui' || true"
+echo
+echo "Gazebo model eufs:"
+docker exec eufs-f1-sim bash -lc "gz model -m eufs -p || true"

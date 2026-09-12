@@ -1,6 +1,17 @@
 # EUFS F1 Sim — Runbook
 
-Lean ROS 2 Humble + Gazebo Classic 11 container for EUFS tracks with the Mercedes F1 visual and Forgez battery plugin.
+## Inspect (why RViz had the car and Gazebo did not)
+
+1. RViz RobotModel is fed by `robot_state_publisher` on `/eufs/robot_description` (one xacro, `package://eufs_racecar/meshes/*.STL`). That topic is enough for RViz; it does not prove Gazebo spawned anything.
+2. Docker CMD used a second launch: `eufs_tracks/small_track.launch` starts `gazebo.launch.py` then includes `load_car`. Two files, two env graphs.
+3. That XML `set_env` **replaces** `GAZEBO_PLUGIN_PATH` with `/opt/ros/humble/lib` + `install/eufs_plugins` (no `/lib`, no `gazebo_ros_battery`). Forgez/energy-gate plugins fail; `spawn_entity` dies; Gazebo stays empty.
+4. The same `set_env` replaces `GAZEBO_MODEL_PATH` with `eufs_tracks/models` only, so `model://eufs_tracks/meshes/...` cones miss and gzclient can stick on splash / never show the car.
+5. `load_car` already published RSP + JSP (`use_sim_time`) and spawned from the namespaced topic, but it did **not** start gzserver/gzclient. RViz and Gazebo were not one process tree.
+6. Meshes are binary STL; RViz can load them. Gazebo never got a successful spawn of that same URDF.
+7. `gz model -l` vs `/eufs/robot_description` vs RViz RobotModel were therefore different: description present, model absent.
+8. `/clock` `/tf` `/eufs/odom` `/eufs/cmd_vel` must be one graph with `use_sim_time:=true` on RViz and RSP.
+9. Fix: **one** launch (`eufs_racecar/load_car.launch.py`) starts gzserver+gzclient, writes one URDF, publishes it, spawns that file once, RSP+JSP, RViz `-d` eufs_f1.rviz, rqt.
+10. Do not start `eufs_tracks/*.launch` or `eufs_launcher` for this demo — they are a second stack.
 
 ## Prerequisites (host)
 
@@ -23,15 +34,9 @@ xhost +local:
 | `scripts/prepare-workspace.sh` | Populates `ws/src` at build time |
 | `scripts/step_to_urdf_ocp.py` | GrabCAD STEP → grouped STL meshes + URDF joints |
 | `overlay/` | F1 meshes, battery plugin, patches |
+| `overlay/eufs_racecar/launch/load_car.launch.py` | **The** launch: Gazebo + RViz + one spawn |
 
-## Build (only when image is missing or sources changed)
-
-```bash
-cd eufs-f1-sim
-docker compose build
-```
-
-## Start (default: small_track + Gazebo + RViz + rqt manual control)
+## Start (single command)
 
 ```bash
 cd eufs-f1-sim
@@ -40,50 +45,30 @@ export DISPLAY=:0
 sg docker -c './scripts/start-stack.sh'
 ```
 
-Or manually:
+That is the only start path. Compose CMD is:
 
-```bash
-cd eufs-f1-sim
-xhost +local:
-sg docker -c 'docker compose up -d'
-```
+`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true`
+
+| GUI | Process | Purpose |
+|-----|---------|---------|
+| Gazebo | `gzserver` + `gzclient` | small_track world + one `eufs` model |
+| RViz2 | `rviz2 -d eufs_f1.rviz` | RobotModel on `/eufs/robot_description` |
+| rqt | `rqt_gui` | EUFS Robot Steering + Mission Control |
 
 - **Service name:** `eufs-f1-sim`
 - **Container name:** `eufs-f1-sim`
 - **Image:** `eufs-f1-sim:lean`
-- **Default CMD:** `ros2 launch eufs_tracks small_track.launch gazebo_gui:=true show_rqt_gui:=true rviz:=true vehicleModelConfig:=configDry.yaml`
-
-Every stack start launches three GUIs:
-
-| GUI | Process | Purpose |
-|-----|---------|---------|
-| Gazebo | `gzclient` | 3D sim + F1 car visual |
-| RViz2 | `rviz2` | Laser/TF visualization |
-| rqt | `rqt_gui` | EUFS Robot Steering + Mission Control |
-
-### If Gazebo GUI (`gzclient`) does not appear
-
-```bash
-cd eufs-f1-sim
-xhost +local:
-docker compose restart
-```
-
-Or launch the client manually inside the running container:
-
-```bash
-docker exec -e DISPLAY=$DISPLAY eufs-f1-sim bash -lc "gzclient"
-```
 
 ## Verify
 
 ```bash
 docker compose ps
-docker compose logs -f --tail=50
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui'"
+docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
+docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list; ros2 topic list"
 ```
 
-Expect `eufs-f1-sim` **Up** and all three GUI processes running (`gzclient`, `rviz2`, and `python3 ... rqt_gui`). Meshes are **binary STL** so RViz2 can load the RobotModel (ASCII STL is rejected). In gzclient the chassis should be silver and the tires black — not default white. In RViz the Orbit view should sit behind `base_link` on the track, with RobotModel OK.
+Expect one `eufs` model on the track, one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
 
 ## Stop
 
@@ -96,51 +81,41 @@ Do **not** run `docker system prune`, disk wipes, or unbounded Docker operations
 
 ## RViz
 
-Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` with `rviz2 -d` (not `~/.rviz2/default.rviz`). That file is EUFS `eufs_launcher/config/default.rviz` with this racecar’s frames: **third-person behind the car**, same Orbit numbers as stock EUFS (`Distance` 8.5, `Yaw` π, `Pitch` 0.4, focal point 2 m ahead).
+Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` with `rviz2 -d` and `use_sim_time:=true`.
 
 | Display | Topic / frame |
 |---------|----------------|
-| Fixed frame | `base_link` (this URDF has no `base_footprint`) |
-| View target | `base_link` (chase cam; Target Frame `odom` looks at the origin and shows an empty grid) |
-| RobotModel | `/robot_description` (Transient Local — matches `robot_state_publisher`) |
+| Fixed frame | `map` |
+| View target | `base_link` (third-person Orbit view) |
+| RobotModel | `/eufs/robot_description` (Transient Local) |
 | TF | all frames |
-| Grid | XY in `base_link` |
-| LaserScan | `/scan` (Best Effort; Humble remaps `gazebo_ros_ray_sensor` `~/out` → `/scan`) |
+| Track | `/track_markers` (71 transient-local cone markers) |
+| Odometry | `/eufs/odom` |
 
-Meshes use `package://eufs_racecar/meshes/...` so RViz2 can load the RobotModel. The lean image does not ship `eufs_rviz_plugins`, so stock cone displays are omitted.
+## Driving
+
+```bash
+docker exec eufs-f1-sim bash -lc 'source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 topic pub -r 10 /eufs/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 1.0}, angular: {z: 0.0}}"'
+```
+
+Stop with Ctrl-C, then one zero command on `/eufs/cmd_vel`.
 
 ## F1 mesh from GrabCAD STEP
 
-The GrabCAD STEP is **Y-up**. `scripts/step_to_urdf_ocp.py` maps CAD → ROS as `X=-Z`, `Y=-X`, `Z=+Y` (proper rotation, +Z up) so wheels sit on the ground under the body. Regenerating STLs updates visuals, wheel collisions, and lidar/camera height together — do not apply a visual-only RPY flip.
-
-Each corner wheel mesh is the GrabCAD `WHEEL` instance only (tire + rim). Leftover `Formula 1` body solids at the corners — uprights, wishbones, and brake ducts — are dropped so nothing pokes out of the rubber. Front/rear wings are already part of the chassis body solid.
-
-**Colors:** RViz uses URDF `silver` / `tire_black`. **gzclient** ignores those and only paints STL links from Classic `<gazebo reference="..."><material>NAME</material></gazebo>` names on `GAZEBO_MATERIAL_PATH`. Chassis/wings: `EUFSF1/Silver`. Tires: `EUFSF1/TireBlack`. Scripts: `overlay/eufs_racecar/eufs_racecar/materials/scripts/eufs_f1.material`. Nested SDF `<ambient>` blobs do **not** color the car in Classic (that left it white). Confirm paint in `gzclient`, not from the xacro files.
+The GrabCAD STEP is **Y-up**. `scripts/step_to_urdf_ocp.py` maps CAD → ROS as `X=-Z`, `Y=-X`, `Z=+Y`. Meshes are **binary STL** at `package://eufs_racecar/meshes/...` so both RViz and Gazebo load the same files.
 
 ```bash
 cd eufs-f1-sim
 python3 scripts/step_to_urdf_ocp.py --step "/home/gera/Downloads/Assem step.STEP"
-sg docker -c 'docker compose build && docker compose up -d --force-recreate'
+sg docker -c './scripts/start-stack.sh'
 ```
-
-## Alternate launches
-
-One-off runs without changing the default service CMD:
-
-```bash
-docker compose run --rm eufs-f1-sim bash -lc \
-  'ros2 launch eufs_tracks skidpad.launch gazebo_gui:=true show_rqt_gui:=true rviz:=true vehicleModelConfig:=configDry.yaml'
-
-docker compose run --rm eufs-f1-sim bash -lc \
-  'ros2 launch eufs_tracks small_track.launch forgez_mode:=Attack gazebo_gui:=true show_rqt_gui:=true rviz:=true vehicleModelConfig:=configDry.yaml'
-```
-
-Forgez battery modes and params: `overlay/eufs_racecar/config/forgez_battery.yaml`.
 
 ## Battery topics
 
 - `/eufs/forgez/battery_state` (`sensor_msgs/BatteryState`)
 - `/eufs/forgez/charge_level_wh` (`std_msgs/Float64`)
+
+Forgez modes: `overlay/eufs_racecar/config/forgez_battery.yaml` (`forgez_mode:=Harvest|Nominal|Attack` on the same launch).
 
 ## Native build (without Docker)
 
@@ -152,9 +127,8 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
-export GAZEBO_MATERIAL_PATH="$PWD/install/eufs_racecar/share/eufs_racecar/materials/scripts:/usr/share/gazebo-11/media/materials/scripts"
 xhost +local:
-ros2 launch eufs_tracks small_track.launch gazebo_gui:=true show_rqt_gui:=true rviz:=true vehicleModelConfig:=configDry.yaml
+ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true
 ```
 
 ## Version locks

@@ -43,4 +43,4 @@ ENV GAZEBO_MODEL_PATH=${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/model
 WORKDIR /opt/eufs_ws
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["bash", "-lc", "ros2 launch eufs_tracks small_track.launch gazebo_gui:=true show_rqt_gui:=true rviz:=true vehicleModelConfig:=configDry.yaml"]
+CMD ["ros2", "launch", "eufs_racecar", "load_car.launch.py", "gazebo_gui:=true", "show_rqt_gui:=true", "rviz:=true"]
