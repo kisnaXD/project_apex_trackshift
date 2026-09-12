@@ -43,8 +43,8 @@ Visualization Manager:
       Normal Cell Count: 0
       Offset:
         X: 0
-        Y: 0
-        Z: 0
+        Y: -22.0
+        Z: 0.5
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
@@ -178,46 +178,46 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 8.5
+      Distance: 55.0
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2
-        Y: 0
-        Z: 0
+        X: 28.0
+        Y: -22.0
+        Z: 0.5
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6200000047683716
-      Target Frame: base_link
+      Pitch: 0.5
+      Target Frame: map
       Value: Orbit (rviz_default_plugins)
-      Yaw: 3.1414999961853027
+      Yaw: 2.466
     Saved:
       - Class: rviz_default_plugins/Orbit
-        Distance: 8.5
+        Distance: 55.0
         Enable Stereo Rendering:
           Stereo Eye Separation: 0.05999999865889549
           Stereo Focal Distance: 1
           Swap Stereo Eyes: false
           Value: false
         Focal Point:
-          X: 2
-          Y: 0
-          Z: 0
+          X: 28.0
+          Y: -22.0
+          Z: 0.5
         Focal Shape Fixed Size: true
         Focal Shape Size: 0.05000000074505806
         Invert Z Axis: false
         Name: Default POV
         Near Clip Distance: 0.009999999776482582
-        Pitch: 0.6200000047683716
-        Target Frame: base_link
+        Pitch: 0.5
+        Target Frame: map
         Value: Orbit (rviz_default_plugins)
-        Yaw: 3.1414999961853027
+        Yaw: 2.466
 Window Geometry:
   Displays:
     collapsed: false

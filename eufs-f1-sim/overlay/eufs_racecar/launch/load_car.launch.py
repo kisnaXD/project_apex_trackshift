@@ -239,16 +239,6 @@ def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publ
     if publish_tf:
         nodes.append(
             Node(
-                package='tf2_ros',
-                executable='static_transform_publisher',
-                name='map_to_odom_publisher',
-                output='screen',
-                parameters=[{'use_sim_time': True}],
-                arguments=['0.0', '0.0', '0.0', '0.0', '0', '0', 'map', 'odom'],
-            ),
-        )
-        nodes.append(
-            Node(
                 package='eufs_racecar',
                 executable='odom_tf_publisher',
                 name=f'odom_tf_{stem}',

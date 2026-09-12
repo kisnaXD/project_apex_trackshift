@@ -127,7 +127,7 @@
     <parent link="chassis" />
     <child link="left_steering_hinge" />
     <axis xyz="-1 0 0" />
-    <limit lower="-1.0" upper="1.0" effort="8000" velocity="200" />
+    <limit lower="-1.0" upper="1.0" effort="80" velocity="8" />
   </joint>
 
   <xacro:steering_hinge_transmission name="left_steering_hinge" />
@@ -146,12 +146,12 @@
     </visual>
   </link>
 
-  <joint name="right_steering_hinge_joint" type="continuous">
+  <joint name="right_steering_hinge_joint" type="revolute">
     <origin xyz="3.2800 -0.7495 0.3450" rpy="0 1.5708 0" />
     <parent link="chassis" />
     <child link="right_steering_hinge" />
     <axis xyz="-1 0 0" />
-    <limit lower="-1.0" upper="1.0" effort="8000" velocity="200" />
+    <limit lower="-1.0" upper="1.0" effort="80" velocity="8" />
   </joint>
 
   <xacro:steering_hinge_transmission name="right_steering_hinge" />

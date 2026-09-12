@@ -8,6 +8,7 @@ import math
 import os
 import subprocess
 import sys
+import threading
 import time
 
 from ackermann_msgs.msg import AckermannDriveStamped
@@ -291,6 +292,7 @@ class StartDashboard(Node):
             )
             self._gui_procs.append(proc)
             self.get_logger().info(f'gzclient pid={proc.pid} DISPLAY={env["DISPLAY"]}')
+            threading.Thread(target=self._gz_follow_car, daemon=True).start()
         if not _pgrep('rviz2'):
             proc = subprocess.Popen(
                 [
@@ -303,6 +305,24 @@ class StartDashboard(Node):
             )
             self._gui_procs.append(proc)
             self.get_logger().info(f'rviz2 pid={proc.pid} DISPLAY={env["DISPLAY"]}')
+
+    def _gz_follow_car(self):
+        time.sleep(4.0)
+        env = self._gui_env()
+        listed = subprocess.run(
+            ['gz', 'camera', '-l'],
+            capture_output=True, text=True, env=env, check=False,
+        )
+        names = [line.strip() for line in (listed.stdout or '').splitlines() if line.strip()]
+        for name in names or ('gzclient_camera', 'user_camera'):
+            result = subprocess.run(
+                ['gz', 'camera', '-c', name, '-f', 'eufs'],
+                capture_output=True, text=True, env=env, check=False,
+            )
+            if result.returncode == 0:
+                self.get_logger().info(f'gz camera {name} following eufs')
+                return
+        self.get_logger().warn(f'could not follow eufs; cameras={names!r}')
 
     def physics_services_ready(self):
         return self.unpause_cli.service_is_ready() and self.pause_cli.service_is_ready()
