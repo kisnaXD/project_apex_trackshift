@@ -98,6 +98,20 @@ def spawn_car(context, *args, **kwargs):
 
 
 def generate_launch_description():
+    rqt_perspective_file = join(
+        get_package_share_directory('eufs_rqt'),
+        'config',
+        'eufs_sim.perspective',
+    )
+    rviz_config_file = join(
+        get_package_share_directory('eufs_launcher'),
+        'config',
+        'default.rviz',
+    )
+    default_user_config_file = join(os.path.expanduser('~'), '.rviz2', 'default.rviz')
+    if os.path.isfile(default_user_config_file):
+        rviz_config_file = default_user_config_file
+
     return LaunchDescription([
         DeclareLaunchArgument('namespace', default_value='eufs'),
         DeclareLaunchArgument('launch_group', default_value='default'),
@@ -107,8 +121,8 @@ def generate_launch_description():
         DeclareLaunchArgument('vehicleModelConfig', default_value='configDry.yaml'),
         DeclareLaunchArgument('publish_gt_tf', default_value='false'),
         DeclareLaunchArgument('pub_ground_truth', default_value='true'),
-        DeclareLaunchArgument('show_rqt_gui', default_value='false'),
-        DeclareLaunchArgument('rviz', default_value='false'),
+        DeclareLaunchArgument('show_rqt_gui', default_value='true'),
+        DeclareLaunchArgument('rviz', default_value='true'),
         DeclareLaunchArgument('forgez_mode', default_value='auto',
                               description='Forgez mode: Harvest, Nominal, Attack, or auto'),
         DeclareLaunchArgument('x', default_value='-13.0'),
@@ -120,7 +134,17 @@ def generate_launch_description():
         Node(
             package='rviz2',
             executable='rviz2',
+            name='rviz',
+            arguments=['-d', rviz_config_file],
             condition=IfCondition(LaunchConfiguration('rviz')),
+        ),
+        Node(
+            package='rqt_gui',
+            executable='rqt_gui',
+            name='eufs_sim_rqt',
+            output='screen',
+            arguments=['--force-discover', '--perspective-file', rqt_perspective_file],
+            condition=IfCondition(LaunchConfiguration('show_rqt_gui')),
         ),
         OpaqueFunction(function=spawn_car),
     ])
