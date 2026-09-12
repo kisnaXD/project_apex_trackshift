@@ -32,6 +32,12 @@ setup(
         for path in package_files('eufs_racecar/models')
     ] if os.path.isdir('eufs_racecar/models') else [],
     install_requires=['setuptools'],
+    entry_points={
+        'console_scripts': [
+            'track_marker_publisher = eufs_racecar.track_marker_publisher:main',
+            'start_dashboard = eufs_racecar.start_dashboard:main',
+        ],
+    },
     zip_safe=True,
     maintainer='EUFS F1 Sim',
     maintainer_email='eufs-f1-sim@local',

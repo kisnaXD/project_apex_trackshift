@@ -2,15 +2,20 @@
 
 from os import environ
 from os.path import join
-import re
 import subprocess
+import xml.etree.ElementTree as ET
 
 import yaml
 import xacro
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    OpaqueFunction,
+    TimerAction,
+)
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -57,43 +62,75 @@ def _lib_or_empty(package_name):
         return ''
 
 
+_SILVER = {
+    'script': 'EUFSF1/Silver',
+    'ambient': '0.75 0.75 0.78 1',
+    'diffuse': '0.75 0.75 0.78 1',
+    'specular': '0.90 0.90 0.95 1',
+}
+_TIRE_BLACK = {
+    'script': 'EUFSF1/TireBlack',
+    'ambient': '0.05 0.05 0.05 1',
+    'diffuse': '0.05 0.05 0.05 1',
+    'specular': '0.08 0.08 0.08 1',
+}
+_LINK_PAINT = {
+    # gz sdf -p lumps chassis + wings onto base_link.
+    'base_link': _SILVER,
+    'chassis': _SILVER,
+    'front_wing': _SILVER,
+    'rear_wing': _SILVER,
+    'left_rear_wheel': _TIRE_BLACK,
+    'right_rear_wheel': _TIRE_BLACK,
+    'left_front_wheel': _TIRE_BLACK,
+    'right_front_wheel': _TIRE_BLACK,
+}
+_GZ_MATERIAL_URI = 'file://media/materials/scripts/gazebo.material'
+
+
+def _set_visual_paint(material_el, paint):
+    """Classic script (gazebo.material) plus RGBA so gzclient still paints if OGRE misses the name."""
+    material_el.clear()
+    script = ET.SubElement(material_el, 'script')
+    ET.SubElement(script, 'uri').text = _GZ_MATERIAL_URI
+    ET.SubElement(script, 'name').text = paint['script']
+    ET.SubElement(material_el, 'ambient').text = paint['ambient']
+    ET.SubElement(material_el, 'diffuse').text = paint['diffuse']
+    ET.SubElement(material_el, 'specular').text = paint['specular']
+    ET.SubElement(material_el, 'emissive').text = '0 0 0 1'
+    ET.SubElement(material_el, 'lighting').text = '1'
+
+
 def _sdf_with_rviz_paint(urdf_path):
-    """URDF to SDF hardcodes gazebo.material, which has no EUFSF1/Silver."""
+    """Force silver/black on named links. URDF→SDF otherwise leaves STLs Gazebo-white."""
     converted = subprocess.run(
         ['gz', 'sdf', '-p', urdf_path],
         check=True, capture_output=True, text=True,
     )
-    script = join(
-        get_package_share_directory('eufs_racecar'),
-        'materials', 'scripts', 'eufs_f1.material',
-    )
-    sdf = converted.stdout.replace(
-        'file://media/materials/scripts/gazebo.material',
-        f'file://{script}',
-    )
-    paints = {
-        'EUFSF1/Silver': (
-            '0.75 0.75 0.78 1',
-            '0.75 0.75 0.78 1',
-            '0.90 0.90 0.95 1',
-        ),
-        'EUFSF1/TireBlack': (
-            '0.05 0.05 0.05 1',
-            '0.05 0.05 0.05 1',
-            '0.08 0.08 0.08 1',
-        ),
-    }
-    for name, (ambient, diffuse, specular) in paints.items():
-        sdf = re.sub(
-            rf'(<name>{re.escape(name)}</name>\s*<uri>file://[^<]+</uri>\s*</script>)',
-            rf'\1\n            <ambient>{ambient}</ambient>\n'
-            rf'            <diffuse>{diffuse}</diffuse>\n'
-            rf'            <specular>{specular}</specular>',
-            sdf,
-        )
+    racecar_meshes = join(get_package_share_directory('eufs_racecar'), 'meshes')
+    root = ET.fromstring(converted.stdout)
+    for uri_el in root.iter('uri'):
+        text = uri_el.text or ''
+        if 'eufs_racecar/meshes/' in text:
+            uri_el.text = f'file://{racecar_meshes}/{text.rsplit("/", 1)[-1]}'
+    for link in root.iter('link'):
+        paint = _LINK_PAINT.get(link.get('name'))
+        if paint is None:
+            continue
+        visuals = list(link.findall('visual'))
+        if not visuals:
+            visuals = [ET.SubElement(link, 'visual')]
+        for visual in visuals:
+            material_el = visual.find('material')
+            if material_el is None:
+                material_el = ET.SubElement(visual, 'material')
+            _set_visual_paint(material_el, paint)
     sdf_path = '/tmp/eufs_robot_description.sdf'
+    ET.indent(root, space='  ')
     with open(sdf_path, 'w', encoding='utf-8') as stream:
-        stream.write(sdf)
+        stream.write("<?xml version='1.0'?>\n")
+        stream.write(ET.tostring(root, encoding='unicode'))
+        stream.write('\n')
     return sdf_path
 
 
@@ -123,6 +160,9 @@ def _prepare_gazebo_env():
         racecar,
         '/usr/share/gazebo-11',
     )
+    # Default models.gazebosim.org makes gzclient sit on "Preparing your world".
+    environ['GAZEBO_MODEL_DATABASE_URI'] = ''
+    environ['LIBGL_DRI3_DISABLE'] = '1'
 
 
 def spawn_car(context, *args, **kwargs):
@@ -160,9 +200,14 @@ def spawn_car(context, *args, **kwargs):
         },
     )
     robot_description = doc.toxml()
+    racecar_meshes = join(get_package_share_directory('eufs_racecar'), 'meshes')
+    gazebo_description = robot_description.replace(
+        'package://eufs_racecar/meshes/',
+        f'file://{racecar_meshes}/',
+    )
     urdf_path = '/tmp/eufs_robot_description.urdf'
     with open(urdf_path, 'w', encoding='utf-8') as stream:
-        stream.write(robot_description)
+        stream.write(gazebo_description)
     sdf_path = _sdf_with_rviz_paint(urdf_path)
     joint_states_topic = f'{namespace_path}/joint_states' if namespace_path else '/joint_states'
 
@@ -267,26 +312,36 @@ def generate_launch_description():
                 'pause': 'false',
             }.items(),
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzclient.launch.py')),
-            condition=IfCondition(LaunchConfiguration('gazebo_gui')),
-            launch_arguments={'verbose': 'false'}.items(),
+        TimerAction(
+            period=2.0,
+            actions=[
+                IncludeLaunchDescription(
+                    PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzclient.launch.py')),
+                    condition=IfCondition(LaunchConfiguration('gazebo_gui')),
+                    launch_arguments={'verbose': 'false'}.items(),
+                ),
+            ],
         ),
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz',
-            arguments=['-d', rviz_config_file],
-            parameters=[{'use_sim_time': True}],
-            condition=IfCondition(LaunchConfiguration('rviz')),
-        ),
-        Node(
-            package='rqt_gui',
-            executable='rqt_gui',
-            name='eufs_sim_rqt',
-            output='screen',
-            arguments=['--force-discover', '--perspective-file', rqt_perspective_file],
-            condition=IfCondition(LaunchConfiguration('show_rqt_gui')),
+        TimerAction(
+            period=5.0,
+            actions=[
+                Node(
+                    package='rviz2',
+                    executable='rviz2',
+                    name='rviz',
+                    arguments=['-d', rviz_config_file],
+                    parameters=[{'use_sim_time': True}],
+                    condition=IfCondition(LaunchConfiguration('rviz')),
+                ),
+                Node(
+                    package='rqt_gui',
+                    executable='rqt_gui',
+                    name='eufs_sim_rqt',
+                    output='screen',
+                    arguments=['--force-discover', '--perspective-file', rqt_perspective_file],
+                    condition=IfCondition(LaunchConfiguration('show_rqt_gui')),
+                ),
+            ],
         ),
         Node(
             package='eufs_racecar',
@@ -300,6 +355,18 @@ def generate_launch_description():
                 'publish_rate': 1.0,
             }],
             condition=IfCondition(LaunchConfiguration('rviz')),
+        ),
+        Node(
+            package='eufs_racecar',
+            executable='start_dashboard',
+            name='start_dashboard',
+            output='screen',
+            parameters=[{
+                'use_sim_time': True,
+                'track': LaunchConfiguration('track', default='cota'),
+                'cars': LaunchConfiguration('cars', default='1'),
+                'namespace': LaunchConfiguration('namespace'),
+            }],
         ),
         OpaqueFunction(function=spawn_car),
     ])

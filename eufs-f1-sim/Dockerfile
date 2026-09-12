@@ -29,7 +29,7 @@ COPY . /opt/eufs-f1-sim/
 RUN chmod +x /opt/eufs-f1-sim/scripts/*.sh \
     && /opt/eufs-f1-sim/scripts/prepare-workspace.sh \
     && rosdep init || true \
-    && rosdep update \
+    && rosdep update --rosdistro humble || true \
     && cd /opt/eufs_ws \
     && apt-get update \
     && rosdep install --from-paths src --ignore-src -r -y \
@@ -43,4 +43,4 @@ ENV GAZEBO_MODEL_PATH=${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/model
 WORKDIR /opt/eufs_ws
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["ros2", "launch", "eufs_racecar", "load_car.launch.py", "gazebo_gui:=true", "show_rqt_gui:=true", "rviz:=true"]
+CMD ["ros2", "launch", "eufs_racecar", "load_car.launch.py", "gazebo_gui:=true", "show_rqt_gui:=true", "rviz:=true", "track:=cota", "cars:=1"]

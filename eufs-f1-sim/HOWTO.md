@@ -34,7 +34,8 @@ xhost +local:
 | `scripts/prepare-workspace.sh` | Populates `ws/src` at build time |
 | `scripts/step_to_urdf_ocp.py` | GrabCAD STEP → grouped STL meshes + URDF joints |
 | `overlay/` | F1 meshes, battery plugin, patches |
-| `overlay/eufs_racecar/launch/load_car.launch.py` | **The** launch: Gazebo + RViz + one spawn |
+| `overlay/eufs_racecar/launch/load_car.launch.py` | **The** launch: Gazebo + map + start dashboard + RViz + one spawn |
+| `overlay/eufs_racecar/eufs_racecar/start_dashboard.py` | Stock PyQt5 Track / Cars / Start / Stop window |
 
 ## Start (single command)
 
@@ -45,34 +46,57 @@ export DISPLAY=:0
 sg docker -c './scripts/start-stack.sh'
 ```
 
-That is the only start path. Compose CMD is:
+That is the only start path. It builds and starts the `eufs-f1-sim` compose service. Compose CMD is:
 
-`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true`
+`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota cars:=1`
+
+`load_car.launch.py` is the only launch. It starts gzserver/gzclient, the track map (`track_marker_publisher`), the stock PyQt5 start window (`start_dashboard`), one spawn, RViz, and rqt. Do not add a second Gazebo launch or a second compose service.
+
+Override the launch args from the host without editing files:
+
+```bash
+TRACK=small_track CARS=1 sg docker -c './scripts/start-stack.sh'
+```
+
+If `cota` is not in the launch file yet, still pass `track:=cota` (unused launch args are ignored until the track selector lands).
 
 | GUI | Process | Purpose |
 |-----|---------|---------|
-| Gazebo | `gzserver` + `gzclient` | small_track world + one `eufs` model |
-| RViz2 | `rviz2 -d eufs_f1.rviz` | RobotModel on `/eufs/robot_description` |
+| Start window | `start_dashboard` | Track `cota` / `small_track`, Cars=1, Start/Stop |
+| Gazebo | `gzserver` + `gzclient` | Track world + one `eufs` model |
+| RViz2 | `rviz2 -d eufs_f1.rviz` | RobotModel on `/eufs/robot_description` plus `/track_markers` |
 | rqt | `rqt_gui` | EUFS Robot Steering + Mission Control |
+
+Start unpauses `/unpause_physics` on the Gazebo that launch already started. Stop publishes a zero `/eufs/cmd_vel` and pauses `/pause_physics`. Neither button starts Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
 
 - **Service name:** `eufs-f1-sim`
 - **Container name:** `eufs-f1-sim`
 - **Image:** `eufs-f1-sim:lean`
 
+## Dashboard
+
+`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node, next to the track map (`track_marker_publisher`). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling.
+
+Start calls `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and calls `/pause_physics`. The buttons do not start Gazebo, do not run a second launch, and do not start `eufs_launcher`.
+
 ## Verify
 
 ```bash
 docker compose ps
-docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui'"
+docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui|start_dashboard'"
 docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
 docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list; ros2 topic list"
 ```
 
 Expect one `eufs` model on the track, one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
 
+`load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. Do not run `gz model -m eufs -p` against a live gzclient; it can freeze the GUI. `timeout 5 gz model -l` is enough.
+
 In **gzclient** the chassis and wings should read **silver** (RViz `0.75 0.75 0.78`) and the tires **black**. Classic binds STL color from `EUFSF1/Silver` / `EUFSF1/TireBlack` in `gazebo.material` (entrypoint appends `eufs_f1.material`) plus the same RGBA on each visual. Scene ambient is `0.40` so silver does not wash to white.
 
-## Stop
+## Shutdown
+
+The dashboard Stop button pauses physics only. To tear down the container and all GUIs:
 
 ```bash
 cd eufs-f1-sim
@@ -130,7 +154,7 @@ colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
 xhost +local:
-ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true
+ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota cars:=1
 ```
 
 ## Version locks

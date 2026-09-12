@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     image: eufs-f1-sim:lean
     container_name: eufs-f1-sim
+    cpus: 4
+    mem_limit: 8g
     network_mode: host
     ipc: host
     privileged: true
@@ -16,3 +18,13 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     stdin_open: true
     tty: true
+    command:
+      - ros2
+      - launch
+      - eufs_racecar
+      - load_car.launch.py
+      - gazebo_gui:=true
+      - show_rqt_gui:=true
+      - rviz:=true
+      - "track:=${TRACK:-cota}"
+      - "cars:=${CARS:-1}"
