@@ -24,6 +24,10 @@ CONE_SPACING_MIN_M = 5.0
 KAPPA_DENSE = 0.025
 GATE_ALONG_M = 0.40
 HALF_WIDTH_M = 7.0
+BOUNDARY_STRIP_WIDTH_M = 0.20
+BOUNDARY_STRIP_HEIGHT_M = 0.008
+BOUNDARY_STRIP_Z_M = 0.0
+BOUNDARY_STRIP_MESH = "cota_boundary_strips.dae"
 COVARIANCE = (0.01, 0.01, 0.0)
 SELECTOR_NAME = "cota"
 TRACK_ID = "cota_layout_reference_v1"
@@ -339,9 +343,137 @@ def _write_sdf(path: Path, built):
             '      <covariance x="0.01" y="0.01" xy="0.0"/>\n'
             "    </include>\n"
         )
+    # Keep the cone parent model include-only.  Gazebo Classic can drop
+    # direct include visuals when a second link is added to that model, so the
+    # visual-only boundary mesh is included as a separate world model below.
     chunks.append("    <static>1</static>\n  </model>\n</sdf>\n")
     path.write_text("".join(chunks), encoding="utf-8")
     return counts
+
+
+def _miter_ring(points):
+    """Return left/right offset vertices for a closed, ordered polyline.
+
+    The cone samples are ordered by increasing centerline s.  Computing the
+    join from the incoming and outgoing directions keeps the ribbon width
+    constant through corners while avoiding the visible gaps produced by
+    independently placed boxes.
+    """
+    half = 0.5 * BOUNDARY_STRIP_WIDTH_M
+    ring = []
+    for i, point in enumerate(points):
+        previous = points[(i - 1) % len(points)]
+        following = points[(i + 1) % len(points)]
+        incoming = (point[0] - previous[0], point[1] - previous[1])
+        outgoing = (following[0] - point[0], following[1] - point[1])
+        incoming_norm = math.hypot(*incoming)
+        outgoing_norm = math.hypot(*outgoing)
+        if incoming_norm < 1e-9 or outgoing_norm < 1e-9:
+            raise SystemExit("cannot build boundary strip with coincident cone samples")
+        incoming = (incoming[0] / incoming_norm, incoming[1] / incoming_norm)
+        outgoing = (outgoing[0] / outgoing_norm, outgoing[1] / outgoing_norm)
+        incoming_normal = (-incoming[1], incoming[0])
+        outgoing_normal = (-outgoing[1], outgoing[0])
+        miter = (
+            incoming_normal[0] + outgoing_normal[0],
+            incoming_normal[1] + outgoing_normal[1],
+        )
+        miter_norm = math.hypot(*miter)
+        if miter_norm < 1e-9:
+            miter = outgoing_normal
+            miter_norm = 1.0
+        else:
+            miter = (miter[0] / miter_norm, miter[1] / miter_norm)
+        denominator = miter[0] * outgoing_normal[0] + miter[1] * outgoing_normal[1]
+        if denominator <= 1e-6:
+            miter = outgoing_normal
+            scale = half
+        else:
+            # The cap prevents a near-reversal in a sampled polyline from
+            # producing a long spike while retaining the miter join.
+            scale = min(half / denominator, 4.0 * half)
+        offset = (miter[0] * scale, miter[1] * scale)
+        ring.append(
+            (
+                (point[0] + offset[0], point[1] + offset[1]),
+                (point[0] - offset[0], point[1] - offset[1]),
+            )
+        )
+    return ring
+
+
+def _write_boundary_mesh(path: Path, built):
+    """Write both closed boundary ribbons as one compact Collada visual.
+
+    Each side is an independent closed solid.  The only loop closure is the
+    last-to-first join on that same side, so the finish gate never gets a
+    cross-track white segment.
+    """
+    vertices = []
+    triangles = []
+    for points in (built["left"], built["right"]):
+        ring = _miter_ring(points)
+        base = len(vertices)
+        for left, right in ring:
+            vertices.extend(
+                (
+                    (left[0], left[1], BOUNDARY_STRIP_Z_M),
+                    (right[0], right[1], BOUNDARY_STRIP_Z_M),
+                    (left[0], left[1], BOUNDARY_STRIP_Z_M + BOUNDARY_STRIP_HEIGHT_M),
+                    (right[0], right[1], BOUNDARY_STRIP_Z_M + BOUNDARY_STRIP_HEIGHT_M),
+                )
+            )
+        count = len(ring)
+        for i in range(count):
+            j = (i + 1) % count
+            il, ir, ibl, ibr = (base + 4 * i + k for k in (0, 1, 2, 3))
+            jl, jr, jbl, jbr = (base + 4 * j + k for k in (0, 1, 2, 3))
+            # top, bottom, and both vertical sides: a watertight quad strip.
+            for quad in (
+                (ibl, ibr, jbr, jbl),
+                (il, ir, jr, jl),
+                (il, jl, jbl, ibl),
+                (ir, ibr, jbr, jr),
+            ):
+                a, b, c, d = quad
+                triangles.extend((a, b, c, a, c, d))
+
+    position_values = " ".join(
+        f"{x:.9f} {y:.9f} {z:.9f}" for x, y, z in vertices
+    )
+    index_values = " ".join(str(index) for index in triangles)
+    path.write_text(
+        "<?xml version='1.0' encoding='utf-8'?>\n"
+        "<COLLADA xmlns='http://www.collada.org/2005/11/COLLADASchema' version='1.4.1'>\n"
+        "  <asset><unit name='meter' meter='1'/><up_axis>Z_UP</up_axis></asset>\n"
+        "  <library_effects>\n"
+        "    <effect id='boundary_white_effect'><profile_COMMON><technique sid='common'>"
+        "<phong><diffuse><color>1 1 1 1</color></diffuse>"
+        "<specular><color>0.1 0.1 0.1 1</color></specular></phong>"
+        "</technique></profile_COMMON></effect>\n"
+        "  </library_effects>\n"
+        "  <library_materials><material id='boundary_white_material' name='White'>"
+        "<instance_effect url='#boundary_white_effect'/></material></library_materials>\n"
+        "  <library_geometries>\n"
+        "    <geometry id='cota_boundary_strips_geometry' name='COTA white boundary strips'>\n"
+        "      <mesh>\n"
+        f"        <source id='cota_boundary_strips_positions'><float_array id='cota_boundary_strips_positions_array' count='{len(vertices) * 3}'>{position_values}</float_array>"
+        f"<technique_common><accessor source='#cota_boundary_strips_positions_array' count='{len(vertices)}' stride='3'>"
+        "<param name='X' type='float'/><param name='Y' type='float'/><param name='Z' type='float'/>"
+        "</accessor></technique_common></source>\n"
+        "        <vertices id='cota_boundary_strips_vertices'><input semantic='POSITION' source='#cota_boundary_strips_positions'/></vertices>\n"
+        f"        <triangles material='boundary_white_material' count='{len(triangles) // 3}'><input semantic='VERTEX' source='#cota_boundary_strips_vertices' offset='0'/><p>{index_values}</p></triangles>\n"
+        "      </mesh>\n"
+        "    </geometry>\n"
+        "  </library_geometries>\n"
+        "  <library_visual_scenes><visual_scene id='cota_boundary_scene' name='COTA boundary strips'><node id='cota_boundary_strips'>"
+        "<instance_geometry url='#cota_boundary_strips_geometry'><bind_material><technique_common>"
+        "<instance_material symbol='boundary_white_material' target='#boundary_white_material'/>"
+        "</technique_common></bind_material></instance_geometry></node></visual_scene></library_visual_scenes>\n"
+        "  <scene><instance_visual_scene url='#cota_boundary_scene'/></scene>\n"
+        "</COLLADA>\n",
+        encoding="utf-8",
+    )
 
 
 def _write_world(path: Path, built, geom):
@@ -410,6 +542,26 @@ def _write_world(path: Path, built, geom):
         </visual>
       </link>
     </model>
+    <model name='cota_boundary_strips'>
+      <static>1</static>
+      <pose>0 0 0.01 0 0 0</pose>
+      <link name='boundary_strip_link'>
+        <visual name='boundary_strips'>
+          <geometry>
+            <mesh>
+              <uri>model://cota/{BOUNDARY_STRIP_MESH}</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <lighting>false</lighting>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <emissive>1 1 1 1</emissive>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
     <include>
       <uri>model://cota</uri>
       <pose>0 0 0.5 0 0 0</pose>
@@ -457,7 +609,9 @@ def main():
     for directory in (csv_dir, model_dir, world_dir, source_dir, meta_dir):
         directory.mkdir(parents=True, exist_ok=True)
 
-    shutil.copy2(args.svg, source_dir / "2022_F1_CourseLayout_COTA.svg")
+    source_copy = source_dir / "2022_F1_CourseLayout_COTA.svg"
+    if args.svg.resolve() != source_copy.resolve():
+        shutil.copy2(args.svg, source_copy)
     (source_dir / "LICENSE.txt").write_text(
         "Source map: Wikimedia File:2022 F1 CourseLayout COTA.svg\n"
         "License: Creative Commons Attribution-ShareAlike 4.0 International\n"
@@ -469,8 +623,10 @@ def main():
 
     csv_path = csv_dir / "cota.csv"
     sdf_path = model_dir / "model.sdf"
+    mesh_path = model_dir / BOUNDARY_STRIP_MESH
     world_path = world_dir / "cota.world"
     _write_table(csv_path, built["csv_rows"][0], built["csv_rows"][1:])
+    _write_boundary_mesh(mesh_path, built)
     counts = _write_sdf(sdf_path, built)
     _write_world(world_path, built, geom)
     (model_dir / "model.config").write_text(
@@ -528,7 +684,12 @@ def main():
         }
     )
 
-    hashes = {"csv": _sha256(csv_path), "model_sdf": _sha256(sdf_path), "world": _sha256(world_path)}
+    hashes = {
+        "csv": _sha256(csv_path),
+        "model_sdf": _sha256(sdf_path),
+        "world": _sha256(world_path),
+        "boundary_mesh": _sha256(mesh_path),
+    }
     xs = [p[0] for p in geom["xy"]]
     ys = [p[1] for p in geom["xy"]]
     provenance = {
@@ -554,6 +715,13 @@ def main():
             "half_width_m": HALF_WIDTH_M,
             "width_note": "authored constant 14 m envelope from the plan view, not surveyed boundaries",
             "collision_mode": "cone_cylinder",
+            "white_strip_width_m": BOUNDARY_STRIP_WIDTH_M,
+            "white_strip_height_m": BOUNDARY_STRIP_HEIGHT_M,
+            "white_strip_mesh": f"models/cota/{BOUNDARY_STRIP_MESH}",
+            "white_strip_join": "miter_joined_quad_strip; each side closes at finish seam independently",
+            "white_strip_gate_policy": "no cross-track connection across the four-cone orange gate",
+            "white_strip_marker_namespace": "eufs_track_boundary",
+            "white_strip_source": "ordered_blue_yellow_cones",
         },
         "spawn": {
             "front_extent_m": FRONT_EXTENT_M,
@@ -567,6 +735,14 @@ def main():
             "spawn_yaw_rad": built["spawn_yaw"],
             "direction_check": "increasing_s",
         },
+        # Launch attachment metadata is explicit so the generic selector can
+        # preserve the established N=1 pose without guessing cone ordering.
+        "launch_spawn": {
+            "spawn_x_m": -3.904850706197952,
+            "spawn_y_m": 3.1228419364078146,
+            "spawn_yaw_rad": -0.6745807971885812,
+        },
+        "grid": {"spawn_arclength_back_m": 5.0},
         "counts": {
             "blue": counts["blue_cone"],
             "yellow": counts["yellow_cone"],

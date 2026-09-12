@@ -39,6 +39,7 @@ setup(
             'tyre_state_publisher = eufs_racecar.tyre_state_publisher:main',
             'ackermann_cmd_bridge = eufs_racecar.ackermann_cmd_bridge:main',
             'odom_tf_publisher = eufs_racecar.odom_tf_publisher:main',
+            'rviz_grid = eufs_racecar.rviz_grid:main',
         ],
     },
     zip_safe=True,

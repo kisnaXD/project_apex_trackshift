@@ -1,0 +1,39 @@
+# F1 visual's stock EUFS DynamicBicycle parameters.
+# The model is a planar acceleration model; wheel contact and drivetrain
+# torques are intentionally owned by the Ackermann alternate profile instead.
+inertia:
+  m: 788.0
+  g: 9.81
+  I_z: 1500.0
+
+kinematics:
+  l: 3.28
+  b_F: 3.13
+  b_R: 0.15
+  w_front: 0.45
+  axle_width: 1.50
+
+tire:
+  tire_coefficient: 1.0
+  B: 12.56
+  C: -1.38
+  D: 1.60
+  E: -0.58
+  radius: 0.346
+
+aero:
+  # F_down = C_Down * vx^2 and F_drag = C_drag * vx^2.
+  # C_drag matches rho*CdA/2 for rho=1.225 and CdA=1.35.
+  C_Down: 1.50
+  C_drag: 0.8269
+
+input_ranges:
+  acceleration:
+    max: 8.0
+    min: -12.0
+  velocity:
+    max: 80.0
+    min: 0.0
+  steering:
+    max: 0.6458
+    min: -0.6458

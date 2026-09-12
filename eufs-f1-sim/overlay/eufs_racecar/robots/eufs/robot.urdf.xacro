@@ -6,6 +6,15 @@
   <xacro:arg name="forgez_T_core" default="40.0"/>
   <xacro:arg name="forgez_E_lap" default="220.0"/>
   <xacro:arg name="forgez_R_OT" default="0.040"/>
+  <!-- Motion plant selection.  DynamicBicycle is the stock EUFS acceleration
+       plant; Ackermann is the contact-rich Gazebo velocity plant. -->
+  <xacro:arg name="vehicle_model" default="DynamicBicycle"/>
+  <xacro:arg name="command_mode" default="acceleration"/>
+  <xacro:arg name="publish_tf" default="false"/>
+  <xacro:arg name="frame_prefix" default=""/>
+  <xacro:arg name="native_remap" default="false"/>
+  <xacro:arg name="pub_ground_truth" default="true"/>
+  <xacro:arg name="noise_config" default=""/>
 
   <xacro:include filename="$(find eufs_racecar)/urdf/racecar.xacro"/>
   <xacro:include filename="$(find eufs_racecar)/urdf/forgez_battery.gazebo"/>

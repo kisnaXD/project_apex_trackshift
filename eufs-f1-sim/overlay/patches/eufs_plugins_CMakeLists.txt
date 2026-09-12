@@ -29,8 +29,10 @@ link_directories(${gazebo_dev_LIBRARY_DIRS})
 
 install(DIRECTORY urdf DESTINATION share/${PROJECT_NAME})
 
-# Lean slice: cone plugins only (mit_racecar ackermann; skip Galactic race_car_model).
+# Build the stock EUFS race-car plugin required by the DynamicBicycle launch.
+# Keep the unrelated bounding-box plugin out of the lean image.
 add_subdirectory(gazebo_cone_plugins)
+add_subdirectory(gazebo_race_car_model)
 
 ament_export_include_directories(include)
 

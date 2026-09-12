@@ -24,6 +24,13 @@ cone_policy:
   half_width_m: 7.0
   width_note: "authored constant 14 m envelope from the plan view, not surveyed boundaries"
   collision_mode: "cone_cylinder"
+  white_strip_width_m: 0.2
+  white_strip_height_m: 0.008
+  white_strip_mesh: "models/cota/cota_boundary_strips.dae"
+  white_strip_join: "miter_joined_quad_strip; each side closes at finish seam independently"
+  white_strip_gate_policy: "no cross-track connection across the four-cone orange gate"
+  white_strip_marker_namespace: "eufs_track_boundary"
+  white_strip_source: "ordered_blue_yellow_cones"
 spawn:
   front_extent_m: 4.4
   gate_clearance_m: 1.0
@@ -35,6 +42,15 @@ spawn:
   spawn_y_m: 3.3726781713928813
   spawn_yaw_rad: -0.6745808541151297
   direction_check: "increasing_s"
+# Runtime launch contract retained from the original EUFS COTA integration.
+# This explicit attachment metadata keeps N=1 pose stable while the generic
+# selector remains free of map-name conditions.
+launch_spawn:
+  spawn_x_m: -3.904850706197952
+  spawn_y_m: 3.1228419364078146
+  spawn_yaw_rad: -0.6745807971885812
+grid:
+  spawn_arclength_back_m: 5.0
 counts:
   blue: 711
   yellow: 711
@@ -43,7 +59,8 @@ counts:
 hashes:
   csv: "8b0024c60d6d542ccea62aa5b969d76d67432ff33c05174ebfb57cff7205fa6e"
   model_sdf: "fc5630cb5587c3e1c1407ca011ac1173f669d8b1fa5bf8f46ce06df9b48b1ea5"
-  world: "f420881f92fb3d5c594718e591df62f3e5fc43aa62161f64870646029115e7c0"
+  world: "5b3ab9f0b7a597446d78ff94d501ea61d632a554d3b49b694f276385e422ee45"
+  boundary_mesh: "65053c465ac128c43a62a1f60a61669a0026784d54f3f56f4f664b48e64527fd"
 source_urls:
   - "https://commons.wikimedia.org/wiki/File:2022_F1_CourseLayout_COTA.svg"
   - "https://www.fia.com/sites/default/files/2017_usa_preview_0.pdf"

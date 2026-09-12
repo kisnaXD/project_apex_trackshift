@@ -1,0 +1,30 @@
+FROM eufs-f1-sim:forward-rolling-20260912
+
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /opt/eufs_ws
+ENV EUFS_MASTER=/opt/eufs_ws \
+    ROS_LOCALHOST_ONLY=1 \
+    GAZEBO_IP=127.0.0.1 \
+    GAZEBO_MASTER_URI=http://127.0.0.1:11345
+
+# Replace only the authored racecar and track overlays.  The forward-rolling
+# image already contains the compiled Gazebo race-car plugin; this image does
+# not rebuild or replace eufs_plugins.
+COPY overlay/eufs_racecar /opt/eufs_ws/src/eufs_racecar
+COPY overlay/eufs_tracks /opt/eufs_ws/src/eufs_sim/eufs_tracks
+COPY scripts/entrypoint.sh /entrypoint.sh
+COPY scripts/cota_lap.py scripts/cota_path.py scripts/drive_straight_10s.py scripts/drive_straight_10s.sh /opt/eufs-f1-sim/scripts/
+
+RUN test -s /opt/eufs_ws/install/eufs_plugins/lib/libgazebo_race_car_model.so \
+    && sha256sum /opt/eufs_ws/install/eufs_plugins/lib/libgazebo_race_car_model.so > /tmp/gazebo_race_car_model.sha256 \
+    && chmod 0755 /opt/eufs-f1-sim/scripts/cota_lap.py /opt/eufs-f1-sim/scripts/drive_straight_10s.py /opt/eufs-f1-sim/scripts/drive_straight_10s.sh \
+    && source /opt/ros/humble/setup.bash \
+    && colcon build --symlink-install --packages-select eufs_racecar eufs_tracks --parallel-workers 2 \
+    && sha256sum -c /tmp/gazebo_race_car_model.sha256
+
+RUN chmod +x /entrypoint.sh
+
+WORKDIR /opt/eufs_ws
+
+CMD ["ros2", "run", "eufs_racecar", "start_dashboard", "--ros-args", "-p", "manage_stack:=true"]

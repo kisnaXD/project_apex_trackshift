@@ -15,9 +15,9 @@
   </gazebo>
 
   <gazebo>
-    <plugin name="gazebo_ros_battery_discharge" filename="libgazebo_ros_battery_discharge.so">
+    <plugin name="$(arg robot_namespace)_gazebo_ros_battery_discharge" filename="libgazebo_ros_battery_discharge.so">
       <ros>
-        <namespace>/eufs</namespace>
+        <namespace>/$(arg robot_namespace)</namespace>
         <remapping>battery_state:=forgez/battery_state</remapping>
         <remapping>charge_level_wh:=forgez/charge_level_wh</remapping>
       </ros>
@@ -42,9 +42,9 @@
       <forgez_R_OT>$(arg forgez_R_OT)</forgez_R_OT>
     </plugin>
 
-    <plugin name="gazebo_ros_mechanical_energy_battery_consumer" filename="libgazebo_ros_mechanical_energy_battery_consumer.so">
+    <plugin name="$(arg robot_namespace)_gazebo_ros_mechanical_energy_battery_consumer" filename="libgazebo_ros_mechanical_energy_battery_consumer.so">
       <ros>
-        <namespace>/eufs</namespace>
+        <namespace>/$(arg robot_namespace)</namespace>
       </ros>
       <link_name>base_link</link_name>
       <battery_name>forgez_pack</battery_name>

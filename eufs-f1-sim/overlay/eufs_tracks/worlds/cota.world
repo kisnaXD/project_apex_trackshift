@@ -55,6 +55,26 @@
         </visual>
       </link>
     </model>
+    <model name='cota_boundary_strips'>
+      <static>1</static>
+      <pose>0 0 0.01 0 0 0</pose>
+      <link name='boundary_strip_link'>
+        <visual name='boundary_strips'>
+          <geometry>
+            <mesh>
+              <uri>model://cota/cota_boundary_strips.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <lighting>false</lighting>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <emissive>1 1 1 1</emissive>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
     <include>
       <uri>model://cota</uri>
       <pose>0 0 0.5 0 0 0</pose>

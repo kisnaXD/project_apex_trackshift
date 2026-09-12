@@ -7,6 +7,9 @@ source /opt/eufs_ws/install/setup.bash
 set -u
 
 export EUFS_MASTER=/opt/eufs_ws
+export ROS_LOCALHOST_ONLY="${ROS_LOCALHOST_ONLY:-1}"
+export GAZEBO_IP="${GAZEBO_IP:-127.0.0.1}"
+export GAZEBO_MASTER_URI="${GAZEBO_MASTER_URI:-http://127.0.0.1:11345}"
 
 # setup.py once installed meshes under share/eufs_racecar/eufs_racecar/meshes;
 # URDF/xacro expect share/eufs_racecar/meshes.
@@ -33,7 +36,7 @@ if [[ -f "${_f1_mat}/eufs_f1.material" && -f "${_gz_mat}" ]] && ! grep -q 'mater
 fi
 export GAZEBO_MODEL_PATH="${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/models:${GAZEBO_MODEL_PATH:-}"
 export GAZEBO_MATERIAL_PATH="${_f1_mat}:/usr/share/gazebo-11/media/materials/scripts:${GAZEBO_MATERIAL_PATH:-}"
-export GAZEBO_RESOURCE_PATH="${EUFS_MASTER}/install/eufs_sensors/share/eufs_sensors/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/materials:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar/materials:${_f1_mat}:${GAZEBO_RESOURCE_PATH:-}"
+export GAZEBO_RESOURCE_PATH="${EUFS_MASTER}/install/eufs_sensors/share/eufs_sensors/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/materials:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar/materials:${_f1_mat}:/usr/share/gazebo-11:${GAZEBO_RESOURCE_PATH:-}"
 export GAZEBO_PLUGIN_PATH="${EUFS_MASTER}/install/eufs_plugins/lib:${EUFS_MASTER}/install/gazebo_ros_battery/lib:${GAZEBO_PLUGIN_PATH:-}"
 
 # Allow container GUI apps on the host X server (host must run `xhost +local:` once per session).

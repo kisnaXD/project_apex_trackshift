@@ -1,19 +1,82 @@
-"""Resolve named EUFS tracks for load_car.launch.py.
+"""Discover and resolve EUFS track assets for ``load_car.launch.py``.
 
-Unknown names and missing/mismatched COTA hashes fail. There is no silent
-fallback to small_track.
+Tracks are attached to the normal ``eufs_tracks`` package layout: a world in
+``worlds/<name>.world``, model in ``models/<name>/model.sdf`` and cone CSV in
+``csv/<name>.csv``.  Optional geometry/provenance files live beside the model
+or in ``<name>/``.  This keeps adding a map an asset/configuration operation;
+the launch code does not need a map-name branch.
 """
 
 from __future__ import annotations
 
 import hashlib
-import math
-from os.path import isfile, join
+from glob import glob
+from os.path import isfile, join, normpath
 
 import yaml
-from ament_index_python.packages import get_package_share_directory
+try:
+    from ament_index_python.packages import get_package_share_directory
+except ModuleNotFoundError:  # pragma: no cover - ROS supplies this in launch
+    def get_package_share_directory(_package):
+        raise RuntimeError("ament_index_python is unavailable")
 
-ALLOWED_TRACKS = ("cota", "small_track")
+def _tracks_share():
+    return get_package_share_directory("eufs_tracks")
+
+
+def _asset_paths(share: str, name: str) -> dict:
+    """Return standard asset paths and optional map-owned metadata paths."""
+    world = join(share, "worlds", f"{name}.world")
+    model = join(share, "models", name, "model.sdf")
+    csv_path = join(share, "csv", f"{name}.csv")
+    # ``<name>/`` is the convenient overlay attachment point.  Keep the
+    # model directory as a fallback because that is how installed EUFS models
+    # are packaged and how the existing COTA metadata is installed.
+    roots = (join(share, name), join(share, "models", name))
+    geometry_root = next((root for root in roots if isfile(join(root, "centerline.csv"))), roots[0])
+    profile_path = next((join(root, filename)
+                         for root in roots
+                         for filename in ("metadata.yaml", "provenance.yaml")
+                         if isfile(join(root, filename))), "")
+    return {
+        "name": name,
+        "world": world,
+        "track_file": model,
+        "csv": csv_path,
+        "centerline": join(geometry_root, "centerline.csv"),
+        "boundaries": join(geometry_root, "boundaries.csv"),
+        "profile": profile_path,
+    }
+
+
+def _discovered_assets(share: str) -> dict:
+    """Discover complete world/model/CSV triplets in deterministic order."""
+    worlds = set()
+    csvs = set()
+    models = set()
+    for filename in glob(join(share, "worlds", "*.world")):
+        worlds.add(filename.rsplit("/", 1)[-1][:-len(".world")])
+    for filename in glob(join(share, "csv", "*.csv")):
+        csvs.add(filename.rsplit("/", 1)[-1][:-len(".csv")])
+    for filename in glob(join(share, "models", "*", "model.sdf")):
+        models.add(filename.rsplit("/", 2)[-2])
+    return {
+        name: _asset_paths(share, name)
+        for name in sorted(worlds & csvs & models)
+    }
+
+
+def available_tracks():
+    """Return complete, valid track names from the installed workspace."""
+    try:
+        return tuple(_discovered_assets(_tracks_share()))
+    except Exception:
+        # Dashboard discovery runs during startup; an unavailable ament index
+        # should not make importing this pure selector fail.
+        return ()
+
+
+discover_tracks = available_tracks
 
 
 def _sha256(path: str) -> str:
@@ -35,92 +98,107 @@ def _car_start(csv_path: str):
     raise RuntimeError(f"{csv_path} has no car_start row")
 
 
-def _rows(csv_path: str, tag: str):
-    points = []
-    with open(csv_path, encoding="utf-8") as handle:
-        handle.readline()
-        for line in handle:
-            parts = [item.strip() for item in line.split(",")]
-            if parts and parts[0] == tag:
-                points.append((float(parts[1]), float(parts[2])))
-    return points
+def _profile(path: str) -> dict:
+    if not path:
+        return {}
+    with open(path, encoding="utf-8") as handle:
+        value = yaml.safe_load(handle) or {}
+    return value if isinstance(value, dict) else {}
 
 
-def _align_cota_spawn(csv_path: str, x: float, y: float, yaw: float):
-    """Put the chassis on the racing line, heading along the orange S/F gate.
+def _nested(profile: dict, *keys):
+    value = profile
+    for key in keys:
+        if not isinstance(value, dict):
+            return None
+        value = value.get(key)
+    return value
 
-    EUFS car_start yaw is the centerline tangent, but a stale CSV or a mesh
-    that looks cocked vs the cones is fixed here from the four big_orange
-    cones every launch (csv hashes stay valid).
-    """
-    oranges = _rows(csv_path, "big_orange")
-    if len(oranges) < 4:
-        return x, y, yaw
-    mean_y = sum(point[1] for point in oranges) / len(oranges)
-    left = [point for point in oranges if point[1] >= mean_y]
-    right = [point for point in oranges if point[1] < mean_y]
-    if not left or not right:
-        return x, y, yaw
-    lx = sum(point[0] for point in left) / len(left)
-    ly = sum(point[1] for point in left) / len(left)
-    rx = sum(point[0] for point in right) / len(right)
-    ry = sum(point[1] for point in right) / len(right)
-    # Left→right across the gate; +90° CCW is COTA travel direction.
-    fwd_x, fwd_y = -(ry - ly), (rx - lx)
-    norm = math.hypot(fwd_x, fwd_y)
-    if norm < 1e-6:
-        return x, y, yaw
-    fwd_x /= norm
-    fwd_y /= norm
-    gate_x = 0.5 * (lx + rx)
-    gate_y = 0.5 * (ly + ry)
-    # Origin is the rear axle. Nose is ~4.0 m ahead; sit 1.0 m behind the gate.
-    back = 4.0 + 1.0
-    aligned_x = gate_x - fwd_x * back
-    aligned_y = gate_y - fwd_y * back
-    aligned_yaw = math.atan2(fwd_y, fwd_x)
-    return aligned_x, aligned_y, aligned_yaw
+
+def _profile_spawn(profile: dict):
+    """Read an authored spawn/alignment policy without knowing map identity."""
+    # ``launch_spawn`` is an integration override for an asset whose runtime
+    # pose is deliberately different from the raw CSV car_start row.  It is
+    # map metadata, so adding another map never requires a selector branch.
+    spawn = profile.get("launch_spawn") or profile.get("spawn")
+    if not isinstance(spawn, dict):
+        return None
+    values = tuple(spawn.get(key) for key in ("spawn_x_m", "spawn_y_m", "spawn_yaw_rad"))
+    if all(value is not None for value in values):
+        return tuple(float(value) for value in values)
+    return None
+
+
+def _spawn_back_m(profile: dict):
+    """Return optional authored grid spawn distance behind the gate."""
+    for keys in (("spawn_arclength_back_m",), ("grid", "spawn_arclength_back_m"),
+                 ("spawn", "arclength_back_m")):
+        value = _nested(profile, *keys)
+        if value is not None:
+            return float(value)
+    return None
+
+
+def _validate_hashes(assets: dict, profile: dict):
+    """Validate optional provenance hashes for any map that supplies them."""
+    expected = profile.get("hashes") or {}
+    if not isinstance(expected, dict):
+        return
+    actual = {
+        key: _sha256(assets[key])
+        for key in ("csv", "track_file", "world")
+        if isfile(assets[key])
+    }
+    # Existing provenance calls the model hash ``model_sdf``; accept the
+    # standard asset key too so new maps can use either spelling.
+    expected_keys = {"csv": "csv", "model_sdf": "track_file", "world": "world"}
+    mismatched = [key for key, asset_key in expected_keys.items()
+                  if expected.get(key) and expected[key] != actual.get(asset_key)]
+    if mismatched:
+        raise RuntimeError(f"{assets['name']} hash mismatch for {mismatched} (no fallback)")
+
+
+def _boundary_strip_path(share: str, profile: dict):
+    value = _nested(profile, "cone_policy", "white_strip_mesh")
+    if not value:
+        value = profile.get("boundary_strips")
+    if not value:
+        return ""
+    value = str(value)
+    if value.startswith("/"):
+        return value
+    return normpath(join(share, value))
 
 
 def resolve_track(name: str) -> dict:
     track = (name or "").strip()
-    if track not in ALLOWED_TRACKS:
-        raise RuntimeError(f"Unknown track {track!r}. Allowed: {ALLOWED_TRACKS}")
+    share = _tracks_share()
+    discovered = _discovered_assets(share)
+    assets = discovered.get(track)
+    if assets is None:
+        raise RuntimeError(f"Unknown track {track!r}. Available: {tuple(discovered)}")
 
-    share = get_package_share_directory("eufs_tracks")
-    world = join(share, "worlds", f"{track}.world")
-    model = join(share, "models", track, "model.sdf")
-    csv_path = join(share, "csv", f"{track}.csv")
-    missing = [path for path in (world, model, csv_path) if not isfile(path)]
+    missing = [path for path in (assets["world"], assets["track_file"], assets["csv"])
+               if not isfile(path)]
     if missing:
         raise RuntimeError(
             f"track {track} is missing {missing} (no fallback to another circuit)"
         )
-
-    if track == "cota":
-        provenance_path = join(share, "models", track, "provenance.yaml")
-        if not isfile(provenance_path):
-            raise RuntimeError("cota is missing provenance.yaml (no fallback)")
-        with open(provenance_path, encoding="utf-8") as handle:
-            provenance = yaml.safe_load(handle)
-        expected = provenance.get("hashes") or {}
-        actual = {"csv": _sha256(csv_path), "model_sdf": _sha256(model), "world": _sha256(world)}
-        mismatched = [
-            key for key in ("csv", "model_sdf", "world")
-            if expected.get(key) and expected[key] != actual[key]
-        ]
-        if mismatched:
-            raise RuntimeError(f"cota hash mismatch for {mismatched} (no fallback)")
-
-    x, y, yaw = _car_start(csv_path)
-    if track == "cota":
-        x, y, yaw = _align_cota_spawn(csv_path, x, y, yaw)
-    return {
-        "name": track,
-        "world": world,
-        "track_file": model,
-        "csv": csv_path,
+    profile = _profile(assets["profile"])
+    _validate_hashes(assets, profile)
+    x, y, yaw = _car_start(assets["csv"])
+    spawn = _profile_spawn(profile)
+    if isinstance(spawn, tuple):
+        x, y, yaw = spawn
+    assets.update({
+        "boundary_strips": _boundary_strip_path(share, profile),
+        "profile_data": profile,
+        "spawn_arclength_back_m": _spawn_back_m(profile),
         "x": x,
         "y": y,
         "yaw": yaw,
+    })
+    # Keep the resolve_track dictionary shape consumed by dashboard/launch.
+    return {
+        **assets,
     }

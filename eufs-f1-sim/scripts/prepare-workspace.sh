@@ -23,6 +23,16 @@ rm -rf "${SRC}/eufs_racecar" "${SRC}/gazebo_ros_battery"
 cp -a "${ROOT}/overlay/eufs_racecar" "${SRC}/eufs_racecar"
 cp -a "${ROOT}/overlay/gazebo_ros_battery" "${SRC}/gazebo_ros_battery"
 cp "${ROOT}/overlay/patches/eufs_plugins_CMakeLists.txt" "${SRC}/eufs_sim/eufs_plugins/CMakeLists.txt"
+_RACE_PLUGIN_PATCH="${ROOT}/overlay/patches/race_car_model_tf2_geometry.patch"
+if ! grep -q 'tf2_geometry_msgs/tf2_geometry_msgs.hpp' \
+  "${SRC}/eufs_sim/eufs_plugins/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp"; then
+  patch -d "${SRC}/eufs_sim/eufs_plugins" -p1 < "${_RACE_PLUGIN_PATCH}"
+fi
+_WHEEL_ROLLING_PATCH="${ROOT}/overlay/patches/race_car_wheel_rolling.patch"
+if ! grep -q 'void animateWheels' \
+  "${SRC}/eufs_sim/eufs_plugins/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp"; then
+  patch -d "${SRC}/eufs_sim/eufs_plugins" -p1 < "${_WHEEL_ROLLING_PATCH}"
+fi
 sed -i "s|-40 40 20 0 0.667643 -1|-22 8 6 0 0.45 0.55|g" \
   "${SRC}/eufs_sim/eufs_tracks/worlds/small_track.world" || true
 

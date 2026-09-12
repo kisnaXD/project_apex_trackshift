@@ -1,0 +1,111 @@
+--- a/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp
++++ b/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp
+@@ -26,6 +26,7 @@
+ #define EUFS_PLUGINS_GAZEBO_RACE_CAR_MODEL_INCLUDE_GAZEBO_RACE_CAR_MODEL_GAZEBO_ROS_RACE_CAR_HPP_
+ 
+ #include <memory>
++#include <stdexcept>
+ #include <queue>
+ #include <string>
+ #include <vector>
+@@ -86,6 +87,7 @@
+   void returnCommandMode(std::shared_ptr<std_srvs::srv::Trigger::Request>,
+                          std::shared_ptr<std_srvs::srv::Trigger::Response> response);
+   void setModelState();
++  void animateWheels(double dt);
+ 
+   void initVehicleModel(const sdf::ElementPtr &sdf);
+   void initParams(const sdf::ElementPtr &sdf);
+@@ -155,6 +157,12 @@
+   // Steering joints state
+   gazebo::physics::JointPtr _left_steering_joint;
+   gazebo::physics::JointPtr _right_steering_joint;
++  gazebo::physics::JointPtr _left_front_wheel_joint;
++  gazebo::physics::JointPtr _right_front_wheel_joint;
++  gazebo::physics::JointPtr _left_rear_wheel_joint;
++  gazebo::physics::JointPtr _right_rear_wheel_joint;
++  bool _animate_wheels{false};
++  double _wheel_angle{0.0};
+ 
+   // Stop Ground truth
+   bool _pub_ground_truth;
+--- a/gazebo_race_car_model/src/gazebo_ros_race_car_model.cpp
++++ b/gazebo_race_car_model/src/gazebo_ros_race_car_model.cpp
+@@ -27,6 +27,7 @@
+ 
+ // STD Include
+ #include <algorithm>
++#include <cmath>
+ #include <fstream>
+ #include <mutex>  // NOLINT(build/c++11)
+ #include <thread>  // NOLINT(build/c++11)
+@@ -224,6 +225,9 @@
+   } else {
+     _pub_ground_truth = sdf->GetElement("pubGroundTruth")->Get<bool>();
+   }
++  if (sdf->HasElement("animateWheels")) {
++    _animate_wheels = sdf->GetElement("animateWheels")->Get<bool>();
++  }
+ }
+ 
+ void RaceCarModelPlugin::initVehicleModel(const sdf::ElementPtr &sdf) {
+@@ -266,6 +270,39 @@
+   std::string rightSteeringJointName =
+       _model->GetName() + "::" + sdf->Get<std::string>("front_right_wheel_steering");
+   _right_steering_joint = _model->GetJoint(rightSteeringJointName);
++  if (!_animate_wheels) return;
++  const auto joint = [this](const sdf::ElementPtr &element) {
++    return _model->GetJoint(_model->GetName() + "::" + element->Get<std::string>());
++  };
++  if (!sdf->HasElement("front_left_wheel") || !sdf->HasElement("front_right_wheel") ||
++      !sdf->HasElement("rear_left_wheel") || !sdf->HasElement("rear_right_wheel")) {
++    RCLCPP_FATAL(_rosnode->get_logger(), "animateWheels requires all four wheel joint names");
++    throw std::runtime_error("animateWheels requires all four wheel joint names");
++  }
++  _left_front_wheel_joint = joint(sdf->GetElement("front_left_wheel"));
++  _right_front_wheel_joint = joint(sdf->GetElement("front_right_wheel"));
++  _left_rear_wheel_joint = joint(sdf->GetElement("rear_left_wheel"));
++  _right_rear_wheel_joint = joint(sdf->GetElement("rear_right_wheel"));
++  if (!_left_front_wheel_joint || !_right_front_wheel_joint || !_left_rear_wheel_joint ||
++      !_right_rear_wheel_joint || _vehicle->getParam().tire.radius <= 0.0) {
++    RCLCPP_FATAL(_rosnode->get_logger(), "animateWheels could not initialize wheel joints or tire radius");
++    throw std::runtime_error("animateWheels could not initialize wheel joints or tire radius");
++  }
++}
++
++void RaceCarModelPlugin::animateWheels(const double dt) {
++  if (!_animate_wheels || !std::isfinite(dt) || dt <= 0.0) return;
++  const double radius = _vehicle->getParam().tire.radius;
++  const double omega = radius > 0.0 ? _state.v_x / radius : 0.0;
++  _wheel_angle += omega * dt;
++  if (std::abs(_wheel_angle) > 2.0 * M_PI) {
++    _wheel_angle = std::fmod(_wheel_angle, 2.0 * M_PI);
++  }
++  for (const auto &joint : {_left_front_wheel_joint, _right_front_wheel_joint,
++                            _left_rear_wheel_joint, _right_rear_wheel_joint}) {
++    joint->SetPosition(0, _wheel_angle, true);
++    joint->SetVelocity(0, omega);
++  }
+ }
+ 
+ void RaceCarModelPlugin::initNoise(const sdf::ElementPtr &sdf) {
+@@ -549,7 +586,10 @@
+   _tf_br->sendTransform(transform_stamped);
+ }
+ 
+-void RaceCarModelPlugin::Reset() { _last_sim_time = 0; }
++void RaceCarModelPlugin::Reset() {
++  _last_sim_time = 0;
++  _wheel_angle = 0.0;
++}
+ 
+ void RaceCarModelPlugin::update() {
+   gazebo::common::Time curTime = _world->SimTime();
+@@ -600,6 +640,7 @@
+   _left_steering_joint->SetPosition(0, _act_input.delta);
+   _right_steering_joint->SetPosition(0, _act_input.delta);
+   setModelState();
++  animateWheels(dt);
+ 
+   double time_since_last_published = (_last_sim_time - _time_last_published).Double();
+   if (time_since_last_published < (1 / _publish_rate)) {

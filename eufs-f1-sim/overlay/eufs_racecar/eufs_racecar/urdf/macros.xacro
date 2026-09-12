@@ -14,25 +14,25 @@
 <xacro:macro name="left_wheels_inertial_params">
   <origin xyz="0 0 -0.0225" rpy="0 0 0" />
   <mass value="12.0" />
-  <inertia ixx="0.35" ixy="0"     ixz="0"
-                       iyy="0.70"  iyz="0"
-                                   izz="0.35" />
+  <inertia ixx="0.535548" ixy="0"       ixz="0"
+                       iyy="0.535548" iyz="0"
+                                   izz="0.718296" />
 </xacro:macro>
 
 <xacro:macro name="right_wheels_inertial_params">
   <origin xyz="0 0 0.0225" rpy="0 0 0" />
   <mass value="12.0" />
-  <inertia ixx="0.35" ixy="0"     ixz="0"
-                       iyy="0.70"  iyz="0"
-                                   izz="0.35" />
+  <inertia ixx="0.535548" ixy="0"       ixz="0"
+                       iyy="0.535548" iyz="0"
+                                   izz="0.718296" />
 </xacro:macro>
 
 <xacro:macro name="steering_hinge_inertial_params">
   <origin xyz="0 0 0" rpy="0 0 0" />
-  <mass value="0.100" />
-  <inertia ixx="4E-06" ixy="0"           ixz="0"
-                            iyy="4E-06"  iyz="0"
-                                              izz="4E-06" />
+  <mass value="1.0" />
+  <inertia ixx="0.005" ixy="0"       ixz="0"
+                       iyy="0.005" iyz="0"
+                                  izz="0.005" />
 </xacro:macro>
 
 <xacro:macro name="hokuyo_inertial_params">
@@ -47,7 +47,11 @@
 <!-- geometry macros -->
 
 <xacro:macro name="chassis_geometry">
-  <origin xyz="0 0 0" rpy="0 0 0" />
+  <!-- The chassis mesh is authored nose-at-negative-X, while the vehicle
+       frame places the steering/front axle at positive X (rear axle at X=0).
+       Rotate the body about Z and reflect it around the axle midpoint so the
+       visible nose follows the vehicle's forward +X direction. -->
+  <origin xyz="3.28 0 0" rpy="0 0 3.141592653589793" />
   <geometry>
     <mesh filename="package://eufs_racecar/meshes/chassis.STL" />
   </geometry>

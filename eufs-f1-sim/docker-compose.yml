@@ -14,17 +14,21 @@ services:
       - DISPLAY=${DISPLAY:-:0}
       - QT_X11_NO_MITSHM=1
       - EUFS_MASTER=/opt/eufs_ws
+      - ROS_LOCALHOST_ONLY=1
+      - GAZEBO_IP=127.0.0.1
+      - GAZEBO_MASTER_URI=http://127.0.0.1:11345
+      - "TRACK=${TRACK:-cota}"
+      - "CARS=${CARS:-1}"
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     stdin_open: true
     tty: true
+    init: true
     command:
       - ros2
-      - launch
+      - run
       - eufs_racecar
-      - load_car.launch.py
-      - gazebo_gui:=false
-      - show_rqt_gui:=false
-      - rviz:=false
-      - "track:=${TRACK:-cota}"
-      - "cars:=${CARS:-1}"
+      - start_dashboard
+      - --ros-args
+      - -p
+      - manage_stack:=true

@@ -1,0 +1,7 @@
+# Local simulator artifacts and Python caches.
+.tmp/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+eufs-f1-sim/.build.log
+eufs-f1-sim/.run.log

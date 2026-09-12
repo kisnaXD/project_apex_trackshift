@@ -1,0 +1,30 @@
+diff --git a/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp b/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp
+--- a/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp
++++ b/gazebo_race_car_model/include/gazebo_race_car_model/gazebo_ros_race_car.hpp
+@@ -47,5 +47,6 @@
+ #include <tf2/transform_datatypes.h>
+ #include <tf2/utils.h>
+ #include <tf2_ros/transform_broadcaster.h>
++#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+ 
+ namespace gazebo_plugins {
+diff --git a/gazebo_race_car_model/CMakeLists.txt b/gazebo_race_car_model/CMakeLists.txt
+--- a/gazebo_race_car_model/CMakeLists.txt
++++ b/gazebo_race_car_model/CMakeLists.txt
+@@ -10,3 +10,4 @@
+ find_package(geometry_msgs REQUIRED)
+ find_package(tf2 REQUIRED)
++find_package(tf2_geometry_msgs REQUIRED)
+ find_package(ackermann_msgs REQUIRED)
+@@ -22,3 +23,4 @@
+   "geometry_msgs"
+   "tf2"
++  "tf2_geometry_msgs"
+   "ackermann_msgs"
+diff --git a/package.xml b/package.xml
+--- a/package.xml
++++ b/package.xml
+@@ -26,2 +26,3 @@
+   <depend>tf2</depend>
+   <depend>tf2_ros</depend>
++  <depend>tf2_geometry_msgs</depend>
