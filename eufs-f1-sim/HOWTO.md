@@ -35,8 +35,10 @@ xhost +local:
 | `scripts/step_to_urdf_ocp.py` | GrabCAD STEP → grouped STL meshes + URDF joints |
 | `overlay/` | F1 meshes, battery plugin, patches |
 | `overlay/eufs_racecar/launch/load_car.launch.py` | **The** launch: Gazebo + map + start dashboard + RViz + one spawn |
-| `overlay/eufs_racecar/eufs_racecar/start_dashboard.py` | Red/black telemetry dashboard (Start/Stop + live stats) |
-| `scripts/drive_straight_10s.sh` | Separate 10s straight-drive test (not on the dashboard) |
+| `overlay/eufs_racecar/eufs_racecar/start_dashboard.py` | Red/black telemetry dashboard (Start/Stop + 10s throttle + live stats) |
+| `overlay/eufs_racecar/eufs_racecar/tyre_state_publisher.py` | Motion-driven tyre temps / wear |
+| `overlay/eufs_racecar/eufs_racecar/ackermann_cmd_bridge.py` | `/eufs/cmd` Ackermann → `/eufs/cmd_vel` Twist |
+| `scripts/drive_straight_10s.sh` | Host/container helper for the same 10s throttle |
 
 ## Start (single command)
 
@@ -73,7 +75,7 @@ ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 | Gazebo client | `gzclient` | After **Start**. Same `gzserver` / `cota.world` / one `eufs` model |
 | RViz2 | `rviz2 -d eufs_f1.rviz` | After **Start**. Fixed frame `map`, RobotModel `/eufs/robot_description`, `/track_markers` |
 
-**Start** opens `gzclient` + RViz on the existing paused `gzserver` (same `DISPLAY`) and calls `/unpause_physics`. **Stop** publishes a zero `/eufs/cmd_vel` and calls `/pause_physics`. Neither button starts a second Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
+**Start** opens `gzclient` + RViz on the existing paused `gzserver` (same `DISPLAY`) and calls `/unpause_physics` **once**. Physics then stays RUNNING until **Stop**, which zeros drive commands and calls `/pause_physics` **once**. The dashboard does **not** infer pause from `/clock` (that is what made the Physics field flicker Paused ↔ Running). Neither button starts a second Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
 
 - **Service name:** `eufs-f1-sim`
 - **Container name:** `eufs-f1-sim`
@@ -81,9 +83,18 @@ ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 
 ## Dashboard
 
-`load_car.launch.py` starts a red/black PyQt5 **EUFS F1 Demo** window as the `start_dashboard` Node on the **same** launch as `track:=cota`. Same `DISPLAY` as gzclient. Start/Stop still open/pause Gazebo+RViz. There is **no** 10-second drive button on this window.
+`load_car.launch.py` starts a red/black PyQt5 **EUFS F1 Demo** window as the `start_dashboard` Node on the **same** launch as `track:=cota`. Same `DISPLAY` as gzclient. Start/Stop open/pause Gazebo+RViz. **10s front throttle** is on the dashboard (and still in `scripts/drive_straight_10s.sh`).
 
-Live fields (real topics only):
+This racecar does **not** use `gazebo_ros_race_car_model`. The live command path is:
+
+1. `ackermann_msgs/AckermannDriveStamped` on `/eufs/cmd` — `drive.acceleration`, `drive.steering_angle`, `drive.speed` (EUFS rqt shape)
+2. `ackermann_cmd_bridge` turns that into `geometry_msgs/Twist` on `/eufs/cmd_vel` (`linear.x` = target speed m/s, `angular.z` = steer rad)
+3. `gazebo_ros_energy_aware_ackermann_gate` remaps `cmd_vel` → `energy_cmd_vel` with launch-accel limiting
+4. `gazebo_ros_ackermann_drive` consumes `/eufs/energy_cmd_vel`
+
+The 10s button publishes both (1) and (2) at 20 Hz for 10 s (`speed=8`, `accel=8`, `steer=0`), then zeros them so the car rolls forward.
+
+Live fields:
 
 | Label | Source |
 |-------|--------|
@@ -94,15 +105,19 @@ Live fields (real topics only):
 | Battery SOC | `/eufs/forgez/battery_state`.percentage |
 | Current Demand | `/eufs/forgez/battery_state`.current (+ deploy W if published) |
 | Cell Temps | `BatteryState.cell_temperature` — **N/A** (plugin does not fill cells) |
-| Wheel rpm | `/eufs/joint_states` velocity. No tyre temp/pressure topics. |
+| Tire temps | `/eufs/tyres/temps` (`tyre_state_publisher`, motion/load model) |
+| Degradation rate | `/eufs/tyres/degradation_rate` |
+| Lap-time tire deg | `/eufs/tyres/lap_degradation` |
+| Tire life | `/eufs/tyres/life` |
+| Wheel rpm | `/eufs/joint_states` from Gazebo, else `/eufs/tyres/wheel_rpm` from odom |
 
-10s straight-line test (separate script, unpause + `/eufs/cmd_vel` then zero):
+Host helper (same commands, no second stack):
 
 ```bash
 sg docker -c './scripts/drive_straight_10s.sh'
 ```
 
-Start opens `gzclient` + `rviz2 -d eufs_f1.rviz` against the gzserver this launch already started, then `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and `/pause_physics`.
+Start opens `gzclient` + `rviz2 -d eufs_f1.rviz` against the gzserver this launch already started, then `/unpause_physics` once. Stop zeros `/eufs/cmd` and `/eufs/cmd_vel` and calls `/pause_physics` once.
 
 ## Verify
 
@@ -146,20 +161,22 @@ The dashboard Start button loads `overlay/eufs_racecar/config/eufs_f1.rviz` with
 
 ## Driving
 
-10s straight (separate from the dashboard):
+**10s front throttle** is the red button on the EUFS F1 Demo window. It unpauses if needed, commands forward accel + zero steer for 10 s, then zeros commands. Physics stays RUNNING.
+
+Host helper (same topics):
 
 ```bash
 cd eufs-f1-sim
 sg docker -c './scripts/drive_straight_10s.sh'
 ```
 
-Manual:
+Manual (target speed on the gate, not a dead `linear.x=1.0` crawl):
 
 ```bash
-docker exec eufs-f1-sim bash -lc 'source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 topic pub -r 10 /eufs/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 1.0}, angular: {z: 0.0}}"'
+docker exec eufs-f1-sim bash -lc 'source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 topic pub -r 20 /eufs/cmd ackermann_msgs/msg/AckermannDriveStamped "{drive: {steering_angle: 0.0, acceleration: 8.0, speed: 8.0}}"'
 ```
 
-Stop with Ctrl-C, then one zero command on `/eufs/cmd_vel`.
+or Twist on `/eufs/cmd_vel` with `linear.x` as **target speed m/s**. Zero both topics when done.
 
 ## F1 mesh from GrabCAD STEP
 

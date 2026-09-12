@@ -36,6 +36,8 @@ setup(
         'console_scripts': [
             'track_marker_publisher = eufs_racecar.track_marker_publisher:main',
             'start_dashboard = eufs_racecar.start_dashboard:main',
+            'tyre_state_publisher = eufs_racecar.tyre_state_publisher:main',
+            'ackermann_cmd_bridge = eufs_racecar.ackermann_cmd_bridge:main',
         ],
     },
     zip_safe=True,

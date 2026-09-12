@@ -1,6 +1,6 @@
 """Single EUFS F1 launch: headless gzserver + dashboard; Start opens gzclient + RViz."""
 
-from math import cos, sin
+from math import cos, degrees, sin
 from os import environ
 from os.path import join
 import subprocess
@@ -14,6 +14,7 @@ from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
     IncludeLaunchDescription,
+    LogInfo,
     OpaqueFunction,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -166,7 +167,7 @@ def _prepare_gazebo_env():
 
 
 def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publish_tf):
-    namespace_clean, namespace_path = _namespace_path(namespace)
+    namespace_clean, _ns_path = _namespace_path(namespace)
     entity = entity or namespace_clean or 'eufs'
     config_file = join(get_package_share_directory('eufs_racecar'), 'robots', 'eufs', 'configDry.yaml')
 
@@ -203,7 +204,6 @@ def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publ
     with open(urdf_path, 'w', encoding='utf-8') as stream:
         stream.write(gazebo_description)
     _sdf_with_rviz_paint(urdf_path, sdf_path)
-    joint_states_topic = f'{namespace_path}/joint_states' if namespace_path else '/joint_states'
 
     nodes = [
         Node(
@@ -235,19 +235,6 @@ def _spawn_nodes(namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publ
                 '--ros-args', '--log-level', 'warn',
             ],
         ),
-        Node(
-            package='joint_state_publisher',
-            executable='joint_state_publisher',
-            namespace=namespace_clean,
-            name='joint_state_publisher',
-            output='screen',
-            parameters=[{
-                'use_sim_time': True,
-                'robot_description': robot_description,
-                'rate': 200,
-            }],
-            remappings=[('/joint_states', joint_states_topic)],
-        ),
     ]
     if publish_tf:
         nodes.append(
@@ -274,7 +261,7 @@ def _launch_stack(context, *args, **kwargs):
     x = float(_arg(context, 'x') or assets['x'])
     y = float(_arg(context, 'y') or assets['y'])
     yaw = float(_arg(context, 'yaw') or assets['yaw'])
-    z = _arg(context, 'z')
+    z = _arg(context, 'z') or '0.08'
     roll = _arg(context, 'roll')
     pitch = _arg(context, 'pitch')
     forgez_mode = _arg(context, 'forgez_mode')
@@ -297,6 +284,10 @@ def _launch_stack(context, *args, **kwargs):
     # Headless gzserver only. gzclient and RViz open from start_dashboard Start.
     # Do not Include gzclient.launch / eufs_tracks/*.launch / eufs_launcher.
     actions = [
+        LogInfo(msg=[
+            f'Spawn {track} x={x:.6f} y={y:.6f} z={z} yaw={yaw:.6f} rad '
+            f'({degrees(yaw):.2f} deg) heading along COTA S/F'
+        ]),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzserver.launch.py')),
             launch_arguments={
@@ -338,6 +329,27 @@ def _launch_stack(context, *args, **kwargs):
                 'forgez_T_core': str(forgez_params['T_core']),
                 'forgez_E_lap': str(forgez_params['E_lap']),
                 'forgez_R_OT': str(forgez_params['R_OT']),
+            }],
+        ),
+        Node(
+            package='eufs_racecar',
+            executable='ackermann_cmd_bridge',
+            name='ackermann_cmd_bridge',
+            output='screen',
+            parameters=[{
+                'use_sim_time': False,
+                'namespace': base_ns,
+            }],
+        ),
+        Node(
+            package='eufs_racecar',
+            executable='tyre_state_publisher',
+            name='tyre_state_publisher',
+            output='screen',
+            parameters=[{
+                'use_sim_time': False,
+                'namespace': base_ns,
+                'lap_length_m': 5513.0,
             }],
         ),
     ]
@@ -399,7 +411,7 @@ def generate_launch_description():
         DeclareLaunchArgument('forgez_mode', default_value='auto'),
         DeclareLaunchArgument('x', default_value=''),
         DeclareLaunchArgument('y', default_value=''),
-        DeclareLaunchArgument('z', default_value='0.1'),
+        DeclareLaunchArgument('z', default_value='0.08'),
         DeclareLaunchArgument('roll', default_value='0'),
         DeclareLaunchArgument('pitch', default_value='0'),
         DeclareLaunchArgument('yaw', default_value=''),

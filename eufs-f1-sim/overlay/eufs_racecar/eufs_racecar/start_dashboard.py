@@ -1,19 +1,20 @@
 """Red/black EUFS F1 telemetry dashboard. Node on load_car.launch.py.
 
-Start/Stop still open gzclient+RViz and pause the existing gzserver.
-Display-only otherwise — no drive controls on this window.
+Start/Stop open gzclient+RViz against the existing gzserver and set physics
+ONCE. Physics state is the last user action, not a /clock sample.
 """
 
 import math
 import os
 import subprocess
 import sys
-import time
 
+from ackermann_msgs.msg import AckermannDriveStamped
 from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QColor, QFont, QPalette
 from PyQt5.QtWidgets import (
     QApplication,
     QComboBox,
@@ -23,15 +24,15 @@ from PyQt5.QtWidgets import (
     QLabel,
     QPushButton,
     QSpinBox,
+    QStyleFactory,
     QVBoxLayout,
     QWidget,
 )
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
-from rosgraph_msgs.msg import Clock
+from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import BatteryState, JointState
-from std_msgs.msg import Float64, String
+from std_msgs.msg import Float32, Float32MultiArray, Float64, String
 from std_srvs.srv import Empty
 
 TRACKS = ('cota', 'small_track')
@@ -41,20 +42,32 @@ WHEEL_JOINTS = (
     'left_rear_wheel_joint',
     'right_rear_wheel_joint',
 )
+THROTTLE_SPEED_MPS = 8.0
+THROTTLE_ACCEL_MPS2 = 8.0
+THROTTLE_HZ = 20
+THROTTLE_S = 10.0
+
 THEME = """
-QWidget { background-color: #0b0b0c; color: #f3f3f3; font-size: 13px; }
-QLabel#title { color: #e10600; font-size: 22px; font-weight: 700; }
-QLabel#section { color: #e10600; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
-QLabel#key { color: #9a9a9a; }
-QLabel#val { color: #ffffff; font-weight: 600; font-family: "DejaVu Sans Mono", monospace; }
-QLabel#na { color: #777777; font-style: italic; }
-QLabel#status { color: #d0d0d0; }
+QWidget#demoRoot {
+  background-color: #0b0b0c;
+  color: #f3f3f3;
+  font-size: 13px;
+  font-family: "DejaVu Sans";
+}
+QLabel#title { color: #e10600; font-size: 22px; font-weight: 700; background: transparent; }
+QLabel#section { color: #e10600; font-size: 13px; font-weight: 700; background: transparent; }
+QLabel#key { color: #9a9a9a; background: transparent; }
+QLabel#val { color: #ffffff; font-weight: 600; font-family: "DejaVu Sans Mono"; background: transparent; }
+QLabel#badge { color: #ffffff; font-weight: 700; background: transparent; }
+QLabel#status { color: #d0d0d0; background: transparent; }
 QPushButton {
-  background: #e10600; color: #fff; border: 0; padding: 8px 18px; font-weight: 700;
+  background: #e10600; color: #fff; border: 0; padding: 8px 16px; font-weight: 700;
 }
 QPushButton:hover { background: #ff2a1f; }
 QPushButton#stop { background: #2a2a2a; }
 QPushButton#stop:hover { background: #444; }
+QPushButton#throttle { background: #9b0000; }
+QPushButton#throttle:hover { background: #c40000; }
 QComboBox, QSpinBox {
   background: #161616; color: #fff; border: 1px solid #5a1010; padding: 4px 8px;
 }
@@ -99,8 +112,12 @@ class StartDashboard(Node):
         namespace = str(self.get_parameter('namespace').value).strip('/')
         ns = f'/{namespace}' if namespace else ''
         self.cmd_topic = f'{ns}/cmd_vel' if ns else '/cmd_vel'
+        self.ack_topic = f'{ns}/cmd' if ns else '/cmd'
         self.cmd_pub = self.create_publisher(Twist, self.cmd_topic, 10)
+        self.ack_pub = self.create_publisher(AckermannDriveStamped, self.ack_topic, 10)
         self._gui_procs = []
+        # Launch starts gzserver paused. Only Start / 10s throttle / Stop change this.
+        self._physics_wanted = False
 
         self.cmd_vx = None
         self.act_vx = None
@@ -118,13 +135,16 @@ class StartDashboard(Node):
         self.lap_remain_wh = None
         self.derate = None
         self.wheel_rpm = {name: None for name in WHEEL_JOINTS}
-        self.sim_paused = True
         self._last_v = None
         self._last_v_t = None
-        self._last_clock = None
-        self._last_clock_wall = 0.0
         self.cell_soc = None
         self.cell_temps = None
+        self.tyre_temps = None
+        self.tyre_deg_rate = None
+        self.tyre_lap_deg = None
+        self.tyre_life = None
+        self.tyre_rpm = None
+        self._throttle_active = False
 
         self.create_subscription(Twist, self.cmd_topic, self._on_cmd, 10)
         self.create_subscription(Odometry, f'{ns}/odom', self._on_odom, 10)
@@ -139,8 +159,15 @@ class StartDashboard(Node):
             Float64, f'{ns}/forgez/lap_energy_remaining_wh', self._on_lap_remain, 10,
         )
         self.create_subscription(String, f'{ns}/forgez/derate_reason', self._on_derate, 10)
-        clock_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
-        self.create_subscription(Clock, '/clock', self._on_clock, clock_qos)
+        self.create_subscription(Float32MultiArray, f'{ns}/tyres/temps', self._on_tyre_temps, 10)
+        self.create_subscription(Float32MultiArray, f'{ns}/tyres/wheel_rpm', self._on_tyre_rpm, 10)
+        self.create_subscription(Float32, f'{ns}/tyres/degradation_rate', self._on_tyre_rate, 10)
+        self.create_subscription(Float32, f'{ns}/tyres/lap_degradation', self._on_tyre_lap, 10)
+        self.create_subscription(Float32, f'{ns}/tyres/life', self._on_tyre_life, 10)
+        self.get_logger().info(
+            f'drive topics: Twist {self.cmd_topic} (gate target speed) and '
+            f'AckermannDriveStamped {self.ack_topic} (accel+steer)'
+        )
 
     def track(self):
         value = str(self.get_parameter('track').value).strip()
@@ -164,6 +191,9 @@ class StartDashboard(Node):
     def forgez_r_ot(self):
         return str(self.get_parameter('forgez_R_OT').value)
 
+    def physics_state(self):
+        return 'RUNNING' if self._physics_wanted else 'PAUSED'
+
     def _on_cmd(self, msg):
         self.cmd_vx = msg.linear.x
 
@@ -182,9 +212,11 @@ class StartDashboard(Node):
         self._last_v_t = stamp
 
     def _on_joints(self, msg):
-        for name, vel in zip(msg.name, msg.velocity):
-            if name in self.wheel_rpm:
-                self.wheel_rpm[name] = abs(vel) * 60.0 / (2.0 * math.pi)
+        velocities = list(msg.velocity) if msg.velocity else []
+        for index, name in enumerate(msg.name):
+            if name not in self.wheel_rpm or index >= len(velocities):
+                continue
+            self.wheel_rpm[name] = abs(velocities[index]) * 60.0 / (2.0 * math.pi)
 
     def _on_battery(self, msg):
         self.voltage = msg.voltage
@@ -215,24 +247,20 @@ class StartDashboard(Node):
     def _on_derate(self, msg):
         self.derate = msg.data
 
-    def _on_clock(self, msg):
-        now = msg.clock.sec + msg.clock.nanosec * 1e-9
-        self.sim_paused = self._last_clock is not None and abs(now - self._last_clock) < 1e-9
-        self._last_clock = now
-        self._last_clock_wall = time.monotonic()
+    def _on_tyre_temps(self, msg):
+        self.tyre_temps = list(msg.data)
 
-        self._last_clock_ns = None
+    def _on_tyre_rpm(self, msg):
+        self.tyre_rpm = list(msg.data)
 
-    def physics_state(self):
-        now = self.get_clock().now().nanoseconds
-        if self._last_clock_ns is None:
-            state = 'WAITING'
-        elif now == self._last_clock_ns:
-            state = 'PAUSED'
-        else:
-            state = 'RUNNING'
-        self._last_clock_ns = now
-        return state
+    def _on_tyre_rate(self, msg):
+        self.tyre_deg_rate = msg.data
+
+    def _on_tyre_lap(self, msg):
+        self.tyre_lap_deg = msg.data
+
+    def _on_tyre_life(self, msg):
+        self.tyre_life = msg.data
 
     def _gui_env(self):
         env = os.environ.copy()
@@ -273,14 +301,6 @@ class StartDashboard(Node):
             self._gui_procs.append(proc)
             self.get_logger().info(f'rviz2 pid={proc.pid} DISPLAY={env["DISPLAY"]}')
 
-    def start_sim(self):
-        self._start_guis()
-        return self._call_empty(self.unpause_cli)
-
-    def stop_sim(self):
-        self.cmd_pub.publish(Twist())
-        return self._call_empty(self.pause_cli)
-
     def _call_empty(self, client):
         if not client.wait_for_service(timeout_sec=0.5):
             self.get_logger().warn(f'{client.srv_name} is not ready')
@@ -288,22 +308,65 @@ class StartDashboard(Node):
         client.call_async(Empty.Request())
         return True
 
+    def publish_forward_cmd(self):
+        twist = Twist()
+        twist.linear.x = THROTTLE_SPEED_MPS
+        twist.angular.z = 0.0
+        self.cmd_pub.publish(twist)
+        ack = AckermannDriveStamped()
+        ack.header.stamp = self.get_clock().now().to_msg()
+        ack.drive.steering_angle = 0.0
+        ack.drive.acceleration = THROTTLE_ACCEL_MPS2
+        ack.drive.speed = THROTTLE_SPEED_MPS
+        self.ack_pub.publish(ack)
+
+    def publish_stop_cmd(self):
+        self.cmd_pub.publish(Twist())
+        ack = AckermannDriveStamped()
+        ack.header.stamp = self.get_clock().now().to_msg()
+        ack.drive.steering_angle = 0.0
+        ack.drive.acceleration = 0.0
+        ack.drive.speed = 0.0
+        self.ack_pub.publish(ack)
+
+    def start_sim(self):
+        self._start_guis()
+        self._physics_wanted = True
+        return self._call_empty(self.unpause_cli)
+
+    def stop_sim(self):
+        self._throttle_active = False
+        self.publish_stop_cmd()
+        self._physics_wanted = False
+        return self._call_empty(self.pause_cli)
+
+    def ensure_running(self):
+        if self._physics_wanted:
+            return True
+        self._physics_wanted = True
+        return self._call_empty(self.unpause_cli)
+
 
 def _card():
     frame = QFrame()
     frame.setObjectName('card')
     layout = QGridLayout(frame)
     layout.setContentsMargins(12, 10, 12, 10)
-    layout.setHorizontalSpacing(16)
-    layout.setVerticalSpacing(6)
+    layout.setHorizontalSpacing(18)
+    layout.setVerticalSpacing(8)
     return frame, layout
 
 
 def _kv(layout, row, col, key):
     k = QLabel(key)
     k.setObjectName('key')
+    k.setTextFormat(Qt.PlainText)
+    k.setWordWrap(False)
     v = QLabel('—')
     v.setObjectName('val')
+    v.setTextFormat(Qt.PlainText)
+    v.setWordWrap(False)
+    v.setMinimumWidth(140)
     layout.addWidget(k, row, col * 2)
     layout.addWidget(v, row, col * 2 + 1)
     return v
@@ -313,14 +376,26 @@ class DemoWindow(QWidget):
     def __init__(self, node: StartDashboard):
         super().__init__()
         self.node = node
+        self.setObjectName('demoRoot')
         self.setWindowTitle('EUFS F1 Demo')
         self.setStyleSheet(THEME)
-        self.setMinimumSize(920, 680)
+        self.setAutoFillBackground(True)
+        self.setMinimumSize(960, 720)
 
         title = QLabel('EUFS F1')
         title.setObjectName('title')
+        title.setTextFormat(Qt.PlainText)
+
+        track_lbl = QLabel('Track')
+        track_lbl.setObjectName('key')
+        track_lbl.setTextFormat(Qt.PlainText)
+        cars_lbl = QLabel('Cars')
+        cars_lbl.setObjectName('key')
+        cars_lbl.setTextFormat(Qt.PlainText)
+
         self.physics = QLabel('PAUSED')
-        self.physics.setObjectName('val')
+        self.physics.setObjectName('badge')
+        self.physics.setTextFormat(Qt.PlainText)
 
         self.track = QComboBox()
         self.track.addItems(TRACKS)
@@ -333,33 +408,41 @@ class DemoWindow(QWidget):
         start = QPushButton('Start')
         stop = QPushButton('Stop')
         stop.setObjectName('stop')
+        throttle = QPushButton('10s front throttle')
+        throttle.setObjectName('throttle')
         start.clicked.connect(self._on_start)
         stop.clicked.connect(self._on_stop)
+        throttle.clicked.connect(self._on_throttle)
 
         header = QHBoxLayout()
+        header.setSpacing(10)
         header.addWidget(title)
         header.addStretch(1)
-        header.addWidget(QLabel('Track'))
+        header.addWidget(track_lbl)
         header.addWidget(self.track)
-        header.addWidget(QLabel('Cars'))
+        header.addWidget(cars_lbl)
         header.addWidget(self.cars)
+        header.addWidget(self.physics)
         header.addWidget(start)
         header.addWidget(stop)
+        header.addWidget(throttle)
 
         motion, mgrid = _card()
         sec_m = QLabel('MOTION')
         sec_m.setObjectName('section')
+        sec_m.setTextFormat(Qt.PlainText)
         self.cmd_v = _kv(mgrid, 1, 0, 'Commanded vx')
         self.act_v = _kv(mgrid, 1, 1, 'Actual vx')
         self.accel = _kv(mgrid, 2, 0, 'Acceleration')
         self.yaw = _kv(mgrid, 2, 1, 'Yaw')
         self.pose = _kv(mgrid, 3, 0, 'Pose x, y')
-        self.sim = _kv(mgrid, 3, 1, 'Physics')
+        self.steer = _kv(mgrid, 3, 1, 'Steer cmd')
         mgrid.addWidget(sec_m, 0, 0, 1, 4)
 
         batt, bgrid = _card()
         sec_b = QLabel('BATTERY')
         sec_b.setObjectName('section')
+        sec_b.setTextFormat(Qt.PlainText)
         self.cell_soc = _kv(bgrid, 1, 0, 'Cell SOC')
         self.batt_temps = _kv(bgrid, 1, 1, 'Battery Temps')
         self.batt_soc = _kv(bgrid, 2, 0, 'Battery SOC')
@@ -375,30 +458,38 @@ class DemoWindow(QWidget):
         bgrid.addWidget(sec_b, 0, 0, 1, 4)
 
         tyres, tgrid = _card()
-        sec_t = QLabel('TYRES / WHEELS')
+        sec_t = QLabel('TYRES')
         sec_t.setObjectName('section')
-        self.fl = _kv(tgrid, 1, 0, 'FL rpm')
-        self.fr = _kv(tgrid, 1, 1, 'FR rpm')
-        self.rl = _kv(tgrid, 2, 0, 'RL rpm')
-        self.rr = _kv(tgrid, 2, 1, 'RR rpm')
-        note = QLabel('No tyre temperature or pressure topics in this sim — wheel speed from /eufs/joint_states only.')
-        note.setObjectName('na')
-        note.setWordWrap(True)
+        sec_t.setTextFormat(Qt.PlainText)
+        self.tyre_temp = _kv(tgrid, 1, 0, 'Tire temps')
+        self.tyre_rate = _kv(tgrid, 1, 1, 'Degradation rate')
+        self.tyre_lap = _kv(tgrid, 2, 0, 'Lap-time tire deg')
+        self.tyre_life = _kv(tgrid, 2, 1, 'Tire life')
+        self.fl = _kv(tgrid, 3, 0, 'FL rpm')
+        self.fr = _kv(tgrid, 3, 1, 'FR rpm')
+        self.rl = _kv(tgrid, 4, 0, 'RL rpm')
+        self.rr = _kv(tgrid, 4, 1, 'RR rpm')
         tgrid.addWidget(sec_t, 0, 0, 1, 4)
-        tgrid.addWidget(note, 3, 0, 1, 4)
 
-        self.status = QLabel('Click Start to open Gazebo and RViz. This panel is telemetry only.')
+        self.status = QLabel(
+            'Click Start to open Gazebo and RViz. 10s front throttle commands '
+            f'{node.ack_topic} (accel+steer) and {node.cmd_topic} (target speed).'
+        )
         self.status.setObjectName('status')
         self.status.setWordWrap(True)
 
         form = QVBoxLayout()
+        form.setSpacing(12)
         form.addLayout(header)
-        form.addWidget(self.physics)
         form.addWidget(motion)
         form.addWidget(batt)
         form.addWidget(tyres)
         form.addWidget(self.status)
         self.setLayout(form)
+
+        self._drive_ticks_left = 0
+        self._drive_timer = QTimer(self)
+        self._drive_timer.timeout.connect(self._drive_tick)
 
         self._ui = QTimer(self)
         self._ui.timeout.connect(self._refresh)
@@ -408,21 +499,45 @@ class DemoWindow(QWidget):
     def _on_start(self):
         if self.node.start_sim():
             self.status.setText(
-                f'Running track={self.track.currentText()} cars={self.cars.value()}'
+                f'RUNNING track={self.track.currentText()} cars={self.cars.value()}  '
+                'physics stays running until Stop'
             )
         else:
             self.status.setText('Opened GUIs; /unpause_physics not ready')
 
     def _on_stop(self):
+        self._drive_timer.stop()
+        self._drive_ticks_left = 0
         if self.node.stop_sim():
-            self.status.setText('Paused')
+            self.status.setText('PAUSED — physics stays paused until Start')
         else:
             self.status.setText('Stop skipped: /pause_physics not ready')
 
+    def _on_throttle(self):
+        self.node.ensure_running()
+        self.node._throttle_active = True
+        self._drive_ticks_left = int(THROTTLE_S * THROTTLE_HZ)
+        self._drive_timer.start(int(1000 / THROTTLE_HZ))
+        self.status.setText(
+            f'10s front throttle: {self.node.ack_topic} accel={THROTTLE_ACCEL_MPS2:g} '
+            f'steer=0 speed={THROTTLE_SPEED_MPS:g} and {self.node.cmd_topic} linear.x='
+            f'{THROTTLE_SPEED_MPS:g}'
+        )
+        self._drive_tick()
+
+    def _drive_tick(self):
+        if self._drive_ticks_left <= 0:
+            self._drive_timer.stop()
+            self.node._throttle_active = False
+            self.node.publish_stop_cmd()
+            self.status.setText('10s throttle done — commands zeroed, physics still RUNNING')
+            return
+        self.node.publish_forward_cmd()
+        self._drive_ticks_left -= 1
+
     def _refresh(self):
         n = self.node
-        state = n.physics_state()
-        self.physics.setText(state)
+        self.physics.setText(n.physics_state())
         self.cmd_v.setText(_fmt(n.cmd_vx, ' m/s'))
         self.act_v.setText(_fmt(n.act_vx, ' m/s'))
         self.accel.setText(_fmt(n.accel_x, ' m/s²'))
@@ -431,14 +546,12 @@ class DemoWindow(QWidget):
             self.pose.setText('—')
         else:
             self.pose.setText(f'{n.pose_x:.2f}, {n.pose_y:.2f} m')
-        self.sim.setText(state)
+        self.steer.setText('0.00 rad' if n._throttle_active else '0 (hold)')
 
         if n.cell_soc is None:
-            self.cell_soc.setText('N/A (no cell_percentage on /eufs/forgez/battery_state)')
-            self.cell_soc.setObjectName('na')
+            self.cell_soc.setText('N/A (no cell_percentage)')
         else:
             self.cell_soc.setText(n.cell_soc)
-            self.cell_soc.setObjectName('val')
         self.batt_temps.setText(_fmt(n.pack_temp, ' °C', 1) if n.pack_temp is not None else '—')
         if n.soc is None:
             self.batt_soc.setText('—')
@@ -450,11 +563,9 @@ class DemoWindow(QWidget):
             extra = f'  deploy {_fmt(n.deploy_w, " W", 0)}' if n.deploy_w is not None else ''
             self.current.setText(f'{n.current:.2f} A{extra}')
         if n.cell_temps is None:
-            self.cell_temps.setText('N/A (no cell_temperature on /eufs/forgez/battery_state)')
-            self.cell_temps.setObjectName('na')
+            self.cell_temps.setText('N/A (no cell_temperature)')
         else:
             self.cell_temps.setText(n.cell_temps)
-            self.cell_temps.setObjectName('val')
         self.voltage.setText(_fmt(n.voltage, ' V'))
         self.mode.setText(n.forgez_mode())
         self.t_core.setText(f'{n.forgez_t_core()} °C')
@@ -465,11 +576,32 @@ class DemoWindow(QWidget):
         self.energy.setText(f'{charge} / {remain}')
         self.derate.setText(n.derate or '—')
 
+        if n.tyre_temps:
+            self.tyre_temp.setText(
+                ' '.join(f'{t:.1f}' for t in n.tyre_temps[:4]) + ' °C'
+            )
+        else:
+            self.tyre_temp.setText('waiting /eufs/tyres/temps')
+        self.tyre_rate.setText(_fmt(n.tyre_deg_rate, ' %/s', 4))
+        self.tyre_lap.setText(_fmt(n.tyre_lap_deg, ' %', 3))
+        if n.tyre_life is None:
+            self.tyre_life.setText('waiting /eufs/tyres/life')
+        else:
+            self.tyre_life.setText(f'{n.tyre_life:.2f} %')
+
         rpm = n.wheel_rpm
-        self.fl.setText(_fmt(rpm['left_front_wheel_joint'], ' rpm', 0))
-        self.fr.setText(_fmt(rpm['right_front_wheel_joint'], ' rpm', 0))
-        self.rl.setText(_fmt(rpm['left_rear_wheel_joint'], ' rpm', 0))
-        self.rr.setText(_fmt(rpm['right_rear_wheel_joint'], ' rpm', 0))
+        tyre_rpm = n.tyre_rpm or []
+
+        def _rpm(joint, index):
+            value = rpm.get(joint)
+            if value is None and index < len(tyre_rpm):
+                value = tyre_rpm[index]
+            return _fmt(value, ' rpm', 0)
+
+        self.fl.setText(_rpm('left_front_wheel_joint', 0))
+        self.fr.setText(_rpm('right_front_wheel_joint', 1))
+        self.rl.setText(_rpm('left_rear_wheel_joint', 2))
+        self.rr.setText(_rpm('right_rear_wheel_joint', 3))
 
 
 def main(args=None):
@@ -477,6 +609,17 @@ def main(args=None):
         os.environ['DISPLAY'] = ':0'
     rclpy.init(args=args)
     app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create('Fusion'))
+    font = QFont('DejaVu Sans', 10)
+    app.setFont(font)
+    palette = QPalette()
+    palette.setColor(QPalette.Window, QColor('#0b0b0c'))
+    palette.setColor(QPalette.WindowText, QColor('#f3f3f3'))
+    palette.setColor(QPalette.Base, QColor('#141416'))
+    palette.setColor(QPalette.Text, QColor('#ffffff'))
+    palette.setColor(QPalette.Button, QColor('#e10600'))
+    palette.setColor(QPalette.ButtonText, QColor('#ffffff'))
+    app.setPalette(palette)
     node = StartDashboard()
     window = DemoWindow(node)
     window.show()
@@ -486,11 +629,13 @@ def main(args=None):
         f'EUFS F1 Demo window shown on DISPLAY={os.environ.get("DISPLAY")}'
     )
     timer = QTimer()
+
     def _spin():
         try:
             rclpy.spin_once(node, timeout_sec=0.0)
         except Exception as exc:  # noqa: BLE001 — keep the Qt loop alive
             node.get_logger().error(f'spin_once: {exc}')
+
     timer.timeout.connect(_spin)
     timer.start(20)
     code = app.exec_()
