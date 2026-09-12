@@ -63,8 +63,8 @@ the fixed frame, and publishes the car description on `/eufs/robot_description`.
 Gazebo odometry is already in world coordinates, so `map -> odom` is identity.
 Drive with `ackermann_msgs/AckermannDriveStamped` on `/eufs/cmd` (acceleration +
 steering_angle + speed) or `geometry_msgs/Twist` on `/eufs/cmd_vel` where
-`linear.x` is **target speed m/s**. The energy-aware gate ramps that speed and
-feeds `/eufs/energy_cmd_vel`. Send a zero command when releasing control.
+`linear.x` is **target speed m/s**. `gazebo_ros_ackermann_drive` listens on
+`/eufs/cmd_vel`. Send a zero command when releasing control.
 The dashboard **10s front throttle** button does this for ten seconds.
 
 Forgez modes and parameters: `overlay/eufs_racecar/config/forgez_battery.yaml`.

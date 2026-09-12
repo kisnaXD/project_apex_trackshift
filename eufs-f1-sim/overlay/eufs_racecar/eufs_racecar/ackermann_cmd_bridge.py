@@ -2,7 +2,7 @@
 
 Stock EUFS rqt publishes ackermann_msgs/AckermannDriveStamped on /cmd with
 acceleration and steering_angle. This car's Gazebo stack consumes Twist on
-cmd_vel (energy-aware gate → gazebo_ros_ackermann_drive). The bridge is the
+cmd_vel (gazebo_ros_ackermann_drive). The bridge is the
 translation so a 10s throttle can command the real EUFS fields.
 """
 

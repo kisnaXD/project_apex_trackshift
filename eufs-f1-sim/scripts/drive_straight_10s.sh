@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Drive the EUFS car straight for 10 seconds, then zero commands.
 # Real command path: AckermannDriveStamped on /eufs/cmd (accel + steer) and
-# Twist on /eufs/cmd_vel (target speed for the energy-aware gate).
+# Twist on /eufs/cmd_vel (target speed for gazebo_ros_ackermann_drive).
 # Unpauses the existing gzserver. Does not start Gazebo, RViz, or a second stack.
 #
 # Host:  sg docker -c './scripts/drive_straight_10s.sh'

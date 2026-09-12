@@ -89,8 +89,7 @@ This racecar does **not** use `gazebo_ros_race_car_model`. The live command path
 
 1. `ackermann_msgs/AckermannDriveStamped` on `/eufs/cmd` — `drive.acceleration`, `drive.steering_angle`, `drive.speed` (EUFS rqt shape)
 2. `ackermann_cmd_bridge` turns that into `geometry_msgs/Twist` on `/eufs/cmd_vel` (`linear.x` = target speed m/s, `angular.z` = steer rad)
-3. `gazebo_ros_energy_aware_ackermann_gate` remaps `cmd_vel` → `energy_cmd_vel` with launch-accel limiting
-4. `gazebo_ros_ackermann_drive` consumes `/eufs/energy_cmd_vel`
+3. `gazebo_ros_ackermann_drive` consumes `/eufs/cmd_vel` directly. Wheel joint effort is 8000 N·m so rear torque can overcome rolling resistance. The energy gate still publishes `/eufs/energy_cmd_vel` for telemetry; it is not in the drive loop (it would ramp the speed setpoint down to ~0.16 m/s from rest).
 
 The 10s button publishes both (1) and (2) at 20 Hz for 10 s (`speed=8`, `accel=8`, `steer=0`), then zeros them so the car rolls forward.
 
