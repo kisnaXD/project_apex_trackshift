@@ -8,7 +8,7 @@ import xacro
 
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, TimerAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -92,6 +92,10 @@ def _prepare_gazebo_env():
         racecar,
         '/usr/share/gazebo-11',
     )
+    # Must be empty. The Gazebo 11 default (models.gazebosim.org) makes
+    # gzclient sit on the splash while it times out missing model:// names.
+    environ['GAZEBO_MODEL_DATABASE_URI'] = ''
+    environ['LIBGL_DRI3_DISABLE'] = '1'
 
 
 def spawn_car(context, *args, **kwargs):
@@ -129,9 +133,14 @@ def spawn_car(context, *args, **kwargs):
         },
     )
     robot_description = doc.toxml()
+    racecar_meshes = join(get_package_share_directory('eufs_racecar'), 'meshes')
+    gazebo_description = robot_description.replace(
+        'package://eufs_racecar/meshes/',
+        f'file://{racecar_meshes}/',
+    )
     urdf_path = '/tmp/eufs_robot_description.urdf'
     with open(urdf_path, 'w', encoding='utf-8') as stream:
-        stream.write(robot_description)
+        stream.write(gazebo_description)
 
     joint_states_topic = f'{namespace_path}/joint_states' if namespace_path else '/joint_states'
 
@@ -257,12 +266,17 @@ def generate_launch_description():
                 'pause': 'false',
             }.items(),
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzclient.launch.py')),
-            condition=IfCondition(LaunchConfiguration('gazebo_gui')),
-            launch_arguments={
-                'verbose': 'false',
-            }.items(),
+        TimerAction(
+            period=2.0,
+            actions=[
+                IncludeLaunchDescription(
+                    PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzclient.launch.py')),
+                    condition=IfCondition(LaunchConfiguration('gazebo_gui')),
+                    launch_arguments={
+                        'verbose': 'false',
+                    }.items(),
+                ),
+            ],
         ),
         Node(
             package='rviz2',
