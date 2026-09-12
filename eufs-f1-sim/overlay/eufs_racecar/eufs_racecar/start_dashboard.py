@@ -1,12 +1,14 @@
 """Stock PyQt5 start window launched as a Node from load_car.launch.py.
 
-Start/Stop pause and unpause the Gazebo instance that launch already started.
-This node never starts Gazebo or another launch file.
+Start opens gzclient + RViz against the gzserver this launch already started.
+Stop zeros /eufs/cmd_vel and pauses that same Gazebo. No second stack.
 """
 
 import os
+import subprocess
 import sys
 
+from ament_index_python.packages import get_package_share_directory
 from geometry_msgs.msg import Twist
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import (
@@ -26,6 +28,16 @@ from std_srvs.srv import Empty
 TRACKS = ('cota', 'small_track')
 
 
+def _pgrep(pattern):
+    result = subprocess.run(
+        ['pgrep', '-f', pattern],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return result.returncode == 0
+
+
 class StartDashboard(Node):
     def __init__(self):
         super().__init__('start_dashboard')
@@ -33,11 +45,13 @@ class StartDashboard(Node):
         # Humble launch YAML stringifies integers; declare a string and coerce.
         self.declare_parameter('cars', '1')
         self.declare_parameter('namespace', 'eufs')
+        self.declare_parameter('rviz_config', '')
         self.pause_cli = self.create_client(Empty, '/pause_physics')
         self.unpause_cli = self.create_client(Empty, '/unpause_physics')
         namespace = str(self.get_parameter('namespace').value).strip('/')
         cmd_topic = f'/{namespace}/cmd_vel' if namespace else '/cmd_vel'
         self.cmd_pub = self.create_publisher(Twist, cmd_topic, 10)
+        self._gui_procs = []
 
     def track(self):
         value = str(self.get_parameter('track').value).strip()
@@ -49,7 +63,48 @@ class StartDashboard(Node):
         except (TypeError, ValueError):
             return 1
 
+    def _gui_env(self):
+        env = os.environ.copy()
+        env['DISPLAY'] = env.get('DISPLAY') or ':0'
+        env.setdefault('QT_X11_NO_MITSHM', '1')
+        env.setdefault('LIBGL_DRI3_DISABLE', '1')
+        return env
+
+    def _rviz_config(self):
+        configured = str(self.get_parameter('rviz_config').value).strip()
+        if configured:
+            return configured
+        return os.path.join(
+            get_package_share_directory('eufs_racecar'), 'config', 'eufs_f1.rviz',
+        )
+
+    def _start_guis(self):
+        """Open gzclient + RViz on this launch's gzserver. Never start gzserver."""
+        env = self._gui_env()
+        if not _pgrep('gzclient'):
+            proc = subprocess.Popen(
+                ['gzclient', '--gui-client-plugin=libgazebo_ros_eol_gui.so'],
+                env=env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            self._gui_procs.append(proc)
+            self.get_logger().info(f'gzclient pid={proc.pid} DISPLAY={env["DISPLAY"]}')
+        if not _pgrep('rviz2'):
+            proc = subprocess.Popen(
+                [
+                    'rviz2', '-d', self._rviz_config(),
+                    '--ros-args', '-p', 'use_sim_time:=true', '-r', '__node:=rviz',
+                ],
+                env=env,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            self._gui_procs.append(proc)
+            self.get_logger().info(f'rviz2 pid={proc.pid} DISPLAY={env["DISPLAY"]}')
+
     def start_sim(self):
+        self._start_guis()
         return self._call_empty(self.unpause_cli)
 
     def stop_sim(self):
@@ -79,7 +134,7 @@ class StartWindow(QWidget):
         self.cars.setMaximum(1)
         self.cars.setValue(min(1, node.cars()))
 
-        self.status = QLabel('Gazebo is already running from load_car.launch.py')
+        self.status = QLabel('Click Start to open Gazebo and RViz')
         self.status.setWordWrap(True)
 
         start = QPushButton('Start')
@@ -110,7 +165,7 @@ class StartWindow(QWidget):
                 f'Running track={self.track.currentText()} cars={self.cars.value()}'
             )
         else:
-            self.status.setText('Start skipped: /unpause_physics not ready')
+            self.status.setText('Opened GUIs; /unpause_physics not ready')
 
     def _on_stop(self):
         if self.node.stop_sim():

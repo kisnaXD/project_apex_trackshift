@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start EUFS F1 sim with host X11 access: Gazebo, RViz, rqt, and the start dashboard.
+# Start EUFS F1 sim: only the PyQt dashboard until you click Start.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,11 +30,11 @@ echo "Launch: load_car.launch.py track:=${TRACK} cars:=${CARS}"
 echo "DISPLAY (host=${DISPLAY}, container):"
 docker exec eufs-f1-sim bash -lc 'echo DISPLAY=$DISPLAY QT_X11_NO_MITSHM=$QT_X11_NO_MITSHM'
 echo
-echo "GUI processes (expect gzclient, rviz2, rqt_gui, start_dashboard):"
+echo "GUI processes (expect start_dashboard only; gzclient/rviz2 after Start):"
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui|start_dashboard' || true"
 echo
-echo "X11 windows on ${DISPLAY} (expect 'EUFS F1 Start'):"
+echo "X11 windows on ${DISPLAY} (expect only 'EUFS F1 Start' before Start):"
 DISPLAY="${DISPLAY}" xwininfo -root -tree 2>/dev/null | grep -E 'EUFS F1 Start|Gazebo|RViz|rqt' || true
 echo
-echo "Gazebo model eufs:"
+echo "Gazebo model eufs (headless gzserver):"
 docker exec eufs-f1-sim bash -lc "timeout 6 gz model -m eufs -p || true"

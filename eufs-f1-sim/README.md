@@ -42,7 +42,7 @@ docker compose build
 
 ## Run
 
-Single start path (Gazebo + RViz + one spawn):
+Single start path (dashboard only until you click Start):
 
 ```bash
 cd eufs-f1-sim
@@ -52,10 +52,11 @@ sg docker -c './scripts/start-stack.sh'
 ```
 
 Compose CMD is `ros2 launch eufs_racecar load_car.launch.py` with
-`track:=cota cars:=1`. That one file starts gzserver+gzclient, the track map,
-the stock PyQt5 start window, publishes `/eufs/robot_description`, spawns that
-URDF once, and opens RViz (`eufs_f1.rviz`) plus rqt. Do not start
-`eufs_tracks/*.launch` alongside it. Shutdown: `docker compose down`.
+`track:=cota cars:=1`. That one file starts headless gzserver, the track map,
+and the stock PyQt5 start window, then publishes `/eufs/robot_description` and
+spawns that URDF once. Click **Start** to open gzclient + RViz (`eufs_f1.rviz`,
+fixed frame `map`). Do not start `eufs_tracks/*.launch` alongside it.
+Shutdown: `docker compose down`.
 
 The demo publishes 71 stock RViz cone markers on `/track_markers`, uses `map` as
 the fixed frame, and publishes the car description on `/eufs/robot_description`.
@@ -94,7 +95,7 @@ colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
 xhost +local:
-ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota cars:=1
+ros2 launch eufs_racecar load_car.launch.py track:=cota cars:=1
 ```
 
 Requires `ros-humble-gazebo-ros-pkgs` (Gazebo Classic 11) on the host.

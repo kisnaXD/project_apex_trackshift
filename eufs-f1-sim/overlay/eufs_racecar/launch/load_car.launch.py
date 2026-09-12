@@ -1,4 +1,4 @@
-"""Single EUFS F1 launch: Gazebo + RViz + one robot_description + one spawn."""
+"""Single EUFS F1 launch: headless gzserver + dashboard; Start opens gzclient + RViz."""
 
 from math import cos, sin
 from os import environ
@@ -15,9 +15,7 @@ from launch.actions import (
     DeclareLaunchArgument,
     IncludeLaunchDescription,
     OpaqueFunction,
-    TimerAction,
 )
-from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -284,53 +282,21 @@ def _launch_stack(context, *args, **kwargs):
     robot_name = _arg(context, 'robot_name')
     left = (-sin(yaw), cos(yaw))
 
-    rqt_perspective_file = join(
-        get_package_share_directory('eufs_rqt'), 'config', 'eufs_sim.perspective',
-    )
     rviz_config_file = join(
         get_package_share_directory('eufs_racecar'), 'config', 'eufs_f1.rviz',
     )
     gz_launch_dir = join(get_package_share_directory('gazebo_ros'), 'launch')
 
+    # Headless gzserver only. gzclient and RViz open from start_dashboard Start.
+    # Do not Include gzclient.launch / eufs_tracks/*.launch / eufs_launcher.
     actions = [
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzserver.launch.py')),
             launch_arguments={
                 'world': world,
                 'verbose': 'false',
-                'pause': 'false',
+                'pause': 'true',
             }.items(),
-        ),
-        TimerAction(
-            period=2.0,
-            actions=[
-                IncludeLaunchDescription(
-                    PythonLaunchDescriptionSource(join(gz_launch_dir, 'gzclient.launch.py')),
-                    condition=IfCondition(LaunchConfiguration('gazebo_gui')),
-                    launch_arguments={'verbose': 'false'}.items(),
-                ),
-            ],
-        ),
-        TimerAction(
-            period=5.0,
-            actions=[
-                Node(
-                    package='rviz2',
-                    executable='rviz2',
-                    name='rviz',
-                    arguments=['-d', rviz_config_file],
-                    parameters=[{'use_sim_time': True}],
-                    condition=IfCondition(LaunchConfiguration('rviz')),
-                ),
-                Node(
-                    package='rqt_gui',
-                    executable='rqt_gui',
-                    name='eufs_sim_rqt',
-                    output='screen',
-                    arguments=['--force-discover', '--perspective-file', rqt_perspective_file],
-                    condition=IfCondition(LaunchConfiguration('show_rqt_gui')),
-                ),
-            ],
         ),
         Node(
             package='eufs_racecar',
@@ -343,7 +309,6 @@ def _launch_stack(context, *args, **kwargs):
                 'frame_id': 'map',
                 'publish_rate': 1.0,
             }],
-            condition=IfCondition(LaunchConfiguration('rviz')),
         ),
         Node(
             package='eufs_racecar',
@@ -361,6 +326,7 @@ def _launch_stack(context, *args, **kwargs):
                 # String: Humble params YAML cannot override an INTEGER default.
                 'cars': str(num_cars),
                 'namespace': base_ns,
+                'rviz_config': rviz_config_file,
             }],
         ),
     ]
@@ -395,9 +361,21 @@ def generate_launch_description():
         DeclareLaunchArgument('vehicleModelConfig', default_value='configDry.yaml'),
         DeclareLaunchArgument('publish_gt_tf', default_value='false'),
         DeclareLaunchArgument('pub_ground_truth', default_value='true'),
-        DeclareLaunchArgument('show_rqt_gui', default_value='true'),
-        DeclareLaunchArgument('rviz', default_value='true'),
-        DeclareLaunchArgument('gazebo_gui', default_value='true'),
+        DeclareLaunchArgument(
+            'show_rqt_gui',
+            default_value='false',
+            description='Ignored: rqt is not auto-started. Start opens gzclient + RViz.',
+        ),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='false',
+            description='Ignored: RViz starts from the dashboard Start button.',
+        ),
+        DeclareLaunchArgument(
+            'gazebo_gui',
+            default_value='false',
+            description='Ignored: gzclient starts from the dashboard Start button.',
+        ),
         DeclareLaunchArgument(
             'track',
             default_value='cota',

@@ -23,8 +23,8 @@ services:
       - launch
       - eufs_racecar
       - load_car.launch.py
-      - gazebo_gui:=true
-      - show_rqt_gui:=true
-      - rviz:=true
+      - gazebo_gui:=false
+      - show_rqt_gui:=false
+      - rviz:=false
       - "track:=${TRACK:-cota}"
       - "cars:=${CARS:-1}"

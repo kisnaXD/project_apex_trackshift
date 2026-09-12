@@ -48,9 +48,9 @@ sg docker -c './scripts/start-stack.sh'
 
 That is the only start path. It builds and starts the `eufs-f1-sim` compose service. Compose CMD is:
 
-`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota num_cars:=1`
+`ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=false show_rqt_gui:=false rviz:=false track:=cota num_cars:=1`
 
-On this start the stock PyQt **EUFS F1 Start** window (~360x160, Track / Cars / Start / Stop) should appear on the same `DISPLAY` as gzclient. `load_car.launch.py` is the only launch. It starts gzserver/gzclient on the selected track world, that dashboard Node, the cone map (`track_marker_publisher`), one spawn, RViz, and rqt. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack. The dashboard is not `eufs_start_gui` / `eufs_launcher` — those launch a second sim.
+On this start **only** the stock PyQt **EUFS F1 Start** window (~360x160, Track / Cars / Start / Stop) should appear. Gazebo (`gzclient`) and RViz do **not** open until you click **Start**. `load_car.launch.py` is the only launch: headless `gzserver` on `cota.world` (paused), one spawn, `track_marker_publisher`, and the dashboard Node. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack.
 
 ## Track args
 
@@ -60,20 +60,19 @@ On this start the stock PyQt **EUFS F1 Start** window (~360x160, Track / Cars / 
 | `num_cars` | `1` | `1` |
 
 ```bash
-ros2 launch eufs_racecar load_car.launch.py track:=cota num_cars:=1 gazebo_gui:=true show_rqt_gui:=true rviz:=true
+ros2 launch eufs_racecar load_car.launch.py track:=cota num_cars:=1
 ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 ```
 
 `track:=cota` loads `eufs_tracks` world `cota.world` and model `models/cota/model.sdf`. The four `big_orange` cones sit on the orange start/finish line; the car spawns with its front bumper behind that gate. Missing COTA files or hash mismatch fail the launch (no fallback to `small_track`).
 
-| GUI | Process | Purpose |
-|-----|---------|---------|
-| Start window | `start_dashboard` | Track `cota` / `small_track`, Cars=1, Start/Stop |
-| Gazebo | `gzserver` + `gzclient` | `track:=cota` world + one `eufs` model |
-| RViz2 | `rviz2 -d eufs_f1.rviz` | RobotModel on `/eufs/robot_description` plus `/track_markers` |
-| rqt | `rqt_gui` | EUFS Robot Steering + Mission Control |
+| GUI | Process | When |
+|-----|---------|------|
+| Start window | `start_dashboard` | On compose up. Track `cota` / `small_track`, Cars=1, Start/Stop |
+| Gazebo client | `gzclient` | After **Start**. Same `gzserver` / `cota.world` / one `eufs` model |
+| RViz2 | `rviz2 -d eufs_f1.rviz` | After **Start**. Fixed frame `map`, RobotModel `/eufs/robot_description`, `/track_markers` |
 
-Start unpauses `/unpause_physics` on the Gazebo that launch already started. Stop publishes a zero `/eufs/cmd_vel` and pauses `/pause_physics`. Neither button starts Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
+**Start** opens `gzclient` + RViz on the existing paused `gzserver` (same `DISPLAY`) and calls `/unpause_physics`. **Stop** publishes a zero `/eufs/cmd_vel` and calls `/pause_physics`. Neither button starts a second Gazebo, `eufs_tracks/*.launch`, or `eufs_launcher`.
 
 - **Service name:** `eufs-f1-sim`
 - **Container name:** `eufs-f1-sim`
@@ -81,11 +80,11 @@ Start unpauses `/unpause_physics` on the Gazebo that launch already started. Sto
 
 ## Dashboard
 
-`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node on the **same** launch as `track:=cota` (not a second process tree). It uses the container `DISPLAY` (compose passes `${DISPLAY:-:0}` and `/tmp/.X11-unix`, same as gzclient/rviz). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling. Size is about 360x160.
+`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node on the **same** launch as `track:=cota` (not a second process tree). It uses the container `DISPLAY` (compose passes `${DISPLAY:-:0}` and `/tmp/.X11-unix`). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling. Size is about 360x160.
 
-Humble launch YAML stringifies integers. `cars` is declared and passed as a **string** (`'1'`), then coerced with `int()` in the node. An INTEGER default with a string override kills the process before `window.show()`, which is why COTA could come up with Gazebo/RViz and no start window.
+Humble launch YAML stringifies integers. `cars` is declared and passed as a **string** (`'1'`), then coerced with `int()` in the node. An INTEGER default with a string override kills the process before `window.show()`.
 
-Start calls `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and calls `/pause_physics`. The buttons do not start Gazebo, do not run a second launch, and do not start `eufs_launcher`.
+Start opens `gzclient` + `rviz2 -d eufs_f1.rviz` (`use_sim_time:=true`, fixed frame `map`) against the gzserver this launch already started, then `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and `/pause_physics`. The buttons do not start `gzserver`, `eufs_tracks/*.launch`, or `eufs_launcher`.
 
 ## Verify
 
@@ -93,13 +92,11 @@ Start calls `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and calls `/pa
 docker compose ps
 docker exec eufs-f1-sim bash -lc 'echo DISPLAY=$DISPLAY'
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui|start_dashboard'"
-docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list | grep start_dashboard"
-DISPLAY="${DISPLAY:-:0}" xwininfo -root -tree | grep -F 'EUFS F1 Start'
+DISPLAY="${DISPLAY:-:0}" xwininfo -root -tree | grep -E 'EUFS F1 Start|Gazebo|RViz'
 docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
-docker exec eufs-f1-sim bash -lc "source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 node list; ros2 topic list"
 ```
 
-Expect `start_dashboard` still running (not `process has died`), `DISPLAY` the same as gzclient/rviz (`:0` unless you exported another), an X11 window titled **EUFS F1 Start**, `/start_dashboard` in `ros2 node list`, one `eufs` model on the COTA orange start/finish gate (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`, `timeout 6 gz model -m track -p` at `0 0 0.5` in `cota.world`), one `robot_state_publisher`, RobotModel OK in RViz (chase `base_link`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`, `/eufs/robot_description`).
+After compose up, expect **only** `start_dashboard` / **EUFS F1 Start** on `DISPLAY` — no `gzclient`, no `rviz2`. Headless `gzserver` is on `cota.world` with one `eufs` model (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`). After **Start**, expect `gzclient` + `rviz2` on the same `DISPLAY`, RobotModel on `/eufs/robot_description`, cones on `/track_markers` (fixed frame `map`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`). RViz empty while Gazebo is live usually means the config still points at `/robot_description` or fixed frame `base_link` without the namespaced car TF — not a second Gazebo.
 
 `load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. This Gazebo Classic `gz model` has no `-l` list flag; `timeout 6 gz model -m eufs -p` is enough.
 
@@ -118,7 +115,7 @@ Do **not** run `docker system prune`, disk wipes, or unbounded Docker operations
 
 ## RViz
 
-Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` with `rviz2 -d` and `use_sim_time:=true`.
+The dashboard Start button loads `overlay/eufs_racecar/config/eufs_f1.rviz` with `rviz2 -d` and `use_sim_time:=true`. Fixed frame is `map` (same frame as `/track_markers` and `map`→`odom`→`base_link`). RobotModel reads `/eufs/robot_description`, not `/robot_description`.
 
 | Display | Topic / frame |
 |---------|----------------|
@@ -165,7 +162,7 @@ colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
 xhost +local:
-ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota num_cars:=1
+ros2 launch eufs_racecar load_car.launch.py track:=cota num_cars:=1
 ```
 
 ## Version locks
