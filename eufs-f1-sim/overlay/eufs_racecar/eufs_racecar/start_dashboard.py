@@ -191,14 +191,14 @@ class StartDashboard(Node):
         self.current = msg.current
         self.soc = msg.percentage
         self.pack_temp = msg.temperature
-        if msg.cell_percentage:
-            self.cell_soc = ', '.join(f'{p * 100.0:.1f}%' for p in msg.cell_percentage)
-        else:
-            self.cell_soc = None
-        if msg.cell_temperature:
-            self.cell_temps = ', '.join(f'{t:.1f}°C' for t in msg.cell_temperature)
-        else:
-            self.cell_temps = None
+        cell_pct = list(getattr(msg, 'cell_percentage', None) or [])
+        self.cell_soc = (
+            ', '.join(f'{p * 100.0:.1f}%' for p in cell_pct) if cell_pct else None
+        )
+        cell_temps = list(getattr(msg, 'cell_temperature', None) or [])
+        self.cell_temps = (
+            ', '.join(f'{t:.1f}°C' for t in cell_temps) if cell_temps else None
+        )
 
     def _on_charge_wh(self, msg):
         self.charge_wh = msg.data
@@ -221,12 +221,18 @@ class StartDashboard(Node):
         self._last_clock = now
         self._last_clock_wall = time.monotonic()
 
+        self._last_clock_ns = None
+
     def physics_state(self):
-        if self._last_clock is None:
-            return 'NO /clock'
-        if time.monotonic() - self._last_clock_wall > 0.6:
-            return 'PAUSED'
-        return 'PAUSED' if self.sim_paused else 'RUNNING'
+        now = self.get_clock().now().nanoseconds
+        if self._last_clock_ns is None:
+            state = 'WAITING'
+        elif now == self._last_clock_ns:
+            state = 'PAUSED'
+        else:
+            state = 'RUNNING'
+        self._last_clock_ns = now
+        return state
 
     def _gui_env(self):
         env = os.environ.copy()
@@ -480,7 +486,12 @@ def main(args=None):
         f'EUFS F1 Demo window shown on DISPLAY={os.environ.get("DISPLAY")}'
     )
     timer = QTimer()
-    timer.timeout.connect(lambda: rclpy.spin_once(node, timeout_sec=0.0))
+    def _spin():
+        try:
+            rclpy.spin_once(node, timeout_sec=0.0)
+        except Exception as exc:  # noqa: BLE001 — keep the Qt loop alive
+            node.get_logger().error(f'spin_once: {exc}')
+    timer.timeout.connect(_spin)
     timer.start(20)
     code = app.exec_()
     node.destroy_node()
