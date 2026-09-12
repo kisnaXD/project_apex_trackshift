@@ -50,7 +50,7 @@ That is the only start path. It builds and starts the `eufs-f1-sim` compose serv
 
 `ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=true show_rqt_gui:=true rviz:=true track:=cota num_cars:=1`
 
-`load_car.launch.py` is the only launch. It starts gzserver/gzclient on the selected track world, the stock PyQt5 `start_dashboard` Node (window title **EUFS F1 Start**), the cone map (`track_marker_publisher`), one spawn, RViz, and rqt. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack. The dashboard is not `eufs_start_gui` / `eufs_launcher` — those launch a second sim.
+On this start the stock PyQt **EUFS F1 Start** window (~360x160, Track / Cars / Start / Stop) should appear on the same `DISPLAY` as gzclient. `load_car.launch.py` is the only launch. It starts gzserver/gzclient on the selected track world, that dashboard Node, the cone map (`track_marker_publisher`), one spawn, RViz, and rqt. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack. The dashboard is not `eufs_start_gui` / `eufs_launcher` — those launch a second sim.
 
 ## Track args
 
@@ -81,7 +81,7 @@ Start unpauses `/unpause_physics` on the Gazebo that launch already started. Sto
 
 ## Dashboard
 
-`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node on the **same** launch as `track:=cota` (not a second process tree). It uses the container `DISPLAY` (compose passes `${DISPLAY:-:0}` and `/tmp/.X11-unix`, same as gzclient/rviz). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling.
+`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node on the **same** launch as `track:=cota` (not a second process tree). It uses the container `DISPLAY` (compose passes `${DISPLAY:-:0}` and `/tmp/.X11-unix`, same as gzclient/rviz). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling. Size is about 360x160.
 
 Humble launch YAML stringifies integers. `cars` is declared and passed as a **string** (`'1'`), then coerced with `int()` in the node. An INTEGER default with a string override kills the process before `window.show()`, which is why COTA could come up with Gazebo/RViz and no start window.
 

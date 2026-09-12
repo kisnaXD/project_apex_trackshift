@@ -80,6 +80,7 @@ class StartWindow(QWidget):
         self.cars.setValue(min(1, node.cars()))
 
         self.status = QLabel('Gazebo is already running from load_car.launch.py')
+        self.status.setWordWrap(True)
 
         start = QPushButton('Start')
         stop = QPushButton('Stop')
@@ -101,6 +102,7 @@ class StartWindow(QWidget):
         form.addLayout(buttons)
         form.addWidget(self.status)
         self.setLayout(form)
+        self.setFixedSize(360, 160)
 
     def _on_start(self):
         if self.node.start_sim():
