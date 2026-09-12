@@ -83,7 +83,7 @@ docker compose logs -f --tail=50
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui'"
 ```
 
-Expect `eufs-f1-sim` **Up** and all three GUI processes running (`gzclient`, `rviz2`, and `python3 ... rqt_gui`). Meshes are **binary STL** so RViz2 can load the RobotModel (ASCII STL is rejected).
+Expect `eufs-f1-sim` **Up** and all three GUI processes running (`gzclient`, `rviz2`, and `python3 ... rqt_gui`). Meshes are **binary STL** so RViz2 can load the RobotModel (ASCII STL is rejected). In gzclient the chassis should be silver and the tires black — not default white. In RViz the Orbit view should sit behind `base_link` on the track, with RobotModel OK.
 
 ## Stop
 
@@ -96,18 +96,18 @@ Do **not** run `docker system prune`, disk wipes, or unbounded Docker operations
 
 ## RViz
 
-Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` (not `~/.rviz2/default.rviz`).
+Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` with `rviz2 -d` (not `~/.rviz2/default.rviz`). That file is EUFS `eufs_launcher/config/default.rviz` with this racecar’s frames: **third-person behind the car**, same Orbit numbers as stock EUFS (`Distance` 8.5, `Yaw` π, `Pitch` 0.4, focal point 2 m ahead).
 
 | Display | Topic / frame |
 |---------|----------------|
-| Fixed frame | `odom` (ackermann plugin publishes `odom` → `base_link`) |
-| RobotModel | `/robot_description` |
+| Fixed frame | `base_link` (this URDF has no `base_footprint`) |
+| View target | `base_link` (chase cam; Target Frame `odom` looks at the origin and shows an empty grid) |
+| RobotModel | `/robot_description` (Transient Local — matches `robot_state_publisher`) |
 | TF | all frames |
-| Grid | XY in `odom` |
-| LaserScan | `/scan` (Humble remaps `gazebo_ros_ray_sensor` `~/out` → `/scan`) |
-| Odometry | `/odom` |
+| Grid | XY in `base_link` |
+| LaserScan | `/scan` (Best Effort; Humble remaps `gazebo_ros_ray_sensor` `~/out` → `/scan`) |
 
-Do not use `base_footprint` — this racecar URDF has `base_link` only.
+Meshes use `package://eufs_racecar/meshes/...` so RViz2 can load the RobotModel. The lean image does not ship `eufs_rviz_plugins`, so stock cone displays are omitted.
 
 ## F1 mesh from GrabCAD STEP
 
@@ -115,7 +115,7 @@ The GrabCAD STEP is **Y-up**. `scripts/step_to_urdf_ocp.py` maps CAD → ROS as 
 
 Each corner wheel mesh is the GrabCAD `WHEEL` instance only (tire + rim). Leftover `Formula 1` body solids at the corners — uprights, wishbones, and brake ducts — are dropped so nothing pokes out of the rubber. Front/rear wings are already part of the chassis body solid.
 
-**Colors (Gazebo + RViz):** chassis and wings are metallic silver (`ambient`/`diffuse` `0.75 0.75 0.78`, high specular). Tires are black (`0.05 0.05 0.05`). Rims share the tire mesh (dark). There is no default-white STL and no leftover `Gazebo/Red` on the body.
+**Colors:** RViz uses URDF `silver` / `tire_black`. **gzclient** ignores those and only paints STL links from Classic `<gazebo reference="..."><material>NAME</material></gazebo>` names on `GAZEBO_MATERIAL_PATH`. Chassis/wings: `EUFSF1/Silver`. Tires: `EUFSF1/TireBlack`. Scripts: `overlay/eufs_racecar/eufs_racecar/materials/scripts/eufs_f1.material`. Nested SDF `<ambient>` blobs do **not** color the car in Classic (that left it white). Confirm paint in `gzclient`, not from the xacro files.
 
 ```bash
 cd eufs-f1-sim
@@ -152,6 +152,7 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 export EUFS_MASTER=$PWD
+export GAZEBO_MATERIAL_PATH="$PWD/install/eufs_racecar/share/eufs_racecar/materials/scripts:/usr/share/gazebo-11/media/materials/scripts"
 xhost +local:
 ros2 launch eufs_tracks small_track.launch gazebo_gui:=true show_rqt_gui:=true rviz:=true vehicleModelConfig:=configDry.yaml
 ```

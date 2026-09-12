@@ -7,4 +7,4 @@ Conversion: cadquery-ocp (Open CASCADE 7.x) via scripts/step_to_urdf_ocp.py
 CAD→ROS: X=-Z, Y=-X, Z=+Y (STEP is Y-up; ROS is Z-up). Wheels contact z=0 under the body.
 Meshes: chassis (body + wings), dummy wing STLs, four wheels = WHEEL tire+rim only.
 Dropped: Formula 1 body leftover solids at each corner (uprights / wishbones / brake ducts).
-Colors: chassis/wings metallic silver (0.75 0.75 0.78, high specular); tires 0.05 black.
+Colors: gzclient uses Classic materials EUFSF1/Silver and EUFSF1/TireBlack via GAZEBO_MATERIAL_PATH; RViz uses URDF silver/tire_black.

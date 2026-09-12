@@ -22,8 +22,10 @@ if [[ -f "${_world}" ]]; then
   sed -i "s|-40 40 20 0 0.667643 -1|-22 8 6 0 0.45 0.55|g" "${_world}" || true
 fi
 
+_f1_mat="${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar/materials/scripts"
 export GAZEBO_MODEL_PATH="${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/models:${GAZEBO_MODEL_PATH:-}"
-export GAZEBO_RESOURCE_PATH="${EUFS_MASTER}/install/eufs_sensors/share/eufs_sensors/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/materials:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar/materials:${GAZEBO_RESOURCE_PATH:-}"
+export GAZEBO_MATERIAL_PATH="${_f1_mat}:/usr/share/gazebo-11/media/materials/scripts:${GAZEBO_MATERIAL_PATH:-}"
+export GAZEBO_RESOURCE_PATH="${EUFS_MASTER}/install/eufs_sensors/share/eufs_sensors/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/meshes:${EUFS_MASTER}/install/eufs_tracks/share/eufs_tracks/materials:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar:${EUFS_MASTER}/install/eufs_racecar/share/eufs_racecar/materials:${_f1_mat}:${GAZEBO_RESOURCE_PATH:-}"
 export GAZEBO_PLUGIN_PATH="${EUFS_MASTER}/install/eufs_plugins/lib:${EUFS_MASTER}/install/gazebo_ros_battery/lib:${GAZEBO_PLUGIN_PATH:-}"
 
 # Allow container GUI apps on the host X server (host must run `xhost +local:` once per session).

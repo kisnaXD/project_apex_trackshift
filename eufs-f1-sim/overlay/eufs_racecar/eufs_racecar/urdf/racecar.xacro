@@ -221,9 +221,9 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find eufs_racecar)/meshes/hokuyo.dae"/>
-        <material name="grey" />
+        <mesh filename="package://eufs_racecar/meshes/hokuyo.dae"/>
       </geometry>
+      <material name="grey" />
     </visual>
   </link>
 
