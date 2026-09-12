@@ -35,7 +35,8 @@ xhost +local:
 | `scripts/step_to_urdf_ocp.py` | GrabCAD STEP → grouped STL meshes + URDF joints |
 | `overlay/` | F1 meshes, battery plugin, patches |
 | `overlay/eufs_racecar/launch/load_car.launch.py` | **The** launch: Gazebo + map + start dashboard + RViz + one spawn |
-| `overlay/eufs_racecar/eufs_racecar/start_dashboard.py` | Stock PyQt5 Track / Cars / Start / Stop window |
+| `overlay/eufs_racecar/eufs_racecar/start_dashboard.py` | Red/black telemetry dashboard (Start/Stop + live stats) |
+| `scripts/drive_straight_10s.sh` | Separate 10s straight-drive test (not on the dashboard) |
 
 ## Start (single command)
 
@@ -50,7 +51,7 @@ That is the only start path. It builds and starts the `eufs-f1-sim` compose serv
 
 `ros2 launch eufs_racecar load_car.launch.py gazebo_gui:=false show_rqt_gui:=false rviz:=false track:=cota num_cars:=1`
 
-On this start **only** the stock PyQt **EUFS F1 Start** window (~360x160, Track / Cars / Start / Stop) should appear. Gazebo (`gzclient`) and RViz do **not** open until you click **Start**. `load_car.launch.py` is the only launch: headless `gzserver` on `cota.world` (paused), one spawn, `track_marker_publisher`, and the dashboard Node. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack.
+On this start **only** the red/black **EUFS F1 Demo** dashboard should appear. Gazebo (`gzclient`) and RViz do **not** open until you click **Start**. `load_car.launch.py` is the only launch: headless `gzserver` on `cota.world` (paused), one spawn, `track_marker_publisher`, and the dashboard Node. Do not start `eufs_tracks/small_track.launch`, `eufs_launcher`, or any second Gazebo stack.
 
 ## Track args
 
@@ -68,7 +69,7 @@ ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 
 | GUI | Process | When |
 |-----|---------|------|
-| Start window | `start_dashboard` | On compose up. Track `cota` / `small_track`, Cars=1, Start/Stop |
+| Start window | `start_dashboard` | On compose up. Red/black telemetry + Track/Cars + Start/Stop |
 | Gazebo client | `gzclient` | After **Start**. Same `gzserver` / `cota.world` / one `eufs` model |
 | RViz2 | `rviz2 -d eufs_f1.rviz` | After **Start**. Fixed frame `map`, RobotModel `/eufs/robot_description`, `/track_markers` |
 
@@ -80,11 +81,28 @@ ros2 launch eufs_racecar load_car.launch.py track:=small_track num_cars:=1
 
 ## Dashboard
 
-`load_car.launch.py` starts a stock PyQt5 window as the `start_dashboard` Node on the **same** launch as `track:=cota` (not a second process tree). It uses the container `DISPLAY` (compose passes `${DISPLAY:-:0}` and `/tmp/.X11-unix`). Widgets: Track (`cota` / `small_track`), Cars=1, Start, Stop. No extra styling. Size is about 360x160.
+`load_car.launch.py` starts a red/black PyQt5 **EUFS F1 Demo** window as the `start_dashboard` Node on the **same** launch as `track:=cota`. Same `DISPLAY` as gzclient. Start/Stop still open/pause Gazebo+RViz. There is **no** 10-second drive button on this window.
 
-Humble launch YAML stringifies integers. `cars` is declared and passed as a **string** (`'1'`), then coerced with `int()` in the node. An INTEGER default with a string override kills the process before `window.show()`.
+Live fields (real topics only):
 
-Start opens `gzclient` + `rviz2 -d eufs_f1.rviz` (`use_sim_time:=true`, fixed frame `map`) against the gzserver this launch already started, then `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and `/pause_physics`. The buttons do not start `gzserver`, `eufs_tracks/*.launch`, or `eufs_launcher`.
+| Label | Source |
+|-------|--------|
+| Commanded vx / Actual vx | `/eufs/cmd_vel`, `/eufs/odom` |
+| Acceleration | derivative of `/eufs/odom` twist.linear.x vs sim stamp |
+| Cell SOC | `BatteryState.cell_percentage` — **N/A** (plugin does not fill cells) |
+| Battery Temps | `/eufs/forgez/battery_state`.temperature |
+| Battery SOC | `/eufs/forgez/battery_state`.percentage |
+| Current Demand | `/eufs/forgez/battery_state`.current (+ deploy W if published) |
+| Cell Temps | `BatteryState.cell_temperature` — **N/A** (plugin does not fill cells) |
+| Wheel rpm | `/eufs/joint_states` velocity. No tyre temp/pressure topics. |
+
+10s straight-line test (separate script, unpause + `/eufs/cmd_vel` then zero):
+
+```bash
+sg docker -c './scripts/drive_straight_10s.sh'
+```
+
+Start opens `gzclient` + `rviz2 -d eufs_f1.rviz` against the gzserver this launch already started, then `/unpause_physics`. Stop sends a zero `/eufs/cmd_vel` and `/pause_physics`.
 
 ## Verify
 
@@ -92,11 +110,11 @@ Start opens `gzclient` + `rviz2 -d eufs_f1.rviz` (`use_sim_time:=true`, fixed fr
 docker compose ps
 docker exec eufs-f1-sim bash -lc 'echo DISPLAY=$DISPLAY'
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui|start_dashboard'"
-DISPLAY="${DISPLAY:-:0}" xwininfo -root -tree | grep -E 'EUFS F1 Start|Gazebo|RViz'
+DISPLAY="${DISPLAY:-:0}" xwininfo -root -tree | grep -E 'EUFS F1 Demo|Gazebo|RViz'
 docker exec eufs-f1-sim bash -lc "gz model -m eufs -p"
 ```
 
-After compose up, expect **only** `start_dashboard` / **EUFS F1 Start** on `DISPLAY` — no `gzclient`, no `rviz2`. Headless `gzserver` is on `cota.world` with one `eufs` model (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`). After **Start**, expect `gzclient` + `rviz2` on the same `DISPLAY`, RobotModel on `/eufs/robot_description`, cones on `/track_markers` (fixed frame `map`), and one topic graph (`/clock`, `/tf`, `/eufs/odom`, `/eufs/cmd_vel`). RViz empty while Gazebo is live usually means the config still points at `/robot_description` or fixed frame `base_link` without the namespaced car TF — not a second Gazebo.
+After compose up, expect **only** `start_dashboard` / **EUFS F1 Demo** on `DISPLAY` — no `gzclient`, no `rviz2`. Headless `gzserver` is on `cota.world` with one `eufs` model (`timeout 6 gz model -m eufs -p` near `-4.2 3.3`). After **Start**, expect `gzclient` + `rviz2` on the same `DISPLAY`.
 
 `load_car` sets `GAZEBO_MODEL_DATABASE_URI` empty and spawns the car with `file://` STLs. Do not point gzclient at models.gazebosim.org — that is what pins the orange "Preparing your world" splash. This Gazebo Classic `gz model` has no `-l` list flag; `timeout 6 gz model -m eufs -p` is enough.
 
@@ -127,6 +145,15 @@ The dashboard Start button loads `overlay/eufs_racecar/config/eufs_f1.rviz` with
 | Odometry | `/eufs/odom` |
 
 ## Driving
+
+10s straight (separate from the dashboard):
+
+```bash
+cd eufs-f1-sim
+sg docker -c './scripts/drive_straight_10s.sh'
+```
+
+Manual:
 
 ```bash
 docker exec eufs-f1-sim bash -lc 'source /opt/ros/humble/setup.bash; source /opt/eufs_ws/install/setup.bash; ros2 topic pub -r 10 /eufs/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 1.0}, angular: {z: 0.0}}"'

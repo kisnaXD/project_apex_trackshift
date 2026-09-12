@@ -33,8 +33,8 @@ echo
 echo "GUI processes (expect start_dashboard only; gzclient/rviz2 after Start):"
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui|start_dashboard' || true"
 echo
-echo "X11 windows on ${DISPLAY} (expect only 'EUFS F1 Start' before Start):"
-DISPLAY="${DISPLAY}" xwininfo -root -tree 2>/dev/null | grep -E 'EUFS F1 Start|Gazebo|RViz|rqt' || true
+echo "X11 windows on ${DISPLAY} (expect only 'EUFS F1 Demo' before Start):"
+DISPLAY="${DISPLAY}" xwininfo -root -tree 2>/dev/null | grep -E 'EUFS F1 Demo|EUFS F1 Start|Gazebo|RViz|rqt' || true
 echo
 echo "Gazebo model eufs (headless gzserver):"
 docker exec eufs-f1-sim bash -lc "timeout 6 gz model -m eufs -p || true"

@@ -278,6 +278,13 @@ def _launch_stack(context, *args, **kwargs):
     roll = _arg(context, 'roll')
     pitch = _arg(context, 'pitch')
     forgez_mode = _arg(context, 'forgez_mode')
+    if forgez_mode == 'auto':
+        forgez_mode_name, forgez_params = _forgez_defaults()
+    else:
+        forgez_mode_name = forgez_mode
+        cfg_path = join(get_package_share_directory('eufs_racecar'), 'config', 'forgez_battery.yaml')
+        with open(cfg_path, 'r', encoding='utf-8') as stream:
+            forgez_params = yaml.safe_load(stream)['forgez_battery']['modes'][forgez_mode]
     base_ns = _arg(context, 'namespace') or 'eufs'
     robot_name = _arg(context, 'robot_name')
     left = (-sin(yaw), cos(yaw))
@@ -327,6 +334,10 @@ def _launch_stack(context, *args, **kwargs):
                 'cars': str(num_cars),
                 'namespace': base_ns,
                 'rviz_config': rviz_config_file,
+                'forgez_mode': forgez_mode_name,
+                'forgez_T_core': str(forgez_params['T_core']),
+                'forgez_E_lap': str(forgez_params['E_lap']),
+                'forgez_R_OT': str(forgez_params['R_OT']),
             }],
         ),
     ]
