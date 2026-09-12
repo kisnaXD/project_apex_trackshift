@@ -66,7 +66,6 @@ def spawn_car(context, *args, **kwargs):
                 'use_sim_time': True,
                 'robot_description': robot_description,
             }],
-            remappings=[('/joint_states', '/eufs/joint_states')],
         ),
         Node(
             package='gazebo_ros',
