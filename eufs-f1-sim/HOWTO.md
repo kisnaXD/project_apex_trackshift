@@ -83,7 +83,7 @@ docker compose logs -f --tail=50
 docker exec eufs-f1-sim bash -lc "pgrep -af 'gzclient|rviz2|rqt_gui'"
 ```
 
-Expect `eufs-f1-sim` **Up** and all three GUI processes running.
+Expect `eufs-f1-sim` **Up** and all three GUI processes running (`gzclient`, `rviz2`, and `python3 ... rqt_gui`). Meshes are **binary STL** so RViz2 can load the RobotModel (ASCII STL is rejected).
 
 ## Stop
 
@@ -104,7 +104,7 @@ Launch always loads `overlay/eufs_racecar/config/eufs_f1.rviz` (not `~/.rviz2/de
 | RobotModel | `/robot_description` |
 | TF | all frames |
 | Grid | XY in `odom` |
-| LaserScan | `/scan` |
+| LaserScan | `/scan` (Humble remaps `gazebo_ros_ray_sensor` `~/out` → `/scan`) |
 | Odometry | `/odom` |
 
 Do not use `base_footprint` — this racecar URDF has `base_link` only.
