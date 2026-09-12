@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import (
 )
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import QoSProfile, ReliabilityPolicy, qos_profile_sensor_data
 from rosgraph_msgs.msg import Clock
 from sensor_msgs.msg import BatteryState, JointState
 from std_msgs.msg import Float64, String
@@ -139,7 +139,8 @@ class StartDashboard(Node):
             Float64, f'{ns}/forgez/lap_energy_remaining_wh', self._on_lap_remain, 10,
         )
         self.create_subscription(String, f'{ns}/forgez/derate_reason', self._on_derate, 10)
-        self.create_subscription(Clock, '/clock', self._on_clock, 10)
+        clock_qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT)
+        self.create_subscription(Clock, '/clock', self._on_clock, clock_qos)
 
     def track(self):
         value = str(self.get_parameter('track').value).strip()
