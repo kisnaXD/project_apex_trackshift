@@ -11,30 +11,34 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from OCP.BRep import BRep_Builder
+from OCP.BRep import BRep_Builder, BRep_Tool
 from OCP.BRepBndLib import BRepBndLib
 from OCP.BRepBuilderAPI import BRepBuilderAPI_Transform
 from OCP.BRepGProp import BRepGProp
 from OCP.BRepMesh import BRepMesh_IncrementalMesh
+from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCP.Bnd import Bnd_Box
 from OCP.GProp import GProp_GProps
 from OCP.IFSelect import IFSelect_RetDone
 from OCP.STEPControl import STEPControl_Reader
 from OCP.StlAPI import StlAPI_Writer
-from OCP.TopAbs import TopAbs_SOLID
+from OCP.TopAbs import TopAbs_FACE, TopAbs_SOLID
 from OCP.TopExp import TopExp_Explorer
-from OCP.TopoDS import TopoDS_Compound
-from OCP.gp import gp_Pnt, gp_Trsf, gp_Vec
+from OCP.TopLoc import TopLoc_Location
+from OCP.TopoDS import TopoDS, TopoDS_Compound
+from OCP.gp import gp_Ax1, gp_Dir, gp_Pnt, gp_Trsf, gp_Vec
 
 TARGET_WHEELBASE_M = 3.28
 MESH_DEFLECTION_MM = 0.8
 TINY_VOLUME_MM3 = 50_000.0
-WING_VOLUME_MM3 = 1_000_000.0
+# Rim shares the tire center (~3 mm); leftover body uprights sit ~140 mm inboard.
+WHEEL_COMPANION_MM = 50.0
 
 LINK_NAMES = (
     "chassis",
@@ -87,8 +91,33 @@ def solid_info(solid, index: int) -> SolidInfo:
     return SolidInfo(index=index, center_mm=center, extent_mm=extent, volume_mm3=props.Mass())
 
 
-def classify_solids(solids: list) -> dict[str, set[int]]:
-    """Group STEP solids into chassis, wings, and four corner wheels."""
+def _corner_link(info: SolidInfo, mid_z: float) -> str:
+    """CAD +X is ROS right; low CAD Z is the nose."""
+    is_front = info.center_mm[2] < mid_z
+    is_right = info.center_mm[0] > 0
+    if is_front:
+        return "right_front_wheel" if is_right else "left_front_wheel"
+    return "right_rear_wheel" if is_right else "left_rear_wheel"
+
+
+def _center_dist_mm(a: SolidInfo, b: SolidInfo) -> float:
+    dx = a.center_mm[0] - b.center_mm[0]
+    dy = a.center_mm[1] - b.center_mm[1]
+    dz = a.center_mm[2] - b.center_mm[2]
+    return (dx * dx + dy * dy + dz * dz) ** 0.5
+
+
+def classify_solids(solids: list) -> tuple[dict[str, set[int]], set[int]]:
+    """Group STEP solids into chassis and four corner wheels (tire + rim only).
+
+    GrabCAD assembly is one 'Formula 1' body plus four 'WHEEL' instances.
+    Each WHEEL instance is a tire (largest solid at that corner) and a rim at
+    the same center. The body also has leftover suspension solids at each
+    corner (uprights / wishbones / brake ducts, ~140 mm inboard of the tire).
+    Those leftovers are dropped so they do not poke out of the rubber.
+    Front/rear wings are already tessellated inside the body solid, so the
+    wing links stay empty (dummy STLs at export).
+    """
     infos = [solid_info(s, i) for i, s in enumerate(solids)]
     by_volume = sorted(infos, key=lambda item: item.volume_mm3, reverse=True)
 
@@ -104,28 +133,31 @@ def classify_solids(solids: list) -> dict[str, set[int]]:
     mid_z = (front_z + rear_z) / 2
 
     groups: dict[str, set[int]] = {name: set() for name in LINK_NAMES}
+    dropped: set[int] = set()
+    by_corner: dict[str, list[SolidInfo]] = {name: [] for name in WHEEL_LINKS}
 
     for info in candidates:
         if info.volume_mm3 < TINY_VOLUME_MM3:
             chassis.add(info.index)
             continue
+        by_corner[_corner_link(info, mid_z)].append(info)
 
-        cx, _, cz = info.center_mm
-        is_front = cz < mid_z
-
-        if info.volume_mm3 >= WING_VOLUME_MM3:
-            groups["front_wing" if is_front else "rear_wing"].add(info.index)
-            continue
-
-        # Y_ros = -X_cad, so CAD +X (left in the STEP file) is ROS right.
-        if is_front:
-            groups["right_front_wheel" if cx > 0 else "left_front_wheel"].add(info.index)
-        else:
-            groups["right_rear_wheel" if cx > 0 else "left_rear_wheel"].add(info.index)
+    for name, members in by_corner.items():
+        if not members:
+            raise RuntimeError(f"No solids classified for {name}")
+        tire = max(members, key=lambda item: item.volume_mm3)
+        groups[name].add(tire.index)
+        for info in members:
+            if info.index == tire.index:
+                continue
+            if _center_dist_mm(info, tire) <= WHEEL_COMPANION_MM:
+                groups[name].add(info.index)
+            else:
+                dropped.add(info.index)
 
     groups["chassis"] = chassis
 
-    assigned = set().union(*groups.values())
+    assigned = set().union(*groups.values()) | dropped
     if assigned != set(range(len(solids))):
         missing = set(range(len(solids))) - assigned
         groups["chassis"].update(missing)
@@ -134,7 +166,7 @@ def classify_solids(solids: list) -> dict[str, set[int]]:
         if not groups[name]:
             raise RuntimeError(f"No solids classified for {name}")
 
-    return groups
+    return groups, dropped
 
 
 def cad_mm_to_ros_m(x: float, y: float, z: float, scale: float) -> tuple[float, float, float]:
@@ -185,15 +217,6 @@ def bounds_ros(solids: list, scale: float) -> tuple[tuple[float, float, float], 
     ys = [p[1] for p in points]
     zs = [p[2] for p in points]
     return (min(xs), min(ys), min(zs)), (max(xs), max(ys), max(zs))
-
-
-def transform_points(points: list[tuple[float, float, float]], tr: gp_Trsf) -> list[tuple[float, float, float]]:
-    transformed = []
-    for x, y, z in points:
-        p = gp_Pnt(x, y, z)
-        p.Transform(tr)
-        transformed.append((p.X(), p.Y(), p.Z()))
-    return transformed
 
 
 def group_center_ros(solids: list, indices: set[int], scale: float) -> tuple[float, float, float]:
@@ -248,6 +271,49 @@ def export_stl(shape, out_path: Path, transform: gp_Trsf, deflection_mm: float) 
     rewrite_binary_stl(out_path)
 
 
+def mesh_points(shape, transform: gp_Trsf, deflection_mm: float) -> list[tuple[float, float, float]]:
+    transformed = BRepBuilderAPI_Transform(shape, transform, True).Shape()
+    mesher = BRepMesh_IncrementalMesh(transformed, deflection_mm, False, 0.5, True)
+    mesher.Perform()
+    points: list[tuple[float, float, float]] = []
+    exp = TopExp_Explorer(transformed, TopAbs_FACE)
+    while exp.More():
+        loc = TopLoc_Location()
+        tri = BRep_Tool.Triangulation_s(TopoDS.Face_s(exp.Current()), loc)
+        if tri is not None:
+            trsf = loc.Transformation()
+            for i in range(1, tri.NbNodes() + 1):
+                pnt = tri.Node(i)
+                pnt.Transform(trsf)
+                points.append((pnt.X(), pnt.Y(), pnt.Z()))
+        exp.Next()
+    if not points:
+        raise RuntimeError("meshing produced no vertices")
+    return points
+
+
+def wheel_link_rotation() -> gp_Trsf:
+    """Chassis-frame upright tire (disk in XZ, axle +Y) -> wheel link (disk in XY, axle +Z).
+
+    Rear/front wheel joints use rpy 1.5708 0 0, which maps link Z onto the
+    chassis lateral axis so the tire stands wheels-down after this pre-rotation.
+    """
+    tr = gp_Trsf()
+    tr.SetRotation(gp_Ax1(gp_Pnt(0, 0, 0), gp_Dir(1, 0, 0)), -math.pi / 2)
+    return tr
+
+
+def stl_wheel_metrics(path: Path) -> tuple[float, float]:
+    """Radius in the XY disk and width along Z (link frame after wheel_link_rotation)."""
+    from stl import mesh as stlmesh
+    import numpy as np
+
+    verts = stlmesh.Mesh.from_file(str(path)).vectors.reshape(-1, 3)
+    radius = float(np.sqrt(verts[:, 0] ** 2 + verts[:, 1] ** 2).max())
+    width = float(verts[:, 2].max() - verts[:, 2].min())
+    return radius, width
+
+
 def apply_shift(point: tuple[float, float, float], shift: tuple[float, float, float]) -> tuple[float, float, float]:
     return (point[0] + shift[0], point[1] + shift[1], point[2] + shift[2])
 
@@ -274,30 +340,17 @@ def corners_shifted(
     return [apply_shift(point, shift) for point in corners_ros(solids, scale)]
 
 
-def wheel_radius_m(
-    solids: list,
-    indices: set[int],
-    scale: float,
-    shift: tuple[float, float, float],
-) -> float:
-    members = [solids[i] for i in indices]
-    center = group_center_shifted(solids, indices, scale, shift)
-    points = corners_shifted(members, scale, shift)
-    return max(
-        ((p[0] - center[0]) ** 2 + (p[2] - center[2]) ** 2) ** 0.5
-        for p in points
-    )
-
-
-def patch_wheel_collision_macros(macros_path: Path, wheel_radius: float) -> None:
+def patch_wheel_collision_macros(
+    macros_path: Path, wheel_radius: float, wheel_width: float
+) -> None:
     text = macros_path.read_text(encoding="utf-8")
     cyl_pattern = (
         r'(<xacro:macro name="(?:left|right)_wheels_collision_geometry">\s*'
-        r'<origin xyz="0 0 0" rpy="0 1\.5708 0" />\s*'
+        r'<origin xyz="0 0 0" rpy=")[^"]+(" />\s*'
         r'<geometry>\s*'
-        r'<cylinder length=")([0-9.]+)(" radius=")([0-9.]+)(" />)'
+        r'<cylinder length=")[0-9.]+(" radius=")[0-9.]+(" />)'
     )
-    cyl_repl = rf'\g<1>{2 * wheel_radius:.3f}\g<3>{wheel_radius:.3f}\g<5>'
+    cyl_repl = rf'\g<1>0 0 0\g<2>{wheel_width:.3f}\g<3>{wheel_radius:.3f}\g<4>'
     text, count = re.subn(cyl_pattern, cyl_repl, text, count=2)
     if count != 2:
         raise RuntimeError(f"Failed to patch wheel collision cylinders in {macros_path}")
@@ -385,68 +438,94 @@ def main() -> int:
     solids = read_solids(args.step)
     print(f"Read {len(solids)} solids from {args.step.name}")
 
-    link_groups = classify_solids(solids)
+    link_groups, dropped = classify_solids(solids)
     for name in LINK_NAMES:
         print(f"  {name}: {sorted(link_groups[name])}")
+    if dropped:
+        print(
+            "  dropped leftover body solids (uprights/wishbones/brake ducts): "
+            f"{sorted(dropped)}"
+        )
 
     wb_mm = wheelbase_mm(solids, link_groups)
     scale = args.wheelbase / wb_mm
     print(f"Wheelbase CAD {wb_mm:.1f} mm -> scale {scale:.6f} m/mm (target {args.wheelbase} m)")
 
-    tr = ros_transform(scale)
+    tr_scale = ros_transform(scale)
 
     lr = group_center_ros(solids, link_groups["left_rear_wheel"], scale)
     rr = group_center_ros(solids, link_groups["right_rear_wheel"], scale)
     rear_mid = ((lr[0] + rr[0]) / 2, (lr[1] + rr[1]) / 2, (lr[2] + rr[2]) / 2)
 
     wheel_members = [solids[i] for name in WHEEL_LINKS for i in link_groups[name]]
-    wheel_points = corners_shifted(wheel_members, scale, (0.0, 0.0, 0.0))
-    ground_z = z_extent(wheel_points)[0]
+    wheel_pts = mesh_points(make_compound(wheel_members), tr_scale, MESH_DEFLECTION_MM)
+    ground_z = min(p[2] for p in wheel_pts)
+    print(f"Wheel mesh ground z (pre-shift) {ground_z:.3f} m")
 
     shift_tuple = (-rear_mid[0], -rear_mid[1], -ground_z)
     shift = gp_Vec(*shift_tuple)
     tr_pre = gp_Trsf()
     tr_pre.SetTranslation(shift)
-    tr = tr_pre.Multiplied(tr)
+    tr = tr_pre.Multiplied(tr_scale)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     joint_positions: dict[str, tuple[float, float, float]] = {}
     wheel_radii: list[float] = []
+    wheel_widths: list[float] = []
+    rx_wheel = wheel_link_rotation()
+
+    dummy_box = BRepPrimAPI_MakeBox(0.001, 0.001, 0.001).Shape()
 
     for link in LINK_NAMES:
         members = [solids[i] for i in sorted(link_groups[link])]
-        compound = make_compound(members)
         out = args.out_dir / f"{link}.STL"
+
+        if not members:
+            export_stl(dummy_box, out, gp_Trsf(), 0.5)
+            print(f"  {link}: {out.name} dummy (geometry is in chassis)")
+            continue
+
+        compound = make_compound(members)
 
         if link in WHEEL_LINKS:
             center = group_center_shifted(solids, link_groups[link], scale, shift_tuple)
             joint_positions[link] = center
-            wheel_radii.append(wheel_radius_m(solids, link_groups[link], scale, shift_tuple))
             local_shift = gp_Trsf()
             local_shift.SetTranslation(gp_Vec(-center[0], -center[1], -center[2]))
-            export_tr = local_shift.Multiplied(tr)
+            export_tr = rx_wheel.Multiplied(local_shift.Multiplied(tr))
         else:
             export_tr = tr
 
         export_stl(compound, out, export_tr, MESH_DEFLECTION_MM)
-        z_lo, z_hi = z_extent(corners_shifted(members, scale, shift_tuple))
-        print(f"  {link}: {out.name} ({out.stat().st_size // 1024} KiB) z~[{z_lo:.3f},{z_hi:.3f}]")
+        if link in WHEEL_LINKS:
+            radius, width = stl_wheel_metrics(out)
+            wheel_radii.append(radius)
+            wheel_widths.append(width)
+            print(
+                f"  {link}: {out.name} ({out.stat().st_size // 1024} KiB) "
+                f"r={radius:.3f} width={width:.3f} joint_z={center[2]:.3f}"
+            )
+        else:
+            z_lo, z_hi = z_extent(corners_shifted(members, scale, shift_tuple))
+            print(f"  {link}: {out.name} ({out.stat().st_size // 1024} KiB) z~[{z_lo:.3f},{z_hi:.3f}]")
 
-    from OCP.BRepPrimAPI import BRepPrimAPI_MakeBox
-
-    box = BRepPrimAPI_MakeBox(0.001, 0.001, 0.001).Shape()
     for name in ("left_steering_hinge", "right_steering_hinge"):
-        export_stl(box, args.out_dir / f"{name}.STL", gp_Trsf(), 0.5)
+        export_stl(dummy_box, args.out_dir / f"{name}.STL", gp_Trsf(), 0.5)
 
     wheel_radius = sum(wheel_radii) / len(wheel_radii)
+    wheel_width = sum(wheel_widths) / len(wheel_widths)
+    for link, radius in zip(WHEEL_LINKS, wheel_radii):
+        x, y, _ = joint_positions[link]
+        joint_positions[link] = (x, y, radius)
     all_lo, all_hi = bounds_ros([solids[i] for i in range(len(solids))], scale)
     all_lo = apply_shift(all_lo, shift_tuple)
     all_hi = apply_shift(all_hi, shift_tuple)
 
-    chassis_z = z_extent(corners_shifted(
-        [solids[i] for i in link_groups["chassis"]], scale, shift_tuple
-    ))
+    chassis_pts = mesh_points(
+        make_compound([solids[i] for i in link_groups["chassis"]]), tr, MESH_DEFLECTION_MM
+    )
+    chassis_z = z_extent(chassis_pts)
     wheel_z_centers = [joint_positions[name][2] for name in WHEEL_LINKS]
     mean_wheel_z = sum(wheel_z_centers) / len(wheel_z_centers)
     left_y = joint_positions["left_rear_wheel"][1]
@@ -468,7 +547,7 @@ def main() -> int:
     sensor_z = max(mean_wheel_z + wheel_radius, chassis_z[1] - 0.05)
     print(
         f"Upright check OK: chassis z~[{chassis_z[0]:.3f},{chassis_z[1]:.3f}] "
-        f"wheels z~{mean_wheel_z:.3f} lidar z={sensor_z:.3f}"
+        f"wheels z~{mean_wheel_z:.3f} r={wheel_radius:.3f} lidar z={sensor_z:.3f}"
     )
 
     meta = {
@@ -480,6 +559,7 @@ def main() -> int:
         "wheelbase_m": args.wheelbase,
         "scale_factor": scale,
         "wheel_radius_m": wheel_radius,
+        "wheel_width_m": wheel_width,
         "wheel_centers_ros_m": {
             "left_front": list(joint_positions["left_front_wheel"]),
             "right_front": list(joint_positions["right_front_wheel"]),
@@ -491,18 +571,26 @@ def main() -> int:
         "lidar_z_m": sensor_z,
         "ground_z_m": 0.0,
         "link_groups": {k: sorted(v) for k, v in link_groups.items()},
+        "dropped_solids": {
+            "indices": sorted(dropped),
+            "reason": (
+                "Leftover Formula 1 body solids at each corner (uprights / "
+                "wishbones / brake ducts), ~140 mm inboard of the WHEEL tire+rim. "
+                "Dropped so they do not poke out of the rubber."
+            ),
+        },
     }
 
     args.metadata.parent.mkdir(parents=True, exist_ok=True)
     args.metadata.write_text(json.dumps(meta, indent=2) + "\n")
     print(f"Wrote metadata {args.metadata}")
-    print(f"Wheel radius ~{wheel_radius:.3f} m")
+    print(f"Wheel radius ~{wheel_radius:.3f} m  width ~{wheel_width:.3f} m")
 
     if args.patch_xacro.is_file():
         patch_racecar_xacro(args.patch_xacro, joint_positions, sensor_z)
         print(f"Patched joints in {args.patch_xacro}")
     if args.patch_macros.is_file():
-        patch_wheel_collision_macros(args.patch_macros, wheel_radius)
+        patch_wheel_collision_macros(args.patch_macros, wheel_radius, wheel_width)
         print(f"Patched wheel collisions in {args.patch_macros}")
 
     return 0

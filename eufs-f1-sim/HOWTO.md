@@ -113,6 +113,10 @@ Do not use `base_footprint` — this racecar URDF has `base_link` only.
 
 The GrabCAD STEP is **Y-up**. `scripts/step_to_urdf_ocp.py` maps CAD → ROS as `X=-Z`, `Y=-X`, `Z=+Y` (proper rotation, +Z up) so wheels sit on the ground under the body. Regenerating STLs updates visuals, wheel collisions, and lidar/camera height together — do not apply a visual-only RPY flip.
 
+Each corner wheel mesh is the GrabCAD `WHEEL` instance only (tire + rim). Leftover `Formula 1` body solids at the corners — uprights, wishbones, and brake ducts — are dropped so nothing pokes out of the rubber. Front/rear wings are already part of the chassis body solid.
+
+**Colors (Gazebo + RViz):** chassis and wings are metallic silver (`ambient`/`diffuse` `0.75 0.75 0.78`, high specular). Tires are black (`0.05 0.05 0.05`). Rims share the tire mesh (dark). There is no default-white STL and no leftover `Gazebo/Red` on the body.
+
 ```bash
 cd eufs-f1-sim
 python3 scripts/step_to_urdf_ocp.py --step "/home/gera/Downloads/Assem step.STEP"

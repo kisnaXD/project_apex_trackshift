@@ -10,7 +10,42 @@
   <mu2 value="0.0"/>
   <kp  value="10000000.0" />
   <kd  value="1.0" />
-  <material>Gazebo/Red</material>
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/Silver</name>
+    </script>
+    <ambient>0.75 0.75 0.78 1</ambient>
+    <diffuse>0.75 0.75 0.78 1</diffuse>
+    <specular>0.90 0.90 0.95 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
+</gazebo>
+
+<gazebo reference="front_wing">
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/Silver</name>
+    </script>
+    <ambient>0.75 0.75 0.78 1</ambient>
+    <diffuse>0.75 0.75 0.78 1</diffuse>
+    <specular>0.90 0.90 0.95 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
+</gazebo>
+
+<gazebo reference="rear_wing">
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/Silver</name>
+    </script>
+    <ambient>0.75 0.75 0.78 1</ambient>
+    <diffuse>0.75 0.75 0.78 1</diffuse>
+    <specular>0.90 0.90 0.95 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
 </gazebo>
 
 <gazebo reference="left_rear_wheel">
@@ -19,7 +54,16 @@
   <kp  value="10000000.0" />
   <kd  value="1.0" />
   <fdir1 value="1 0 0"/>
-  <material>Gazebo/Black</material>
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/TireBlack</name>
+    </script>
+    <ambient>0.05 0.05 0.05 1</ambient>
+    <diffuse>0.05 0.05 0.05 1</diffuse>
+    <specular>0.08 0.08 0.08 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
 </gazebo>
 
 <gazebo reference="right_rear_wheel">
@@ -28,7 +72,16 @@
   <kp  value="10000000.0" />
   <kd  value="1.0" />
   <fdir1 value="1 0 0"/>
-  <material>Gazebo/Black</material>
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/TireBlack</name>
+    </script>
+    <ambient>0.05 0.05 0.05 1</ambient>
+    <diffuse>0.05 0.05 0.05 1</diffuse>
+    <specular>0.08 0.08 0.08 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
 </gazebo>
 
 <gazebo reference="left_front_wheel">
@@ -37,7 +90,16 @@
   <kp  value="10000000.0" />
   <kd  value="1.0" />
   <fdir1 value="0 0 1"/>
-  <material>Gazebo/Black</material>
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/TireBlack</name>
+    </script>
+    <ambient>0.05 0.05 0.05 1</ambient>
+    <diffuse>0.05 0.05 0.05 1</diffuse>
+    <specular>0.08 0.08 0.08 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
 </gazebo>
 
 <gazebo reference="right_front_wheel">
@@ -46,7 +108,16 @@
   <kp  value="10000000.0" />
   <kd  value="1.0" />
   <fdir1 value="0 0 1"/>
-  <material>Gazebo/Black</material>
+  <material>
+    <script>
+      <uri>file://$(find eufs_racecar)/materials/scripts</uri>
+      <name>EUFSF1/TireBlack</name>
+    </script>
+    <ambient>0.05 0.05 0.05 1</ambient>
+    <diffuse>0.05 0.05 0.05 1</diffuse>
+    <specular>0.08 0.08 0.08 1</specular>
+    <emissive>0 0 0 1</emissive>
+  </material>
 </gazebo>
 
 <!-- Gazebo plugins -->

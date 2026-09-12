@@ -5,4 +5,6 @@ Author: Tarek Abdelaal (GrabCAD community model)
 License: GrabCAD Community terms (educational/concept; not official team CAD)
 Conversion: cadquery-ocp (Open CASCADE 7.x) via scripts/step_to_urdf_ocp.py
 CAD→ROS: X=-Z, Y=-X, Z=+Y (STEP is Y-up; ROS is Z-up). Wheels contact z=0 under the body.
-Meshes: chassis, front_wing, rear_wing, four wheels (STL, flat share/eufs_racecar/meshes/)
+Meshes: chassis (body + wings), dummy wing STLs, four wheels = WHEEL tire+rim only.
+Dropped: Formula 1 body leftover solids at each corner (uprights / wishbones / brake ducts).
+Colors: chassis/wings metallic silver (0.75 0.75 0.78, high specular); tires 0.05 black.

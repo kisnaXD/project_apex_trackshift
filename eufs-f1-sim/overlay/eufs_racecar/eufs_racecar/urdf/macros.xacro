@@ -111,16 +111,16 @@
 </xacro:macro>
 
 <xacro:macro name="left_wheels_collision_geometry">
-  <origin xyz="0 0 0" rpy="0 1.5708 0" />
+  <origin xyz="0 0 0" rpy="0 0 0" />
   <geometry>
-    <cylinder length="0.853" radius="0.427" />
+    <cylinder length="0.413" radius="0.346" />
   </geometry>
 </xacro:macro>
 
 <xacro:macro name="right_wheels_collision_geometry">
-  <origin xyz="0 0 0" rpy="0 1.5708 0" />
+  <origin xyz="0 0 0" rpy="0 0 0" />
   <geometry>
-    <cylinder length="0.853" radius="0.427" />
+    <cylinder length="0.413" radius="0.346" />
   </geometry>
 </xacro:macro>
 

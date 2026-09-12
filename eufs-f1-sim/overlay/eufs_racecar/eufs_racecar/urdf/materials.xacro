@@ -2,7 +2,19 @@
 <robot name="racecar" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 <material name="black">
-  <color rgba="0.0 0.0 0.0 1.0"/>
+  <color rgba="0.05 0.05 0.05 1.0"/>
+</material>
+
+<material name="tire_black">
+  <color rgba="0.05 0.05 0.05 1.0"/>
+</material>
+
+<material name="silver">
+  <color rgba="0.75 0.75 0.78 1.0"/>
+</material>
+
+<material name="rim_grey">
+  <color rgba="0.18 0.18 0.20 1.0"/>
 </material>
 
 <material name="blue">

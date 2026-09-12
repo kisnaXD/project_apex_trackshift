@@ -26,6 +26,7 @@ setup(
         (os.path.join('share', package_name, 'robots', 'eufs'), glob('robots/eufs/*')),
         (os.path.join('share', package_name, 'urdf'), glob('eufs_racecar/urdf/*')),
         (os.path.join('share', package_name, 'meshes'), glob('eufs_racecar/meshes/*')),
+        (os.path.join('share', package_name, 'materials', 'scripts'), glob('eufs_racecar/materials/scripts/*')),
     ] + [
         (os.path.join('share', package_name, 'models', os.path.relpath(os.path.dirname(path), 'eufs_racecar/models')), [path])
         for path in package_files('eufs_racecar/models')

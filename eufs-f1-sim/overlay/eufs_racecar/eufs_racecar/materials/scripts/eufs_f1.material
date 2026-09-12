@@ -1,0 +1,41 @@
+material EUFSF1/Silver
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.75 0.75 0.78 1.0
+      diffuse 0.75 0.75 0.78 1.0
+      specular 0.90 0.90 0.95 1.0 40
+      emissive 0.0 0.0 0.0 1.0
+    }
+  }
+}
+
+material EUFSF1/TireBlack
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.05 0.05 0.05 1.0
+      diffuse 0.05 0.05 0.05 1.0
+      specular 0.08 0.08 0.08 1.0 8
+      emissive 0.0 0.0 0.0 1.0
+    }
+  }
+}
+
+material EUFSF1/RimGrey
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.18 0.18 0.20 1.0
+      diffuse 0.18 0.18 0.20 1.0
+      specular 0.35 0.35 0.38 1.0 16
+      emissive 0.0 0.0 0.0 1.0
+    }
+  }
+}
