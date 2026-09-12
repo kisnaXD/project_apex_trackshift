@@ -1,0 +1,14 @@
+string schema_version
+string run_id
+uint64 epoch_id
+builtin_interfaces/Time stamp
+string snapshot_id
+string decision_id
+string trajectory_id
+builtin_interfaces/Time expires_at
+bool valid
+string validity_reason
+string source
+string frame_id
+string map_id
+string[] known_fields

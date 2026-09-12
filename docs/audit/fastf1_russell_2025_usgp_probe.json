@@ -1,0 +1,78 @@
+{
+  "fastf1_version": "3.8.3",
+  "event": "United States Grand Prix",
+  "year": 2025,
+  "session": "Race",
+  "driver": "RUS",
+  "driver_number": "63",
+  "classification": 6.0,
+  "total_laps": 56,
+  "eligible_clean_laps": 49,
+  "candidate_lap": 28,
+  "stint": 1.0,
+  "compound": "MEDIUM",
+  "lap_time_s": 100.499,
+  "candidate_selection": "median-time lap in stint with most eligible clean laps",
+  "car_samples": 378,
+  "position_samples": 394,
+  "speed_range_kmh": [
+    71.0,
+    310.0
+  ],
+  "car_columns": [
+    "Date",
+    "RPM",
+    "Speed",
+    "nGear",
+    "Throttle",
+    "Brake",
+    "DRS",
+    "Source",
+    "Time",
+    "SessionTime"
+  ],
+  "position_columns": [
+    "Date",
+    "Status",
+    "X",
+    "Y",
+    "Z",
+    "Source",
+    "Time",
+    "SessionTime"
+  ],
+  "car_median_sample_interval_s": 0.23999999999978172,
+  "car_max_sample_gap_s": 1.1610000000000582,
+  "car_nonincreasing_intervals": 0,
+  "position_median_sample_interval_s": 0.23999999999978172,
+  "position_max_sample_gap_s": 1.0789999999997235,
+  "position_nonincreasing_intervals": 0,
+  "artifact_sha256": {
+    "car_candidate_lap.csv": "156c96adcb89828327ba7c321b20f57e847a87eafcccb795b8e28028e532405c",
+    "position_candidate_lap.csv": "73e0a7946154f7d5f96c7fc8bf6e3e2dbee87140e428f2884765ec478d160634"
+  },
+  "dependency_versions": {
+    "fastf1": "3.8.3",
+    "pandas": "2.3.3",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3"
+  },
+  "probe_date": "2026-09-12",
+  "status": "data_available_candidate_not_yet_geometry_or_dynamics_validated",
+  "selection_filters": [
+    "RUS",
+    "no pit in/out laps",
+    "IsAccurate",
+    "TrackStatus equals 1",
+    "not deleted",
+    "LapNumber > 1",
+    "non-null LapTime"
+  ],
+  "local_raw_cache": ".tmp/controls-plan-fastf1-data/",
+  "limitations": [
+    "Selected candidate has sample gaps exceeding one second.",
+    "Raw position data is approximate and has not been registered to EUFS COTA.",
+    "Raw pace has not been validated against the EUFS plant.",
+    "Inherited optional host numerical modules produced binary compatibility warnings; export environment must be cleanly pinned."
+  ]
+}

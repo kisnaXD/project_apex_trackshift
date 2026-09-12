@@ -1,0 +1,14 @@
+ControlHeader header
+string candidate_id
+string state_snapshot_id
+string status
+string reason_code
+float64 time_cost_s
+float64 energy_cost_j
+float64 predicted_exit_progress_m
+float64 predicted_exit_energy_j
+float64 predicted_exit_uncertainty
+bool retention_feasible
+bool abort_available
+float64 coverage
+float64 computation_time_s

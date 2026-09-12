@@ -1,0 +1,13 @@
+{
+  "profile_id": "synthetic_benchmark_2026_energy_model",
+  "cases": [
+    {"name": "drive", "acceleration_mps2": 2.0, "mguk_force_n": 1500.0, "speed_mps": 20.0, "lateral_force_n": 0.0, "dt_s": 0.01},
+    {"name": "regen", "acceleration_mps2": -2.0, "mguk_force_n": -1500.0, "speed_mps": 20.0, "lateral_force_n": 0.0, "dt_s": 0.01},
+    {"name": "zero_speed", "acceleration_mps2": 0.0, "mguk_force_n": 0.0, "speed_mps": 0.0, "lateral_force_n": 0.0, "dt_s": 0.01},
+    {"name": "reserve", "acceleration_mps2": 1.0, "mguk_force_n": 5000.0, "speed_mps": 20.0, "stored_energy_j": 400000.0, "lateral_force_n": 0.0, "dt_s": 0.1},
+    {"name": "full_regen", "acceleration_mps2": -2.0, "mguk_force_n": -5000.0, "speed_mps": 20.0, "stored_energy_j": 4000000.0, "lateral_force_n": 0.0, "dt_s": 0.1},
+    {"name": "deploy_quota", "acceleration_mps2": 1.0, "mguk_force_n": 5000.0, "speed_mps": 0.0, "lap_deployed_j": 4000000.0, "lateral_force_n": 0.0, "dt_s": 0.1},
+    {"name": "hot", "acceleration_mps2": 2.0, "mguk_force_n": 5000.0, "speed_mps": 20.0, "temperature_k": 374.15, "lateral_force_n": 0.0, "dt_s": 0.1},
+    {"name": "worn", "acceleration_mps2": 2.0, "mguk_force_n": 5000.0, "speed_mps": 20.0, "tyre_wear": [1.0, 1.0, 1.0, 1.0], "lateral_force_n": 0.0, "dt_s": 0.1}
+  ]
+}

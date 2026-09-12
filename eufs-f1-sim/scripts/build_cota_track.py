@@ -206,7 +206,12 @@ def _extract_turn_svg(svg_text: str):
     block = re.search(r'<g id="コーナー番号">(.*?)</g>\s*<g id="DRS">', svg_text, re.S)
     if not block:
         return []
-    return [(float(x), float(y)) for x, y in re.findall(r'cx="([0-9.]+)" cy="([0-9.]+)"', block.group(1))]
+    unique = []
+    for x, y in re.findall(r'cx="([0-9.]+)" cy="([0-9.]+)"', block.group(1)):
+        point = (float(x), float(y))
+        if not any(math.hypot(point[0] - prior[0], point[1] - prior[1]) <= 1e-3 for prior in unique):
+            unique.append(point)
+    return unique
 
 
 def _polyline_s(xy):
@@ -657,10 +662,21 @@ def main():
             "notes": "Four big_orange cones on the orange F1 start/finish line (sector 1 start).",
         }
     ]
-    for turn_i, (sx, sy) in enumerate(turn_svg[:20], start=1):
+    projected_turns = []
+    for sx, sy in turn_svg:
         pt = (sx * scale - origin[0], -sy * scale - origin[1])
         idx = _nearest_index(geom["xy"], pt)
         sample = geom["sample"](geom["s_closed"][idx])
+        projected_turns.append((sample["s"], sample))
+    projected_turns.sort(key=lambda item: item[0])
+    if any(left[0] >= right[0] for left, right in zip(projected_turns, projected_turns[1:])):
+        raise SystemExit("COTA turn landmarks are not strictly ordered after projection")
+    # The SVG contains 40 circles (two painted circles per label), and its
+    # source order is not lap order: it lists 1–9, 12–20, 10, 11.  Deduplicate
+    # first, project all labels, sort by increasing map progress, then assign
+    # the canonical turn number.  This keeps event IDs tied to the repaired
+    # centerline order and avoids stale paired labels being numbered twice.
+    for turn_i, (_, sample) in enumerate(projected_turns, start=1):
         events.append(
             {
                 "id": f"turn_{turn_i}",

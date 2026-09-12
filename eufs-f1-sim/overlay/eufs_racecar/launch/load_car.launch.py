@@ -358,7 +358,7 @@ def _prepare_gazebo_env():
 def _spawn_nodes(
     namespace, entity, x, y, z, roll, pitch, yaw, forgez_mode, publish_tf,
     vehicle_model, command_mode, config_file, noise_config, pub_ground_truth, frame_prefix,
-    native_remap,
+    native_remap, hybrid_profile='legacy', native_hybrid=False,
 ):
     namespace_clean, _ns_path = _namespace_path(namespace)
     entity = entity or namespace_clean or 'eufs'
@@ -393,6 +393,8 @@ def _spawn_nodes(
             'frame_prefix': frame_prefix,
             'pub_ground_truth': str(pub_ground_truth).lower(),
             'native_remap': str(native_remap).lower(),
+            'hybrid_profile': hybrid_profile,
+            'native_hybrid': str(native_hybrid).lower(),
         },
     )
     robot_description = doc.toxml()
@@ -502,6 +504,13 @@ def _launch_stack(context, *args, **kwargs):
         paths = [p for p in environ.get('GAZEBO_PLUGIN_PATH', '').split(':') if p]
         if not any(glob(join(path, plugin)) for path in paths):
             raise RuntimeError(f'Requested DynamicBicycle plugin is unavailable: {plugin}')
+    hybrid_profile = _arg(context, 'hybridProfile') or 'legacy'
+    if hybrid_profile not in ('legacy', 'synthetic_low_speed', 'synthetic_benchmark'):
+        raise RuntimeError(
+            f"hybridProfile must be legacy, synthetic_low_speed or synthetic_benchmark, got {hybrid_profile!r}"
+        )
+    if hybrid_profile != 'legacy' and vehicle_model != 'DynamicBicycle':
+        raise RuntimeError('hybridProfile requires vehicleModel=DynamicBicycle')
     if forgez_mode == 'auto':
         forgez_mode_name, forgez_params = _forgez_defaults()
     else:
@@ -602,9 +611,12 @@ def _launch_stack(context, *args, **kwargs):
                 pub_ground_truth=pub_ground_truth,
                 frame_prefix='' if index == 0 else f'{namespace}/',
                 native_remap=index != 0,
+                hybrid_profile=hybrid_profile if index == 0 else 'legacy',
+                native_hybrid=hybrid_profile != 'legacy' and index == 0,
             ))
-        actions.extend([
-            Node(
+        if hybrid_profile == 'legacy' or index != 0:
+            actions.extend([
+              Node(
                 package='eufs_racecar',
                 executable='ackermann_cmd_bridge',
                 name=f'ackermann_cmd_bridge_{namespace}',
@@ -614,8 +626,8 @@ def _launch_stack(context, *args, **kwargs):
                     'use_sim_time': False,
                     'namespace': namespace,
                 }],
-            ),
-            Node(
+              ),
+              Node(
                 package='eufs_racecar',
                 executable='tyre_state_publisher',
                 name=f'tyre_state_publisher_{namespace}',
@@ -626,8 +638,8 @@ def _launch_stack(context, *args, **kwargs):
                     'namespace': namespace,
                     'lap_length_m': 5513.0,
                 }],
-            ),
-        ])
+              ),
+            ])
     return actions
 
 
@@ -639,6 +651,10 @@ def generate_launch_description():
         DeclareLaunchArgument('robot_name', default_value='eufs'),
         DeclareLaunchArgument('vehicleModel', default_value='DynamicBicycle'),
         DeclareLaunchArgument('commandMode', default_value='acceleration'),
+        DeclareLaunchArgument(
+            'hybridProfile', default_value='legacy',
+            description='Optional ego native hybrid profile; legacy keeps the stock battery stack.',
+        ),
         DeclareLaunchArgument(
             'vehicleModelConfig', default_value='',
             description='Vehicle YAML; defaults to the F1 DynamicBicycle config only in that mode.',

@@ -1,0 +1,10 @@
+ControlHeader header
+string candidate_id
+TrajectoryPoint[] points
+float64 max_acceleration_mps2
+float64 min_acceleration_mps2
+float64 max_steering_rad
+float64 max_steering_rate_radps
+float64 expiry_s
+bool feasible
+string infeasibility_reason

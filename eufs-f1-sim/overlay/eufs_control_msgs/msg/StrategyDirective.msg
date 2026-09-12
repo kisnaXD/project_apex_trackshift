@@ -1,0 +1,15 @@
+ControlHeader header
+string action
+string target_id
+string opportunity_id
+float64 corridor_left_m
+float64 corridor_right_m
+builtin_interfaces/Time permitted_after
+builtin_interfaces/Time permitted_until
+float64 deploy_budget_j
+float64 recovery_budget_j
+float64 minimum_exit_energy_j
+float64 marginal_energy_value
+string continuation
+string abort_conditions
+bool committed

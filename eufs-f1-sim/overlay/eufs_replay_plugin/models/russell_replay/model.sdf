@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <!-- This model intentionally has no EUFS vehicle, CAN, battery or controller plugin. -->
+  <model name="eufs2">
+    <static>true</static>
+    <link name="base_link">
+      <!-- This is a display-only static model.  It has no collision geometry,
+           so Gazebo contact response cannot perturb the reference pose. -->
+      <visual name="chassis">
+        <pose>3.28 0 0 0 0 3.141592653589793</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/chassis.STL</uri></mesh></geometry>
+      </visual>
+      <visual name="front_wing">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/front_wing.STL</uri></mesh></geometry>
+      </visual>
+      <visual name="rear_wing">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/rear_wing.STL</uri></mesh></geometry>
+      </visual>
+      <visual name="left_rear_wheel">
+        <pose>0 0.8221 0.3459 1.5708 0 0</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/left_rear_wheel.STL</uri></mesh></geometry>
+      </visual>
+      <visual name="right_rear_wheel">
+        <pose>0 -0.8221 0.3472 1.5708 0 0</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/right_rear_wheel.STL</uri></mesh></geometry>
+      </visual>
+      <visual name="left_front_wheel">
+        <pose>3.28 0.7495 0.345 1.5708 0 0</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/left_front_wheel.STL</uri></mesh></geometry>
+      </visual>
+      <visual name="right_front_wheel">
+        <pose>3.28 -0.7495 0.345 1.5708 0 0</pose>
+        <geometry><mesh><uri>file://REPLAY_MESH_DIR/right_front_wheel.STL</uri></mesh></geometry>
+      </visual>
+    </link>
+    <plugin name="eufs2_exact_russell_replay" filename="libeufs_replay_plugin.so">
+      <reference_file>REPLAY_REFERENCE_FILE</reference_file>
+      <reference_phase_s>0.0</reference_phase_s>
+      <loop>false</loop>
+      <frame_id>map</frame_id>
+      <child_frame_id>eufs2/base_link</child_frame_id>
+      <truth_topic>/eufs2/replay_truth</truth_topic>
+      <z_m>0.0</z_m>
+    </plugin>
+  </model>
+</sdf>

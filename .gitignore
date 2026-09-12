@@ -1,5 +1,12 @@
 # Local simulator artifacts and Python caches.
 .tmp/
+*.o
+*.obj
+*.so
+*.a
+*.dll
+*.dylib
+*.exe
 .pytest_cache/
 __pycache__/
 *.py[cod]

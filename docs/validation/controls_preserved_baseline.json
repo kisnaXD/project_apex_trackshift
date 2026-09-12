@@ -1,0 +1,34 @@
+{
+  "validation": "preserved-native-cota-lap",
+  "profile": "legacy DynamicBicycle unchanged",
+  "image": "eufs-f1-sim:pre-controls-20260912t183012z",
+  "plugin_sha256": "806b4d14fa991fd86da7bf6d9f8a259bd520864fb1c0efffa08417581babecaf",
+  "ros_domain_id": 42,
+  "gazebo_master_uri": "http://127.0.0.1:11365",
+  "summary": {
+    "completed": true,
+    "done": true,
+    "failure": null,
+    "external_override": false,
+    "sim_time": 485.0,
+    "wall_seconds": 496.8123594869976,
+    "progress_m": 5513.149923330518,
+    "route_length_m": 5512.99999987983,
+    "final_pose_map": {
+      "x": 3.320041492401362,
+      "y": -2.6550749219697036,
+      "yaw": -0.674555423722544
+    },
+    "final_vx": 0.0,
+    "final_vy": 0.0,
+    "final_clearance": 5.949998723012704,
+    "trace_csv": "/tmp/controls-baseline-lap.csv"
+  },
+  "minimum_sampled_footprint_clearance_m": 3.908169582511906,
+  "trace_rows": 4808,
+  "artifact_hashes": {
+    "controls-baseline-lap.json": "99127262cc54264cc179e6291773adb3450e69d4fb7ddd09131f02a6471f299b",
+    "controls-baseline-lap.csv": "1611e374edd4cd43eca7d84333fba3c2258f51fa3808be3e8a39768e201c313a"
+  },
+  "limits": "Single-car preserved binary regression; not validation of hybrid plant, MPC or overtaking."
+}

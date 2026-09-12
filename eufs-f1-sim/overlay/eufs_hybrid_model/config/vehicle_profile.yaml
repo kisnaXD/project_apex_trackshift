@@ -1,0 +1,9 @@
+# Vehicle-linked source values only. Electrical and tyre state values are
+# synthetic benchmark parameters until a calibrated powertrain is supplied.
+profile_id: vehicle_linked_synthetic_hybrid
+vehicle_source: overlay/eufs_racecar/robots/eufs/f1_dynamic_bicycle.yaml
+mass_kg: 788.0
+drag_coefficient_n_per_mps2: 0.8269
+wheel_radius_m: 0.346
+gravity_mps2: 9.81
+synthetic_electrical_model: true

@@ -1,0 +1,14 @@
+ControlHeader header
+VehicleState ego
+EnergyState energy
+OpponentBelief opponent
+TyreState tyres
+float64 progress_m
+float64 unwrapped_progress_m
+uint32 lap
+float64 track_length_m
+string rules_id
+string scenario_id
+string event_context
+bool ready
+bool reset

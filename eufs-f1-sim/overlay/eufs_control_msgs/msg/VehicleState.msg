@@ -1,0 +1,15 @@
+ControlHeader header
+geometry_msgs/Pose pose
+geometry_msgs/Twist twist
+geometry_msgs/Accel accel
+float64 world_vx_mps
+float64 world_vy_mps
+float64 track_speed_mps
+float64 lateral_speed_mps
+float64 steering_rad
+float64[36] covariance_pose
+float64[36] covariance_twist
+bool pose_valid
+bool twist_valid
+bool acceleration_valid
+bool steering_valid

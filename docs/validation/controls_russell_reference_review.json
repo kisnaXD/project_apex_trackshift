@@ -1,0 +1,30 @@
+{
+  "status": "provisional_offline_reference_review",
+  "driver": "George Russell",
+  "driver_number": 63,
+  "year": 2025,
+  "event": "United States Grand Prix",
+  "session": "Race",
+  "lap": 28,
+  "path_fidelity": "Frozen COTA layout-reference adaptation; not an exact historical racing line",
+  "artifact_path": ".tmp/russell-reference-review.json",
+  "artifact_sha256": "8920ed17dd4e41bfef6c5a2e37cd4947aa85e5c8c1d194fbcb8f6dd307327d52",
+  "sample_count": 3677,
+  "lap_length_m": 5512.99999987983,
+  "adapted_duration_s": 488.26359902452714,
+  "maximum_speed_mps": 15.0,
+  "minimum_interval_acceleration_mps2": -1.2000000000000133,
+  "maximum_interval_acceleration_mps2": 1.0000000000000142,
+  "seam_speed_difference_mps": 0.0,
+  "sampled_body_corner_checks": 14708,
+  "minimum_sampled_body_clearance_m": 5.1178201548945275,
+  "maximum_sampled_progress_derivative_speed_error_mps": 7.061069950964338e-08,
+  "maximum_sampled_knot_progress_or_speed_error": 4.547473508864641e-13,
+  "focused_exporter_and_logging_tests_passed": 16,
+  "remaining_gates": [
+    "Strict runtime validation and final production artifact provenance",
+    "Physics-tick exact playback and equal-timestamp visual/truth conformance",
+    "Pause/reset/completion behavior",
+    "Integrated ego controls and swept two-car evaluation"
+  ]
+}

@@ -15,8 +15,14 @@
   <xacro:arg name="native_remap" default="false"/>
   <xacro:arg name="pub_ground_truth" default="true"/>
   <xacro:arg name="noise_config" default=""/>
+  <xacro:arg name="hybrid_profile" default="legacy"/>
+  <xacro:arg name="native_hybrid" default="false"/>
 
   <xacro:include filename="$(find eufs_racecar)/urdf/racecar.xacro"/>
-  <xacro:include filename="$(find eufs_racecar)/urdf/forgez_battery.gazebo"/>
+  <!-- Native hybrid owns energy and tyre telemetry.  Keep the historical
+       Forgez stack for legacy/Ackermann launches only. -->
+  <xacro:unless value="$(arg native_hybrid)">
+    <xacro:include filename="$(find eufs_racecar)/urdf/forgez_battery.gazebo"/>
+  </xacro:unless>
 
 </robot>

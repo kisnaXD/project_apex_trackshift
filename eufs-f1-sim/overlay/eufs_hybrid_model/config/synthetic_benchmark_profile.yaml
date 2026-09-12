@@ -1,0 +1,11 @@
+# Explicit synthetic benchmark; this is not a 2026 FIA powertrain claim.
+profile_id: synthetic_benchmark_2026_energy_model
+vehicle_source: overlay/eufs_racecar/robots/eufs/f1_dynamic_bicycle.yaml
+rules_profile: synthetic_energy_caps
+calibrated_fia_claim: false
+battery_capacity_j: 4000000.0
+reserve_energy_j: 400000.0
+mguk_max_power_w: 120000.0
+mguk_regen_power_w: 80000.0
+max_deploy_per_lap_j: 4000000.0
+max_recovery_per_lap_j: 2000000.0

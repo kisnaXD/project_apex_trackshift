@@ -1,0 +1,16 @@
+ControlHeader header
+string owner
+string solver_status
+string fallback_reason
+float64 tracking_error_m
+float64 heading_error_rad
+float64 speed_error_mps
+float64 computation_time_s
+float64 constraint_residual
+float64 requested_acceleration_mps2
+float64 requested_steering_rad
+float64 delivered_acceleration_mps2
+float64 delivered_steering_rad
+bool ready
+bool stale
+bool derated

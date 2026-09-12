@@ -22,6 +22,7 @@
 <xacro:arg name="frame_prefix" default="" />
 <xacro:arg name="pub_ground_truth" default="true" />
 <xacro:arg name="native_remap" default="false" />
+<xacro:arg name="hybrid_profile" default="legacy" />
 
 <!-- Classic paints STL visuals from <material>NAME</material> looked up in
      gazebo.material (entrypoint appends EUFSF1/Silver and EUFSF1/TireBlack). -->
@@ -274,6 +275,7 @@
     <controlDelay>0.2</controlDelay>
     <steeringLockTime>1</steeringLockTime>
     <pubGroundTruth>$(arg pub_ground_truth)</pubGroundTruth>
+    <hybrid_profile>$(arg hybrid_profile)</hybrid_profile>
   </plugin>
 </gazebo>
 </xacro:unless>

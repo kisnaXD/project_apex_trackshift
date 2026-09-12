@@ -1,0 +1,14 @@
+ControlHeader header
+uint64 command_sequence
+string owner
+float64 requested_acceleration_mps2
+float64 requested_steering_rad
+float64 requested_mguk_force_n
+float64 delivered_acceleration_mps2
+float64 delivered_steering_rad
+float64 delivered_mguk_force_n
+float64 friction_brake_force_n
+float64 available_drive_force_n
+float64 available_regen_force_n
+string derate_reason
+bool valid

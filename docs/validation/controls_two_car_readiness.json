@@ -1,0 +1,42 @@
+{
+  "cars": {
+    "eufs": {
+      "odom_frame": "odom",
+      "body_frame": "base_link",
+      "as_state": 0,
+      "map_to_odom_translation": [
+        -5.466414368314778,
+        1.1702108320072813
+      ],
+      "command_publishers": 0
+    },
+    "eufs2": {
+      "odom_frame": "eufs2/odom",
+      "body_frame": "eufs2/base_link",
+      "as_state": 0,
+      "map_to_odom_translation": [
+        -7.029628245236997,
+        8.822275765893876
+      ],
+      "command_publishers": 0
+    }
+  },
+  "mission_responses": {
+    "eufs": "eufs_msgs.srv.SetCanState_Response(success=True, message='')",
+    "eufs2": "eufs_msgs.srv.SetCanState_Response(success=True, message='')"
+  },
+  "as_driving_constant": 2,
+  "observed_can_readiness": {
+    "eufs": {
+      "as_state": 0,
+      "ami_state": 21,
+      "ready": true
+    },
+    "eufs2": {
+      "as_state": 0,
+      "ami_state": 21,
+      "ready": true
+    }
+  },
+  "ready": true
+}

@@ -1,0 +1,13 @@
+builtin_interfaces/Time stamp
+float64 x_m
+float64 y_m
+float64 yaw_rad
+float64 progress_m
+float64 lateral_m
+float64 speed_mps
+float64 curvature_1pm
+float64 corridor_left_m
+float64 corridor_right_m
+float64 energy_reference_j
+float64 acceleration_mps2
+float64 steering_rad
