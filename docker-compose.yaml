@@ -1,0 +1,30 @@
+services:
+  apex_2d:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apex2d_fastf1_race_control
+    ports:
+      - "8501:8501"
+      - "8765:8765"
+      - "8766:8766"
+    volumes:
+      - .:/app
+      - ./telemetry_logs:/app/telemetry_logs
+    environment:
+      - PYTHONPATH=/app
+      - STREAMLIT_SERVER_PORT=8501
+      - FASTF1_CACHE_DIR=/app/telemetry_logs/fastf1_cache
+      - F1SIM_LOG_DIR=/app/telemetry_logs
+      - F1SIM_SESSION_YEAR=2026
+      - F1SIM_SESSION_CIRCUIT=Silverstone
+      - F1SIM_SESSION_TYPE=R
+      - F1SIM_EGO_DRIVER=BEA
+      - F1SIM_REPLAY_DT=0.1
+      - F1SIM_CAR_MODEL_PATH=assets/haas_bearman.glb
+      - F1SIM_CAR_MODEL_SCALE=1.0
+      - F1SIM_CAR_MODEL_YAW_DEG=0
+      - F1SIM_MODEL_SERVER_PORT=8766
+      - F1SIM_MODEL_PUBLIC_BASE_URL=http://localhost:8766
+    command: ["streamlit", "run", "streamlit_app/app.py"]
+    restart: unless-stopped

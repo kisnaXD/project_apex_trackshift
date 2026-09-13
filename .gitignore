@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.telemetry_logs/
+assets/haas_bearman.glb
+telemetry_logs/
